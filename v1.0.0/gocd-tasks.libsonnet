@@ -4,4 +4,7 @@
       command: true,
     },
   },
+  script(input):: {
+    script: input,
+  },
 }

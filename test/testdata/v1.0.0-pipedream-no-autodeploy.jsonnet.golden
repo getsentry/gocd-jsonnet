@@ -1,4 +1,92 @@
 {
+   "example-monitor.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-monitor": {
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git",
+                  "shallow_clone": true
+               },
+               "upstream_pipeline": {
+                  "pipeline": "deploy-example",
+                  "stage": "pipeline-complete"
+               }
+            },
+            "region": "monitor",
+            "stages": [
+               {
+                  "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "approval": {
+                        "allow_only_on_success": true,
+                        "type": "success"
+                     },
+                     "jobs": {
+                        "continue": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "example-us.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-us": {
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git",
+                  "shallow_clone": true
+               },
+               "upstream_pipeline": {
+                  "pipeline": "deploy-example-monitor",
+                  "stage": "pipeline-complete"
+               }
+            },
+            "region": "us",
+            "stages": [
+               {
+                  "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "approval": {
+                        "allow_only_on_success": true,
+                        "type": "success"
+                     },
+                     "jobs": {
+                        "continue": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
    "example.yaml": {
       "format_version": 10,
       "pipelines": {

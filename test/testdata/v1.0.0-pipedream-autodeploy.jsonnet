@@ -14,9 +14,8 @@ local pipedream_config = {
 };
 
 local sample = {
-  pipeline(region, config):: {
+  pipeline(region):: {
     region: region,
-    config: config,
     materials: {
       example_repo: {
         git: 'git@github.com:getsentry/example.git',
