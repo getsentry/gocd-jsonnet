@@ -1,0 +1,9 @@
+{
+   "tasks": [
+      {
+         "exec": {
+            "command": true
+         }
+      }
+   ]
+}
