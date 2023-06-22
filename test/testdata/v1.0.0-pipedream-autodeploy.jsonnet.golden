@@ -1,0 +1,37 @@
+{
+   "example.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example": {
+            "group": "example",
+            "lock_behavior": "unlockWhenFinished",
+            "materials": {
+               "init_repo": {
+                  "branch": "master",
+                  "destination": "init",
+                  "git": "git@github.com:getsentry/init.git",
+                  "shallow_clone": true
+               }
+            },
+            "stages": [
+               {
+                  "pipeline-complete": {
+                     "approval": { },
+                     "jobs": {
+                        "start": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   }
+}
