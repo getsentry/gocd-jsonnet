@@ -1,0 +1,17 @@
+{
+  "name": "gocd-jsonnet",
+  "description": "Jsonnet libraries to help with GoCD",
+  "type": "module",
+  "scripts": {
+    "test": "ava"
+  },
+  "devDependencies": {
+    "ava": "^5.3.0"
+  },
+  "ava": {
+    "files": [
+			"test/**/*",
+			"!test/utils"
+		]
+  }
+}

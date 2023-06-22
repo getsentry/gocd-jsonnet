@@ -1,0 +1,7 @@
+{
+  noop:: {
+    exec: {
+      command: true,
+    },
+  },
+}
