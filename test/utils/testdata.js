@@ -17,5 +17,9 @@ export async function assert_testdata(t, filename) {
 
   const wantBuff = await fs.readFile(goldenPath);
   const want = wantBuff.toString();
+
+  // Deep Equal with give more helpful diffs
+  t.deepEqual(JSON.parse(got), JSON.parse(want));
+  // We still want the golden to match exactly
   t.is(got, want);
 }
