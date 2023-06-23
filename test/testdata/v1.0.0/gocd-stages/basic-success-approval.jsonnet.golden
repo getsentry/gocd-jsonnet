@@ -4,6 +4,7 @@
          "allow_only_on_success": true,
          "type": "success"
       },
+      "fetch_materials": true,
       "jobs": {
          "example": {
             "tasks": [ ]

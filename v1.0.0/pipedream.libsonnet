@@ -23,7 +23,10 @@ local pipedream_trigger_pipeline(pipedream_config) =
           materials: materials,
           lock_behavior: 'unlockWhenFinished',
           stages: [
-            gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], {approval: approval_type}),
+            gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], {
+              approval: approval_type,
+              fetch_materials: false,
+            }),
           ],
         },
       },
@@ -52,11 +55,11 @@ local generate_pipeline(pipedream_config, region, pipeline_fn) =
     [
       // Ready runs when the upstream pipeline is complete, indicating that
       // the pipedream has progressed to the next stage.
-      gocd_stages.basic("ready", [gocd_tasks.noop]),
+      gocd_stages.basic("ready", [gocd_tasks.noop], {fetch_materials: false}),
 
       // The wait stage is used to wait for manual approval before continuing/
       // running the actual pipeline.
-      gocd_stages.basic("wait", [gocd_tasks.noop], {approval: 'manual'}),
+      gocd_stages.basic("wait", [gocd_tasks.noop], {approval: 'manual', fetch_materials: false}),
     ]
   else
     [];
@@ -73,7 +76,7 @@ local generate_pipeline(pipedream_config, region, pipeline_fn) =
           },
         },
         stages: prepend_stages + stages + [
-          gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], {approval: 'success'}),
+          gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], {approval: 'success', fetch_materials: false}),
         ],
       },
     },

@@ -1,5 +1,6 @@
 {
    "example": {
+      "fetch_materials": true,
       "jobs": {
          "example": {
             "tasks": [ ]

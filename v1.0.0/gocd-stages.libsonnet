@@ -13,9 +13,15 @@
     else
       null;
 
+    local fetch_materials = if std.objectHas(opts, 'fetch_materials') then
+      opts.fetch_materials
+    else
+      true;
+
   {
     [name]: {
       [if approval != null then 'approval' else null]: approval,
+      [if fetch_materials == true then 'fetch_materials' else null]: fetch_materials,
       jobs: {
         [name]: {
           tasks: tasks,
