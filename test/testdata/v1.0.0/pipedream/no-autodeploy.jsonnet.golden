@@ -11,7 +11,7 @@
                   "shallow_clone": true
                },
                "upstream_pipeline": {
-                  "pipeline": "deploy-example",
+                  "pipeline": "deploy-example-us",
                   "stage": "pipeline-complete"
                }
             },
@@ -88,7 +88,7 @@
                   "shallow_clone": true
                },
                "upstream_pipeline": {
-                  "pipeline": "deploy-example-monitor",
+                  "pipeline": "deploy-example",
                   "stage": "pipeline-complete"
                }
             },
