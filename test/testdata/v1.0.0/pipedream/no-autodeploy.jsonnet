@@ -1,8 +1,9 @@
-local pipedream = import '../../v1.0.0/pipedream.libsonnet';
+local pipedream = import '../../../../v1.0.0/pipedream.libsonnet';
 
 local pipedream_config = {
   name: 'example',
-  auto_deploy: true,
+  auto_deploy: false,
+  auto_pipeline_progression: false,
   materials: {
     init_repo: {
       git: 'git@github.com:getsentry/init.git',

@@ -6,7 +6,6 @@ export async function assert_testdata(t, filename) {
   const gotBuff = execSync(`jsonnet test/testdata/${filename}`);
   const got = gotBuff.toString();
 
-
   const goldenPath = path.join('test', 'testdata', `${filename}.golden`);
   try {
     await fs.stat(goldenPath)

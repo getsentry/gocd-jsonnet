@@ -11,12 +11,45 @@
                   "shallow_clone": true
                },
                "upstream_pipeline": {
-                  "pipeline": "deploy-example",
+                  "pipeline": "deploy-example-us",
                   "stage": "pipeline-complete"
                }
             },
             "region": "monitor",
             "stages": [
+               {
+                  "ready": {
+                     "jobs": {
+                        "ready": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "wait": {
+                     "approval": {
+                        "type": "manual"
+                     },
+                     "jobs": {
+                        "wait": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
                {
                   "example_stage": { }
                },
@@ -27,7 +60,7 @@
                         "type": "success"
                      },
                      "jobs": {
-                        "continue": {
+                        "pipeline-complete": {
                            "tasks": [
                               {
                                  "exec": {
@@ -55,12 +88,45 @@
                   "shallow_clone": true
                },
                "upstream_pipeline": {
-                  "pipeline": "deploy-example-monitor",
+                  "pipeline": "deploy-example",
                   "stage": "pipeline-complete"
                }
             },
             "region": "us",
             "stages": [
+               {
+                  "ready": {
+                     "jobs": {
+                        "ready": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "wait": {
+                     "approval": {
+                        "type": "manual"
+                     },
+                     "jobs": {
+                        "wait": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
                {
                   "example_stage": { }
                },
@@ -71,7 +137,7 @@
                         "type": "success"
                      },
                      "jobs": {
-                        "continue": {
+                        "pipeline-complete": {
                            "tasks": [
                               {
                                  "exec": {
@@ -104,9 +170,11 @@
             "stages": [
                {
                   "pipeline-complete": {
-                     "approval": { },
+                     "approval": {
+                        "type": "manual"
+                     },
                      "jobs": {
-                        "start": {
+                        "pipeline-complete": {
                            "tasks": [
                               {
                                  "exec": {
