@@ -3,6 +3,7 @@
       "format_version": 10,
       "pipelines": {
          "region-deploy-example-monitor": {
+            "group": "example-region-deployments",
             "materials": {
                "example_repo": {
                   "branch": "master",
@@ -80,6 +81,7 @@
       "format_version": 10,
       "pipelines": {
          "region-deploy-example-us": {
+            "group": "example-region-deployments",
             "materials": {
                "example_repo": {
                   "branch": "master",
