@@ -1,5 +1,5 @@
-local gocd_tasks = import './gocd-tasks.libsonnet';
 local gocd_stages = import './gocd-stages.libsonnet';
+local gocd_tasks = import './gocd-tasks.libsonnet';
 
 local REGIONS = ['us', 'monitor'];
 local FINAL_STAGE_NAME = 'pipeline-complete';
@@ -22,7 +22,7 @@ local pipedream_trigger_pipeline(pipedream_config) =
           materials: materials,
           lock_behavior: 'unlockWhenFinished',
           stages: [
-            gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], {approval: approval_type}),
+            gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], { approval: approval_type }),
           ],
         },
       },
@@ -51,11 +51,11 @@ local generate_pipeline(pipedream_config, region, pipeline_fn) =
     [
       // Ready runs when the upstream pipeline is complete, indicating that
       // the pipedream has progressed to the next stage.
-      gocd_stages.basic("ready", [gocd_tasks.noop]),
+      gocd_stages.basic('ready', [gocd_tasks.noop]),
 
       // The wait stage is used to wait for manual approval before continuing/
       // running the actual pipeline.
-      gocd_stages.basic("wait", [gocd_tasks.noop], {approval: 'manual'}),
+      gocd_stages.basic('wait', [gocd_tasks.noop], { approval: 'manual' }),
     ]
   else
     [];
@@ -72,7 +72,7 @@ local generate_pipeline(pipedream_config, region, pipeline_fn) =
           },
         },
         stages: prepend_stages + stages + [
-          gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], {approval: 'success'}),
+          gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], { approval: 'success' }),
         ],
       },
     },

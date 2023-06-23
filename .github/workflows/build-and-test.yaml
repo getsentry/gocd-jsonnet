@@ -30,9 +30,9 @@ jobs:
       - name: Test
         run: npm run test
 
-      - name: Format
-        run: make fmt-ci
-
-      - name: Lint
-        run: make lint
-
+      - uses: getsentry/action-gocd-jsonnet@v0
+        with:
+          jb-install: true
+          check-for-changes: false
+          jsonnet-dir: .
+          generated-dir: ./generated-pipelines
