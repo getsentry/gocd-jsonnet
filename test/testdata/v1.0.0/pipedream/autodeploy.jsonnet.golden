@@ -27,7 +27,7 @@
                         "type": "success"
                      },
                      "jobs": {
-                        "continue": {
+                        "pipeline-complete": {
                            "tasks": [
                               {
                                  "exec": {
@@ -71,7 +71,7 @@
                         "type": "success"
                      },
                      "jobs": {
-                        "continue": {
+                        "pipeline-complete": {
                            "tasks": [
                               {
                                  "exec": {
@@ -104,11 +104,8 @@
             "stages": [
                {
                   "pipeline-complete": {
-                     "approval": {
-                        "type": "manual"
-                     },
                      "jobs": {
-                        "start": {
+                        "pipeline-complete": {
                            "tasks": [
                               {
                                  "exec": {

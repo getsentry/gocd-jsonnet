@@ -2,8 +2,9 @@ import test from 'ava';
 import {assert_testdata} from '../utils/testdata.js';
 
 const files = [
-  'v1.0.0-pipedream-no-autodeploy.jsonnet',
-  'v1.0.0-pipedream-autodeploy.jsonnet',
+  'v1.0.0/pipedream/no-autodeploy.jsonnet',
+  'v1.0.0/pipedream/autodeploy.jsonnet',
+  'v1.0.0/pipedream/minimal-config.jsonnet',
 ];
 for (const f of files) {
   test(`render ${f}`, async t => {
