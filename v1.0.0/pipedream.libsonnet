@@ -5,8 +5,7 @@ local REGIONS = ['us', 'monitor'];
 local FINAL_STAGE_NAME = 'pipeline-complete';
 
 local pipeline_name(name, region=null) =
-  local suffix = if region != null then '-' + region else '';
-  'deploy-' + name + suffix;
+  if region != null then 'region-deploy-' + name + '-' + region else 'deploy-' + name;
 
 local pipedream_trigger_pipeline(pipedream_config) =
   local name = pipedream_config.name;
