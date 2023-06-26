@@ -67,7 +67,7 @@ local generate_pipeline(pipedream_config, region, pipeline_fn) =
       [pipeline_name(service_name, region)]+: {
         group: service_name + '-region-deployments',
         materials+: {
-          upstream_pipeline: {
+          [upstream_pipeline + '-' + FINAL_STAGE_NAME]: {
             pipeline: upstream_pipeline,
             stage: FINAL_STAGE_NAME,
           },
