@@ -1,3 +1,8 @@
+/**
+
+This library is a set of helpers for building GoCD pipelines.
+
+*/
 {
   basic(name, tasks, opts={})::
     local approval = if std.objectHas(opts, 'approval') then
