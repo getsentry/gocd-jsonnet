@@ -11,7 +11,7 @@
                   "git": "git@github.com:getsentry/example.git",
                   "shallow_clone": true
                },
-               "upstream_pipeline": {
+               "region-deploy-example-us-pipeline-complete": {
                   "pipeline": "region-deploy-example-us",
                   "stage": "pipeline-complete"
                }
@@ -50,15 +50,15 @@
          "region-deploy-example-us": {
             "group": "example-region-deployments",
             "materials": {
+               "deploy-example-pipeline-complete": {
+                  "pipeline": "deploy-example",
+                  "stage": "pipeline-complete"
+               },
                "example_repo": {
                   "branch": "master",
                   "destination": "example",
                   "git": "git@github.com:getsentry/example.git",
                   "shallow_clone": true
-               },
-               "upstream_pipeline": {
-                  "pipeline": "deploy-example",
-                  "stage": "pipeline-complete"
                }
             },
             "region": "us",
