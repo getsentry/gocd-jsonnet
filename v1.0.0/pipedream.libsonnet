@@ -38,7 +38,7 @@ local pipedream_trigger_pipeline(pipedream_config) =
       pipelines: {
         [pipeline_name(name)]: {
           group: name,
-          display_order_weight: std.length(REGIONS) + 1,
+          display_order: 0,
           materials: materials,
           lock_behavior: 'unlockWhenFinished',
           stages: [
@@ -88,7 +88,7 @@ local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
     pipelines+: {
       [pipeline_name(service_name, region)]+: {
         group: service_name,
-        display_order_weight: weight,
+        display_order: weight,
         materials+: {
           [upstream_pipeline + '-' + FINAL_STAGE_NAME]: {
             pipeline: upstream_pipeline,
@@ -106,7 +106,8 @@ local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
 // for each region.
 local get_service_pipelines(pipedream_config, pipeline_fn) =
   {
-    [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: generate_pipeline(pipedream_config, REGIONS[i], std.length(REGIONS) - i, pipeline_fn)
+    // The weight is i + 1 to account for the trigger pipeline
+    [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: generate_pipeline(pipedream_config, REGIONS[i], i + 1, pipeline_fn)
     for i in std.range(0, std.length(REGIONS) - 1)
   };
 
