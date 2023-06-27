@@ -22,7 +22,7 @@ local REGIONS = ['us', 'monitor'];
 local FINAL_STAGE_NAME = 'pipeline-complete';
 
 local pipeline_name(name, region=null) =
-  if region != null then 'region-deploy-' + name + '-' + region else 'deploy-' + name;
+  if region != null then 'deploy-' + name + '-' + region else 'deploy-' + name;
 
 // The "trigger pipeline" is a pipeline that doesn't do anything special,
 // but it serves as a nice way to start the pipedream for end users.
@@ -86,7 +86,7 @@ local generate_pipeline(pipedream_config, region, pipeline_fn) =
   service_pipeline {
     pipelines+: {
       [pipeline_name(service_name, region)]+: {
-        group: service_name + '-region-deployments',
+        group: service_name + '-regions',
         materials+: {
           [upstream_pipeline + '-' + FINAL_STAGE_NAME]: {
             pipeline: upstream_pipeline,

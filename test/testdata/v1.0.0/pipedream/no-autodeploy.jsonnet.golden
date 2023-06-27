@@ -2,18 +2,18 @@
    "example-monitor.yaml": {
       "format_version": 10,
       "pipelines": {
-         "region-deploy-example-monitor": {
-            "group": "example-region-deployments",
+         "deploy-example-monitor": {
+            "group": "example-regions",
             "materials": {
+               "deploy-example-us-pipeline-complete": {
+                  "pipeline": "deploy-example-us",
+                  "stage": "pipeline-complete"
+               },
                "example_repo": {
                   "branch": "master",
                   "destination": "example",
                   "git": "git@github.com:getsentry/example.git",
                   "shallow_clone": true
-               },
-               "region-deploy-example-us-pipeline-complete": {
-                  "pipeline": "region-deploy-example-us",
-                  "stage": "pipeline-complete"
                }
             },
             "region": "monitor",
@@ -80,8 +80,8 @@
    "example-us.yaml": {
       "format_version": 10,
       "pipelines": {
-         "region-deploy-example-us": {
-            "group": "example-region-deployments",
+         "deploy-example-us": {
+            "group": "example-regions",
             "materials": {
                "deploy-example-pipeline-complete": {
                   "pipeline": "deploy-example",
