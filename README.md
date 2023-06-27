@@ -12,6 +12,25 @@ jb install https://github.com/getsentry/gocd-jsonnet.git/v1.0.0@main
 
 ## `pipedream.libsonnet`
 
+This libraries main purpose is to generate a set of pipelines that constitute
+a pipedream.
+
+"pipedream" is what we're calling the overall deployment process for a service
+at sentry, where that service is expected to be deployed to multiple regions.
+
+The entry point for this library is the `render()` function which takes
+some configuration and a callback function. The callback function is expected
+to return a pipeline definition for a given region.
+
+Pipedream will name the returned pipeline, add an upstream pipeline material
+and a final stage. The upstream material and final stage is needed to make GoCD
+chain the pipelines together.
+
+The end result will be a pipeline `deploy-<service name>` that starts the
+run of each pipeline, and a pipeline for each region.
+
+### Example Usage
+
 ```jsonnet
 local pipedream = import 'github.com/getsentry/gocd-jsonnet/v1.0.0/pipedream.libsonnet';
 

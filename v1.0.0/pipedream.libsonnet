@@ -1,3 +1,20 @@
+/**
+
+This libraries main purpose is to generate a set of pipelines that constitute
+a pipedream.
+
+"pipedream" is what we're calling the overall deployment process for a service
+at sentry, where that service is expected to be deployed to multiple regions.
+
+The entry point for this library is the `render()` function which takes
+some configuration and a callback function. The callback function is expected
+to return a pipeline definition for a given region.
+
+Pipedream will name the returned pipeline, add an upstream pipeline material
+and a final stage. The upstream material and final stage is to make GoCD
+chain the pipelines together.
+
+*/
 local gocd_stages = import './gocd-stages.libsonnet';
 local gocd_tasks = import './gocd-tasks.libsonnet';
 
@@ -7,6 +24,8 @@ local FINAL_STAGE_NAME = 'pipeline-complete';
 local pipeline_name(name, region=null) =
   if region != null then 'region-deploy-' + name + '-' + region else 'deploy-' + name;
 
+// The "trigger pipeline" is a pipeline that doesn't do anything special,
+// but it serves as a nice way to start the pipedream for end users.
 local pipedream_trigger_pipeline(pipedream_config) =
   local name = pipedream_config.name;
   local materials = pipedream_config.materials;
@@ -29,6 +48,8 @@ local pipedream_trigger_pipeline(pipedream_config) =
     },
   };
 
+// generate_pipeline will call the pipeline callback function, and then
+// name the pipeline, add an upstream material, and append a final stage.
 local generate_pipeline(pipedream_config, region, pipeline_fn) =
   // Get previous region's pipeline name
   local service_name = pipedream_config.name;
@@ -79,6 +100,8 @@ local generate_pipeline(pipedream_config, region, pipeline_fn) =
     },
   };
 
+// get_service_pipelines iterates over each region and generates the pipeline
+// for each region.
 local get_service_pipelines(pipedream_config, pipeline_fn) =
   {
     [pipedream_config.name + '-' + region + '.yaml']: generate_pipeline(pipedream_config, region, pipeline_fn)
@@ -86,6 +109,7 @@ local get_service_pipelines(pipedream_config, pipeline_fn) =
   };
 
 {
+  // render will generate the trigger pipeline and all the region pipelines.
   render(pipedream_config, pipeline_fn)::
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
     local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn);
