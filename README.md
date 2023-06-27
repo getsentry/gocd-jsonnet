@@ -79,7 +79,7 @@ local sample = {
 pipedream.render(pipedream_config, sample.pipeline)
 ```
 
-## gocd-tasks
+## `gocd-tasks.libsonnet`
 
 The tasks library is a simple helper to simplify common tasks:
 
@@ -98,7 +98,7 @@ local tasks = [
 ];
 ```
 
-## gocd-stages
+## `gocd-stages.libsonnet`
 
 The stages library provides helper methods to define a stage.
 
