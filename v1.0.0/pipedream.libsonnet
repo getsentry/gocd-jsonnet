@@ -38,6 +38,7 @@ local pipedream_trigger_pipeline(pipedream_config) =
       pipelines: {
         [pipeline_name(name)]: {
           group: name,
+          display_order_weight: std.length(REGIONS) + 1,
           materials: materials,
           lock_behavior: 'unlockWhenFinished',
           stages: [
@@ -50,7 +51,7 @@ local pipedream_trigger_pipeline(pipedream_config) =
 
 // generate_pipeline will call the pipeline callback function, and then
 // name the pipeline, add an upstream material, and append a final stage.
-local generate_pipeline(pipedream_config, region, pipeline_fn) =
+local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
   // Get previous region's pipeline name
   local service_name = pipedream_config.name;
   local index = std.find(region, REGIONS)[0];
@@ -86,7 +87,8 @@ local generate_pipeline(pipedream_config, region, pipeline_fn) =
   service_pipeline {
     pipelines+: {
       [pipeline_name(service_name, region)]+: {
-        group: service_name + '-regions',
+        group: service_name,
+        display_order_weight: weight,
         materials+: {
           [upstream_pipeline + '-' + FINAL_STAGE_NAME]: {
             pipeline: upstream_pipeline,
@@ -104,8 +106,8 @@ local generate_pipeline(pipedream_config, region, pipeline_fn) =
 // for each region.
 local get_service_pipelines(pipedream_config, pipeline_fn) =
   {
-    [pipedream_config.name + '-' + region + '.yaml']: generate_pipeline(pipedream_config, region, pipeline_fn)
-    for region in REGIONS
+    [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: generate_pipeline(pipedream_config, REGIONS[i], std.length(REGIONS) - i, pipeline_fn)
+    for i in std.range(0, std.length(REGIONS) - 1)
   };
 
 {

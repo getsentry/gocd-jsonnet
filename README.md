@@ -112,3 +112,11 @@ gocdstages.basic('example-stage', [gocdtasks.noop], {approval: 'manual'})
 # A single job stage, with a noop task and allow only on success approval
 gocdstages.basic('example-stage', [gocdtasks.noop], {approval: 'success'})
 ```
+
+## Development
+
+Run formatting, lint and tests using make:
+
+```shell
+make
+```
