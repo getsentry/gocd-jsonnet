@@ -3,7 +3,8 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-monitor": {
-            "group": "example-regions",
+            "display_order_weight": 1,
+            "group": "example",
             "materials": {
                "deploy-example-us-pipeline-complete": {
                   "pipeline": "deploy-example-us",
@@ -81,7 +82,8 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-us": {
-            "group": "example-regions",
+            "display_order_weight": 2,
+            "group": "example",
             "materials": {
                "deploy-example-pipeline-complete": {
                   "pipeline": "deploy-example",
@@ -159,6 +161,7 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example": {
+            "display_order_weight": 3,
             "group": "example",
             "lock_behavior": "unlockWhenFinished",
             "materials": {
