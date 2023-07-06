@@ -125,5 +125,39 @@
             ]
          }
       }
+   },
+   "rollback-example.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "rollback-example": {
+            "display_order": 1,
+            "group": "example",
+            "lock_behavior": "unlockWhenFinished",
+            "materials": {
+               "deploy-example-monitor-pipeline-complete": {
+                  "pipeline": "deploy-example-monitor",
+                  "stage": "pipeline-complete"
+               }
+            },
+            "stages": [
+               {
+                  "rollback": {
+                     "approval": {
+                        "type": "manual"
+                     },
+                     "jobs": {
+                        "rollback": {
+                           "tasks": [
+                              {
+                                 "script": "##!/bin/bash\n\necho \"Hello World\"\n"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
    }
 }

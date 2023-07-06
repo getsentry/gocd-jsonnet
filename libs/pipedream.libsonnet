@@ -56,6 +56,45 @@ local pipedream_trigger_pipeline(pipedream_config) =
     },
   };
 
+local pipedream_rollback_pipeline(pipedream_config) =
+  local name = pipedream_config.name;
+  local final_pipeline = pipeline_name(name, REGIONS[std.length(REGIONS) - 1]);
+
+  {
+    ['rollback-' + name + '.yaml']: {
+      format_version: 10,
+      pipelines: {
+        ['rollback-' + name]: {
+          group: name,
+          display_order: 1,
+          materials: {
+            [final_pipeline + '-' + FINAL_STAGE_NAME]: {
+              pipeline: final_pipeline,
+              stage: FINAL_STAGE_NAME,
+            },
+          },
+          lock_behavior: 'unlockWhenFinished',
+          stages: [
+            {
+              rollback: {
+                approval: {
+                  type: 'manual',
+                },
+                jobs: {
+                  rollback: {
+                    tasks: [
+                      gocd_tasks.script(importstr './bash/rollback.sh'),
+                    ],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+
 // generate_pipeline will call the pipeline callback function, and then
 // name the pipeline, add an upstream material, and append a final stage.
 local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
@@ -113,7 +152,7 @@ local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
 // for each region.
 local get_service_pipelines(pipedream_config, pipeline_fn) =
   {
-    // The weight is i + 1 to account for the trigger pipeline
+    // The weight is i + 2 to account for the trigger pipeline and rollback pipeline
     [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: generate_pipeline(pipedream_config, REGIONS[i], i + 1, pipeline_fn)
     for i in std.range(0, std.length(REGIONS) - 1)
   };
@@ -122,6 +161,7 @@ local get_service_pipelines(pipedream_config, pipeline_fn) =
   // render will generate the trigger pipeline and all the region pipelines.
   render(pipedream_config, pipeline_fn)::
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
+    local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config);
     local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn);
-    trigger_pipeline + service_pipelines,
+    trigger_pipeline + rollback_pipeline + service_pipelines,
 }
