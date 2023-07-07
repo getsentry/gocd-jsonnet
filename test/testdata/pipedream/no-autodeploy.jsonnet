@@ -4,6 +4,10 @@ local pipedream_config = {
   name: 'example',
   auto_deploy: false,
   auto_pipeline_progression: false,
+  rollback: {
+    material_name: 'example_repo',
+    stage: 'example_stage',
+  },
   materials: {
     init_repo: {
       git: 'git@github.com:getsentry/init.git',

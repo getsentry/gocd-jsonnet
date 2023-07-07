@@ -57,43 +57,59 @@ local pipedream_trigger_pipeline(pipedream_config) =
   };
 
 local pipedream_rollback_pipeline(pipedream_config) =
-  local name = pipedream_config.name;
-  local final_pipeline = pipeline_name(name, REGIONS[std.length(REGIONS) - 1]);
+  if std.objectHas(pipedream_config, 'rollback') then
+    local name = pipedream_config.name;
+    local pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS);
+    local final_pipeline = pipeline_name(name, REGIONS[std.length(REGIONS) - 1]);
+    local pipeline_flags = std.join(' ', std.map(function(p) '--pipeline="' + p + '"', pipeline_names));
 
-  {
-    ['rollback-' + name + '.yaml']: {
-      format_version: 10,
-      pipelines: {
-        ['rollback-' + name]: {
-          group: name,
-          display_order: 1,
-          materials: {
-            [final_pipeline + '-' + FINAL_STAGE_NAME]: {
-              pipeline: final_pipeline,
-              stage: FINAL_STAGE_NAME,
+    {
+      ['rollback-' + name + '.yaml']: {
+        format_version: 10,
+        pipelines: {
+          ['rollback-' + name]: {
+            group: name,
+            display_order: 1,
+            environment_variables: {
+              GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}',
+              ROLLBACK_MATERIAL_NAME: pipedream_config.rollback.material_name,
+              ROLLBACK_STAGE: pipedream_config.rollback.stage,
             },
-          },
-          lock_behavior: 'unlockWhenFinished',
-          stages: [
-            {
-              rollback: {
-                approval: {
-                  type: 'manual',
-                },
-                jobs: {
-                  rollback: {
-                    tasks: [
-                      gocd_tasks.script(importstr './bash/rollback.sh'),
-                    ],
+            materials: {
+              [final_pipeline + '-' + FINAL_STAGE_NAME]: {
+                pipeline: final_pipeline,
+                stage: FINAL_STAGE_NAME,
+              },
+            },
+            lock_behavior: 'unlockWhenFinished',
+            stages: [
+              {
+                rollback: {
+                  approval: {
+                    type: 'manual',
+                  },
+                  jobs: {
+                    rollback: {
+                      tasks: [
+                        gocd_tasks.script(
+                          std.strReplace(
+                            importstr './bash/rollback.sh',
+                            '<PIPELINE_FLAGS>',
+                            pipeline_flags,
+                          ),
+                        ),
+                      ],
+                    },
                   },
                 },
               },
-            },
-          ],
+            ],
+          },
         },
       },
-    },
-  };
+    }
+  else
+    {};
 
 // generate_pipeline will call the pipeline callback function, and then
 // name the pipeline, add an upstream material, and append a final stage.
@@ -161,7 +177,7 @@ local get_service_pipelines(pipedream_config, pipeline_fn) =
   // render will generate the trigger pipeline and all the region pipelines.
   render(pipedream_config, pipeline_fn)::
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
-    local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config);
     local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn);
+    local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config);
     trigger_pipeline + rollback_pipeline + service_pipelines,
 }
