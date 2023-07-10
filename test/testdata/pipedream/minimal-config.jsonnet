@@ -1,12 +1,10 @@
-local pipedream = import '../../../../v1.0.0/pipedream.libsonnet';
+local pipedream = import '../../../src/pipedream.libsonnet';
 
 local pipedream_config = {
   name: 'example',
-  auto_deploy: true,
   materials: {
     init_repo: {
       git: 'git@github.com:getsentry/init.git',
-      shallow_clone: true,
       branch: 'master',
       destination: 'init',
     },
