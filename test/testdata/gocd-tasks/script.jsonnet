@@ -1,4 +1,4 @@
-local gocdtasks = import '../../../src/gocd-tasks.libsonnet';
+local gocdtasks = import '../../../libs/gocd-tasks.libsonnet';
 
 {
   tasks: [

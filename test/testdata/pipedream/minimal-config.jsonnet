@@ -1,4 +1,4 @@
-local pipedream = import '../../../src/pipedream.libsonnet';
+local pipedream = import '../../../libs/pipedream.libsonnet';
 
 local pipedream_config = {
   name: 'example',

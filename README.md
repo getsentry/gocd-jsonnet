@@ -7,7 +7,7 @@ Jsonnet libraries used to help structure GoCD pipelines for getsentry
 You'll need jsonnet-bundler to install these libraries:
 
 ```sh
-jb install https://github.com/getsentry/gocd-jsonnet.git/v1.0.0@main
+jb install https://github.com/getsentry/gocd-jsonnet.git/libs@v1.0.0
 ```
 
 ## `pipedream.libsonnet`
@@ -32,7 +32,7 @@ run of each pipeline, and a pipeline for each region.
 ### Example Usage
 
 ```jsonnet
-local pipedream = import 'github.com/getsentry/gocd-jsonnet/v1.0.0/pipedream.libsonnet';
+local pipedream = import 'github.com/getsentry/gocd-jsonnet/libs/pipedream.libsonnet';
 
 local pipedream_config = {
   # Name of your service
@@ -84,7 +84,7 @@ pipedream.render(pipedream_config, sample.pipeline)
 The tasks library is a simple helper to simplify common tasks:
 
 ```
-local gocdtasks = import 'github.com/getsentry/gocd-jsonnet/v1.0.0/gocd-tasks.libsonnet';
+local gocdtasks = import 'github.com/getsentry/gocd-jsonnet/libs/gocd-tasks.libsonnet';
 
 
 local tasks = [
@@ -103,7 +103,7 @@ local tasks = [
 The stages library provides helper methods to define a stage.
 
 ```
-local gocdstages = import 'github.com/getsentry/gocd-jsonnet/v1.0.0/gocd-stages.libsonnet';
+local gocdstages = import 'github.com/getsentry/gocd-jsonnet/libs/gocd-stages.libsonnet';
 
 # A single job stage, with a noop task
 gocdstages.basic('example-stage', [gocdtasks.noop])
