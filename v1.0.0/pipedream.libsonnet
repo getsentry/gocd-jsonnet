@@ -18,7 +18,14 @@ chain the pipelines together.
 local gocd_stages = import './gocd-stages.libsonnet';
 local gocd_tasks = import './gocd-tasks.libsonnet';
 
-local REGIONS = ['us', 'monitor'];
+local REGIONS = [
+  'monitor',  // s4s
+  'us',
+  // 'customer-1', // Goldman
+  // 'customer-2', // Geico
+  // 'customer-3', // Zendesk
+  // 'customer-4', // Disney
+];
 local FINAL_STAGE_NAME = 'pipeline-complete';
 
 local pipeline_name(name, region=null) =
