@@ -74,6 +74,7 @@ local pipedream_rollback_pipeline(pipedream_config) =
               GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}',
               ROLLBACK_MATERIAL_NAME: pipedream_config.rollback.material_name,
               ROLLBACK_STAGE: pipedream_config.rollback.stage,
+              PIPELINE_FLAGS: pipeline_flags,
             },
             materials: {
               [final_pipeline + '-' + FINAL_STAGE_NAME]: {
@@ -91,13 +92,7 @@ local pipedream_rollback_pipeline(pipedream_config) =
                   jobs: {
                     rollback: {
                       tasks: [
-                        gocd_tasks.script(
-                          std.strReplace(
-                            importstr './bash/rollback.sh',
-                            '<PIPELINE_FLAGS>',
-                            pipeline_flags,
-                          ),
-                        ),
+                        gocd_tasks.script(importstr './bash/rollback.sh'),
                       ],
                     },
                   },
