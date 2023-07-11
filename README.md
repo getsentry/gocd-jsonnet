@@ -48,6 +48,14 @@ local pipedream_config = {
     },
   },
 
+  # To add a rollback pipeline, add the rollback parameter
+  rollback: {
+    # The material name used in all pipelines (i.e. getsentry_repo)
+    material_name: 'example_repo',
+    # The deployment stage that the rollback should run
+    stage: 'example_stage',
+  },
+
   # Set to true to auto-deploy changes (defaults to true)
   auto_deploy: false,
   # Set to true if you want each pipeline to require manual approval
