@@ -202,15 +202,15 @@
             "display_order": 1,
             "environment_variables": {
                "GOCD_ACCESS_TOKEN": "{{SECRET:[devinfra][gocd_access_token]}}",
-               "PIPELINE_FLAGS": "--pipeline=\"deploy-example-us\" --pipeline=\"deploy-example-monitor\"",
+               "PIPELINE_FLAGS": "--pipeline=\"deploy-example-monitor\" --pipeline=\"deploy-example-us\"",
                "ROLLBACK_MATERIAL_NAME": "example_repo",
                "ROLLBACK_STAGE": "example_stage"
             },
             "group": "example",
             "lock_behavior": "unlockWhenFinished",
             "materials": {
-               "deploy-example-monitor-pipeline-complete": {
-                  "pipeline": "deploy-example-monitor",
+               "deploy-example-us-pipeline-complete": {
+                  "pipeline": "deploy-example-us",
                   "stage": "pipeline-complete"
                }
             },
