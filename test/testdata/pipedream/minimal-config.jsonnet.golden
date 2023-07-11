@@ -3,7 +3,7 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-monitor": {
-            "display_order": 1,
+            "display_order": 2,
             "group": "example",
             "materials": {
                "deploy-example-pipeline-complete": {
@@ -49,7 +49,7 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-us": {
-            "display_order": 2,
+            "display_order": 3,
             "group": "example",
             "materials": {
                "deploy-example-monitor-pipeline-complete": {
