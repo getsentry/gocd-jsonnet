@@ -59,9 +59,10 @@ local pipedream_trigger_pipeline(pipedream_config) =
 local pipedream_rollback_pipeline(pipedream_config) =
   if std.objectHas(pipedream_config, 'rollback') then
     local name = pipedream_config.name;
-    local pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS);
+    local region_pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS);
+    local region_pipeline_flags = std.join(' ', std.map(function(p) '--pipeline="' + p + '"', region_pipeline_names));
+    local all_pipeline_flags = region_pipeline_flags + ' --pipeline="' + pipeline_name(name) + '"';
     local final_pipeline = pipeline_name(name, REGIONS[std.length(REGIONS) - 1]);
-    local pipeline_flags = std.join(' ', std.map(function(p) '--pipeline="' + p + '"', pipeline_names));
 
     {
       ['rollback-' + name + '.yaml']: {
@@ -74,7 +75,8 @@ local pipedream_rollback_pipeline(pipedream_config) =
               GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}',
               ROLLBACK_MATERIAL_NAME: pipedream_config.rollback.material_name,
               ROLLBACK_STAGE: pipedream_config.rollback.stage,
-              PIPELINE_FLAGS: pipeline_flags,
+              REGION_PIPELINE_FLAGS: region_pipeline_flags,
+              ALL_PIPELINE_FLAGS: all_pipeline_flags,
             },
             materials: {
               [final_pipeline + '-' + FINAL_STAGE_NAME]: {
@@ -85,10 +87,19 @@ local pipedream_rollback_pipeline(pipedream_config) =
             lock_behavior: 'unlockWhenFinished',
             stages: [
               {
-                rollback: {
+                pause_pipelines: {
                   approval: {
                     type: 'manual',
                   },
+                  jobs: {
+                    rollback: {
+                      tasks: [
+                        gocd_tasks.script(importstr './bash/pause-pipelines.sh'),
+                      ],
+                    },
+                  },
+                },
+                start_rollback: {
                   jobs: {
                     rollback: {
                       tasks: [
