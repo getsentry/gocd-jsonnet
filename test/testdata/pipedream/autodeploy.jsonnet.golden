@@ -155,7 +155,7 @@
                         "rollback": {
                            "tasks": [
                               {
-                                 "script": "##!/bin/bash\n\nif [[ \"${PIPELINE_FLAGS:-}\" ]]; then\n  # shellcheck disable=SC2086\n  set -- $PIPELINE_FLAGS   # note: no quoting, for word expansion\nfi\n\n\n## Pause all pipelines in the pipedream\ngocd-pause-and-cancel-pipelines \\\n  --pause-message=\"This pipeline is being rolled back, please check with team before un-pausing.\" \\\n  \"$@\"\n\n## Get sha from the given pipeline run to deploy to all pipedream pipelines.\nsha=$(gocd-sha-for-pipeline --material-name=\"${ROLLBACK_MATERIAL_NAME}\")\n\ngocd-emergency-deploy \\\n  --commit-sha=\"${sha}\" \\\n  --deploy-stage=\"${ROLLBACK_STAGE}\" \\\n  --pause-message=\"This pipeline was rolled back, please check with team before un-pausing.\" \\\n  \"$@\"\n"
+                                 "script": "##!/bin/bash\n\n## shellcheck disable=SC2086\nif [[ \"${PIPELINE_FLAGS:-}\" ]]; then\n  set -- $PIPELINE_FLAGS   # note: no quoting, for word expansion\nfi\n\n## Pause all pipelines in the pipedream\ngocd-pause-and-cancel-pipelines \\\n  --pause-message=\"This pipeline is being rolled back, please check with team before un-pausing.\" \\\n  \"$@\"\n\n## Get sha from the given pipeline run to deploy to all pipedream pipelines.\nsha=$(gocd-sha-for-pipeline --material-name=\"${ROLLBACK_MATERIAL_NAME}\")\n\ngocd-emergency-deploy \\\n  --commit-sha=\"${sha}\" \\\n  --deploy-stage=\"${ROLLBACK_STAGE}\" \\\n  --pause-message=\"This pipeline was rolled back, please check with team before un-pausing.\" \\\n  \"$@\"\n"
                               }
                            ]
                         }
