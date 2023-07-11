@@ -164,7 +164,7 @@ local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
 local get_service_pipelines(pipedream_config, pipeline_fn) =
   {
     // The weight is i + 2 to account for the trigger pipeline and rollback pipeline
-    [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: generate_pipeline(pipedream_config, REGIONS[i], i + 1, pipeline_fn)
+    [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: generate_pipeline(pipedream_config, REGIONS[i], i + 2, pipeline_fn)
     for i in std.range(0, std.length(REGIONS) - 1)
   };
 
