@@ -1,7 +1,7 @@
 #!/bin/bash
 
+# shellcheck disable=SC2086
 if [[ "${PIPELINE_FLAGS:-}" ]]; then
-  # shellcheck disable=SC2086
   set -- $PIPELINE_FLAGS   # note: no quoting, for word expansion
 fi
 
