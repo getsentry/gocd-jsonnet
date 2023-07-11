@@ -1,8 +1,9 @@
 #!/bin/bash
 
+# Note: $PIPELINGE_FLAGS has no quoting, for word expansion
 # shellcheck disable=SC2086
 if [[ "${PIPELINE_FLAGS:-}" ]]; then
-  set -- $PIPELINE_FLAGS   # note: no quoting, for word expansion
+  set -- $PIPELINE_FLAGS
 fi
 
 # Pause all pipelines in the pipedream
