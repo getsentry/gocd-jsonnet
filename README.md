@@ -54,6 +54,8 @@ local pipedream_config = {
     material_name: 'example_repo',
     # The deployment stage that the rollback should run
     stage: 'example_stage',
+    # The elastic agent profile to run the rollback pipeline as
+    elastic_profile_id: 'example_profile',
   },
 
   # Set to true to auto-deploy changes (defaults to true)
