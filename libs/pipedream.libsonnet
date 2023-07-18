@@ -93,6 +93,7 @@ local pipedream_rollback_pipeline(pipedream_config) =
                   },
                   jobs: {
                     rollback: {
+                      elastic_profile_id: pipedream_config.rollback.elastic_profile_id,
                       tasks: [
                         gocd_tasks.script(importstr './bash/pause-pipelines.sh'),
                       ],
@@ -102,6 +103,7 @@ local pipedream_rollback_pipeline(pipedream_config) =
                 start_rollback: {
                   jobs: {
                     rollback: {
+                      elastic_profile_id: pipedream_config.rollback.elastic_profile_id,
                       tasks: [
                         gocd_tasks.script(importstr './bash/rollback.sh'),
                       ],
