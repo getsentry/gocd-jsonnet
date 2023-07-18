@@ -7,6 +7,7 @@ local pipedream_config = {
   rollback: {
     material_name: 'example_repo',
     stage: 'example_stage',
+    elastic_profile_id: 'example_profile',
   },
   materials: {
     init_repo: {
