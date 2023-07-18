@@ -201,9 +201,9 @@
          "rollback-example": {
             "display_order": 1,
             "environment_variables": {
-               "ALL_PIPELINE_FLAGS": "--pipeline=\"deploy-example-monitor\" --pipeline=\"deploy-example-us\" --pipeline=\"deploy-example\"",
+               "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-monitor --pipeline=deploy-example-us --pipeline=deploy-example",
                "GOCD_ACCESS_TOKEN": "{{SECRET:[devinfra][gocd_access_token]}}",
-               "REGION_PIPELINE_FLAGS": "--pipeline=\"deploy-example-monitor\" --pipeline=\"deploy-example-us\"",
+               "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-monitor --pipeline=deploy-example-us",
                "ROLLBACK_MATERIAL_NAME": "example_repo",
                "ROLLBACK_STAGE": "example_stage"
             },
@@ -231,7 +231,9 @@
                            ]
                         }
                      }
-                  },
+                  }
+               },
+               {
                   "start_rollback": {
                      "jobs": {
                         "rollback": {
