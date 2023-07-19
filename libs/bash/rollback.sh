@@ -12,6 +12,7 @@ sha=$(gocd-sha-for-pipeline --material-name="${ROLLBACK_MATERIAL_NAME}")
 echo "📑 Rolling back to sha: ${sha}"
 
 gocd-emergency-deploy \
+  --material-name="${ROLLBACK_MATERIAL_NAME}" \
   --commit-sha="${sha}" \
   --deploy-stage="${ROLLBACK_STAGE}" \
   --pause-message="This pipeline was rolled back, please check with team before un-pausing." \

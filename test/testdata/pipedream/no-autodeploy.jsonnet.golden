@@ -240,7 +240,7 @@
                            "elastic_profile_id": "example_profile",
                            "tasks": [
                               {
-                                 "script": "##!/bin/bash\n\n## Note: $REGION_PIPELINE_FLAGS has no quoting, for word expansion\n## shellcheck disable=SC2086\nif [[ \"${REGION_PIPELINE_FLAGS:-}\" ]]; then\n  set -- $REGION_PIPELINE_FLAGS\nfi\n\n## Get sha from the given pipeline run to deploy to all pipedream pipelines.\nsha=$(gocd-sha-for-pipeline --material-name=\"${ROLLBACK_MATERIAL_NAME}\")\n\necho \"#️⃣ Deploying sha: ${sha}\"\n\ngocd-emergency-deploy \\\n  --commit-sha=\"${sha}\" \\\n  --deploy-stage=\"${ROLLBACK_STAGE}\" \\\n  --pause-message=\"This pipeline was rolled back, please check with team before un-pausing.\" \\\n  \"$@\"\n"
+                                 "script": "##!/bin/bash\n\n## Note: $REGION_PIPELINE_FLAGS has no quoting, for word expansion\n## shellcheck disable=SC2086\nif [[ \"${REGION_PIPELINE_FLAGS:-}\" ]]; then\n  set -- $REGION_PIPELINE_FLAGS\nfi\n\n## Get sha from the given pipeline run to deploy to all pipedream pipelines.\nsha=$(gocd-sha-for-pipeline --material-name=\"${ROLLBACK_MATERIAL_NAME}\")\n\necho \"📑 Rolling back to sha: ${sha}\"\n\ngocd-emergency-deploy \\\n  --material-name=\"${ROLLBACK_MATERIAL_NAME}\" \\\n  --commit-sha=\"${sha}\" \\\n  --deploy-stage=\"${ROLLBACK_STAGE}\" \\\n  --pause-message=\"This pipeline was rolled back, please check with team before un-pausing.\" \\\n  \"$@\"\n"
                               }
                            ]
                         }
