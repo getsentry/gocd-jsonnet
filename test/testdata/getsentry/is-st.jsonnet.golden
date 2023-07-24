@@ -1,0 +1,8 @@
+{
+   "customer-1": true,
+   "customer-a": true,
+   "demo-customer": false,
+   "eu": false,
+   "s4s": true,
+   "us": false
+}
