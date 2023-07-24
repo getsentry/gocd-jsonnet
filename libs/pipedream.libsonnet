@@ -27,16 +27,20 @@ local FINAL_STAGE_NAME = 'pipeline-complete';
 local pipeline_name(name, region=null) =
   if region != null then 'deploy-' + name + '-' + region else 'deploy-' + name;
 
+local is_autodeploy(pipedream_config) =
+  !std.objectHas(pipedream_config, 'auto_deploy') || pipedream_config.auto_deploy == true;
+
 // The "trigger pipeline" is a pipeline that doesn't do anything special,
 // but it serves as a nice way to start the pipedream for end users.
 local pipedream_trigger_pipeline(pipedream_config) =
   local name = pipedream_config.name;
   local materials = pipedream_config.materials;
-  local approval_type = if std.objectHas(pipedream_config, 'auto_deploy') && pipedream_config.auto_deploy == false then
+  local autodeploy = is_autodeploy(pipedream_config);
+  local approval_type = if autodeploy == false then
     'manual' else null;
 
   {
-    [name + '.yaml']: {
+    [if autodeploy == true then null else name + '.yaml']: {
       format_version: 10,
       pipelines: {
         [pipeline_name(name)]: {
@@ -124,7 +128,10 @@ local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
   local service_name = pipedream_config.name;
   local index = std.find(region, REGIONS)[0];
   local upstream_pipeline = if index == 0 then
-    pipeline_name(service_name)
+    if is_autodeploy(pipedream_config) then
+      null
+    else
+      pipeline_name(service_name)
   else
     pipeline_name(service_name, REGIONS[index - 1]);
 
@@ -158,7 +165,7 @@ local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
         group: service_name,
         display_order: weight,
         materials+: {
-          [upstream_pipeline + '-' + FINAL_STAGE_NAME]: {
+          [if upstream_pipeline == null then null else upstream_pipeline + '-' + FINAL_STAGE_NAME]: {
             pipeline: upstream_pipeline,
             stage: FINAL_STAGE_NAME,
           },
