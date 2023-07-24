@@ -21,6 +21,8 @@ local gocd_tasks = import './gocd-tasks.libsonnet';
 local REGIONS = [
   'monitor',
   'us',
+  'customer-5',
+  'customer-1',
 ];
 local FINAL_STAGE_NAME = 'pipeline-complete';
 
