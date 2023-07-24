@@ -139,7 +139,7 @@
          "rollback-example": {
             "display_order": 1,
             "environment_variables": {
-               "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example",
+               "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-customer-1",
                "GOCD_ACCESS_TOKEN": "{{SECRET:[devinfra][gocd_access_token]}}",
                "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-customer-1",
                "ROLLBACK_MATERIAL_NAME": "example_repo",
