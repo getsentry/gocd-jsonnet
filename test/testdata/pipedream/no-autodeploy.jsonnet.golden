@@ -1,8 +1,8 @@
 {
-   "example-s4s.yaml": {
+   "example-monitor.yaml": {
       "format_version": 10,
       "pipelines": {
-         "deploy-example-s4s": {
+         "deploy-example-monitor": {
             "display_order": 2,
             "group": "example",
             "materials": {
@@ -17,7 +17,7 @@
                   "shallow_clone": true
                }
             },
-            "region": "s4s",
+            "region": "monitor",
             "stages": [
                {
                   "ready": {
@@ -85,8 +85,8 @@
             "display_order": 3,
             "group": "example",
             "materials": {
-               "deploy-example-s4s-pipeline-complete": {
-                  "pipeline": "deploy-example-s4s",
+               "deploy-example-monitor-pipeline-complete": {
+                  "pipeline": "deploy-example-monitor",
                   "stage": "pipeline-complete"
                },
                "example_repo": {
@@ -201,9 +201,9 @@
          "rollback-example": {
             "display_order": 1,
             "environment_variables": {
-               "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example",
+               "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-monitor --pipeline=deploy-example-us --pipeline=deploy-example",
                "GOCD_ACCESS_TOKEN": "{{SECRET:[devinfra][gocd_access_token]}}",
-               "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-us",
+               "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-monitor --pipeline=deploy-example-us",
                "ROLLBACK_MATERIAL_NAME": "example_repo",
                "ROLLBACK_STAGE": "example_stage"
             },

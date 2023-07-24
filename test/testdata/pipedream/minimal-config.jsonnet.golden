@@ -1,8 +1,8 @@
 {
-   "example-s4s.yaml": {
+   "example-monitor.yaml": {
       "format_version": 10,
       "pipelines": {
-         "deploy-example-s4s": {
+         "deploy-example-monitor": {
             "display_order": 2,
             "group": "example",
             "materials": {
@@ -17,7 +17,7 @@
                   "shallow_clone": true
                }
             },
-            "region": "s4s",
+            "region": "monitor",
             "stages": [
                {
                   "example_stage": { }
@@ -52,8 +52,8 @@
             "display_order": 3,
             "group": "example",
             "materials": {
-               "deploy-example-s4s-pipeline-complete": {
-                  "pipeline": "deploy-example-s4s",
+               "deploy-example-monitor-pipeline-complete": {
+                  "pipeline": "deploy-example-monitor",
                   "stage": "pipeline-complete"
                },
                "example_repo": {
