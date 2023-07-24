@@ -6,10 +6,6 @@
             "display_order": 2,
             "group": "example",
             "materials": {
-               "deploy-example-pipeline-complete": {
-                  "pipeline": "deploy-example",
-                  "stage": "pipeline-complete"
-               },
                "example_repo": {
                   "branch": "master",
                   "destination": "example",
@@ -74,41 +70,6 @@
                         "allow_only_on_success": true,
                         "type": "success"
                      },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
-               }
-            ]
-         }
-      }
-   },
-   "example.yaml": {
-      "format_version": 10,
-      "pipelines": {
-         "deploy-example": {
-            "display_order": 0,
-            "group": "example",
-            "lock_behavior": "unlockWhenFinished",
-            "materials": {
-               "init_repo": {
-                  "branch": "master",
-                  "destination": "init",
-                  "git": "git@github.com:getsentry/init.git",
-                  "shallow_clone": true
-               }
-            },
-            "stages": [
-               {
-                  "pipeline-complete": {
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
