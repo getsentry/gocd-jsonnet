@@ -19,7 +19,7 @@ local gocd_stages = import './gocd-stages.libsonnet';
 local gocd_tasks = import './gocd-tasks.libsonnet';
 
 local REGIONS = [
-  's4s',
+  'monitor',
   'us',
 ];
 local FINAL_STAGE_NAME = 'pipeline-complete';
