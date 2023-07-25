@@ -22,6 +22,7 @@ local REGIONS = [
   's4s',
   'us',
   'customer-1',
+  'customer-2',
 ];
 local FINAL_STAGE_NAME = 'pipeline-complete';
 
