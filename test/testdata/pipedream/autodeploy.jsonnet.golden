@@ -151,6 +151,12 @@
                "deploy-example-customer-1-pipeline-complete": {
                   "pipeline": "deploy-example-customer-1",
                   "stage": "pipeline-complete"
+               },
+               "init_repo": {
+                  "branch": "master",
+                  "destination": "init",
+                  "git": "git@github.com:getsentry/init.git",
+                  "shallow_clone": true
                }
             },
             "stages": [

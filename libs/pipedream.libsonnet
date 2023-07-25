@@ -87,7 +87,7 @@ local pipedream_rollback_pipeline(pipedream_config) =
                 pipeline: final_pipeline,
                 stage: FINAL_STAGE_NAME,
               },
-            },
+            } + pipedream_config.materials,
             lock_behavior: 'unlockWhenFinished',
             stages: [
               {
