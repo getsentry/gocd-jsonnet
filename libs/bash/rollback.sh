@@ -6,7 +6,7 @@ if [[ "${REGION_PIPELINE_FLAGS:-}" ]]; then
   set -- $REGION_PIPELINE_FLAGS
 fi
 
-env | grep GO_DEPENDENCY_
+env | grep GO
 
 # Get sha from the given pipeline run to deploy to all pipedream pipelines.
 sha=$(gocd-sha-for-pipeline --material-name="${ROLLBACK_MATERIAL_NAME}")
