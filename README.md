@@ -10,6 +10,58 @@ You'll need jsonnet-bundler to install these libraries:
 jb install https://github.com/getsentry/gocd-jsonnet.git/libs@v1.0.0
 ```
 
+## Build
+
+When using this library, you'll need to build with the following external
+variable:
+
+```bash
+--ext-code output-files=<true|false>
+```
+
+This variable will change the output of pipedream library.
+
+When `output-files=true` it'll output pipelines in the format:
+
+```json
+{
+  "example.yaml": {
+    "format_version": 10,
+    "pipelines": {
+      "deploy-example": {...}
+    }
+  },
+  "example-us.yaml": {
+    "format_version": 10,
+    "pipelines": {
+      "deploy-example-us": {...}
+    }
+  }
+}
+```
+
+This is useful when you build using the `-m` flag in jsonnet as it'll
+output multiple files which makes reviewing pipeliens easier.
+
+```bash
+jsonnet ./example.jsonnet -m --ext-code output-files=true
+```
+
+The GoCD plugin that can process jsonnet files directly doesn't support
+outputting multiple files, so GoCD is configured to have
+`--ext-code output-filaes=false` which will output the pipelines in a
+flattened format:
+
+```json
+{
+  "format_version": 10,
+  "pipelines": {
+    "deploy-example": {...},
+    "deploy-example-us": {...}
+  }
+}
+```
+
 ## `pipedream.libsonnet`
 
 This libraries main purpose is to generate a set of pipelines that constitute
