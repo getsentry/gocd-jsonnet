@@ -7,7 +7,11 @@ const files = [
   'pipedream/minimal-config.jsonnet',
 ];
 for (const f of files) {
-  test(`render ${f}`, async t => {
-    await assert_testdata(t, f);
+  test(`render ${f} as files`, async t => {
+    await assert_testdata(t, f, true);
+  });
+
+  test(`render ${f} as single file`, async t => {
+    await assert_testdata(t, f, false);
   });
 }

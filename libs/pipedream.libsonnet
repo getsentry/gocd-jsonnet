@@ -41,22 +41,20 @@ local pipedream_trigger_pipeline(pipedream_config) =
   local approval_type = if autodeploy == false then
     'manual' else null;
 
-  {
-    [if autodeploy == true then null else name + '.yaml']: {
-      format_version: 10,
-      pipelines: {
-        [pipeline_name(name)]: {
-          group: name,
-          display_order: 0,
-          materials: materials,
-          lock_behavior: 'unlockWhenFinished',
-          stages: [
-            gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], { approval: approval_type }),
-          ],
-        },
+  if autodeploy == true then
+    {}
+  else
+    {
+      [pipeline_name(name)]: {
+        group: name,
+        display_order: 0,
+        materials: materials,
+        lock_behavior: 'unlockWhenFinished',
+        stages: [
+          gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], { approval: approval_type }),
+        ],
       },
-    },
-  };
+    };
 
 local pipedream_rollback_pipeline(pipedream_config) =
   if std.objectHas(pipedream_config, 'rollback') then
@@ -70,9 +68,6 @@ local pipedream_rollback_pipeline(pipedream_config) =
     local final_pipeline = pipeline_name(name, REGIONS[std.length(REGIONS) - 1]);
 
     {
-      ['rollback-' + name + '.yaml']: {
-        format_version: 10,
-        pipelines: {
           ['rollback-' + name]: {
             group: name,
             display_order: 1,
@@ -120,15 +115,13 @@ local pipedream_rollback_pipeline(pipedream_config) =
               },
             ],
           },
-        },
-      },
-    }
+        }
   else
     {};
 
-// generate_pipeline will call the pipeline callback function, and then
+// generate_region_pipeline will call the pipeline callback function, and then
 // name the pipeline, add an upstream material, and append a final stage.
-local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
+local generate_region_pipeline(pipedream_config, region, weight, pipeline_fn) =
   // Get previous region's pipeline name
   local service_name = pipedream_config.name;
   local index = std.find(region, REGIONS)[0];
@@ -140,14 +133,9 @@ local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
   else
     pipeline_name(service_name, REGIONS[index - 1]);
 
-  local service_pipeline = {
-    format_version: 10,
-    pipelines: {
-      [pipeline_name(service_name, region)]: pipeline_fn(
-        region,
-      ),
-    },
-  };
+  local service_pipeline = pipeline_fn(
+    region,
+  );
 
   local prepend_stages = if std.objectHas(pipedream_config, 'auto_pipeline_progression') && pipedream_config.auto_pipeline_progression == false then
     [
@@ -163,31 +151,26 @@ local generate_pipeline(pipedream_config, region, weight, pipeline_fn) =
     [];
 
   // Add the upstream pipeline material and append the final stage
-  local stages = service_pipeline.pipelines[pipeline_name(service_name, region)].stages;
+  local stages = service_pipeline.stages;
   service_pipeline {
-    pipelines+: {
-      [pipeline_name(service_name, region)]+: {
-        group: service_name,
-        display_order: weight,
-        materials+: {
-          [if upstream_pipeline == null then null else upstream_pipeline + '-' + FINAL_STAGE_NAME]: {
-            pipeline: upstream_pipeline,
-            stage: FINAL_STAGE_NAME,
-          },
-        },
-        stages: prepend_stages + stages + [
-          gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], { approval: 'success' }),
-        ],
+    group: service_name,
+    display_order: weight,
+    materials+: {
+      [if upstream_pipeline == null then null else upstream_pipeline + '-' + FINAL_STAGE_NAME]: {
+        pipeline: upstream_pipeline,
+        stage: FINAL_STAGE_NAME,
       },
     },
+    stages: prepend_stages + stages + [
+      gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], { approval: 'success' }),
+    ],
   };
 
 // get_service_pipelines iterates over each region and generates the pipeline
 // for each region.
 local get_service_pipelines(pipedream_config, pipeline_fn) =
   {
-    // The weight is i + 2 to account for the trigger pipeline and rollback pipeline
-    [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: generate_pipeline(pipedream_config, REGIONS[i], i + 2, pipeline_fn)
+    [pipeline_name(pipedream_config.name, REGIONS[i])]: generate_region_pipeline(pipedream_config, REGIONS[i], i + 2, pipeline_fn)
     for i in std.range(0, std.length(REGIONS) - 1)
   };
 
@@ -197,5 +180,29 @@ local get_service_pipelines(pipedream_config, pipeline_fn) =
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
     local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn);
     local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config);
-    trigger_pipeline + rollback_pipeline + service_pipelines,
+    if std.extVar('output-files') then
+      {
+        [if trigger_pipeline == {} then null else pipedream_config.name + '.yaml']: {
+          format_version: 10,
+          pipelines: trigger_pipeline,
+        }
+      } + {
+        [if rollback_pipeline == {} then null else 'rollback-' + pipedream_config.name + '.yaml']: {
+          format_version: 10,
+          pipelines: rollback_pipeline,
+        },
+      } + {
+        [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: {
+          format_version: 10,
+          pipelines: {
+            [pipeline_name(pipedream_config.name, REGIONS[i])]: service_pipelines[pipeline_name(pipedream_config.name, REGIONS[i])],
+          }
+        }
+        for i in std.range(0, std.length(REGIONS) - 1)
+      }
+    else
+      {
+        format_version: 10,
+        pipelines: trigger_pipeline + service_pipelines + rollback_pipeline,
+      }
 }

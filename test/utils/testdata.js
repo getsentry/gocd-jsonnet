@@ -2,11 +2,17 @@ import * as fs from 'node:fs/promises';
 import * as path from 'path';
 import {execSync} from 'node:child_process';
 
-export async function assert_testdata(t, filename) {
-  const gotBuff = execSync(`jsonnet test/testdata/${filename}`);
+export async function assert_testdata(t, filename, outputfiles=true) {
+  const gotBuff = execSync(`jsonnet test/testdata/${filename} --ext-code output-files=${outputfiles} --ext-code random=true`);
   const got = gotBuff.toString();
 
-  const goldenPath = path.join('test', 'testdata', `${filename}.golden`);
+  const suffix = [];
+  if (outputfiles) {
+    suffix.push('output-files');
+  } else {
+    suffix.push('single-file');
+  }
+  const goldenPath = path.join('test', 'testdata', `${filename}_${suffix.join('-')}.golden`);
   try {
     await fs.stat(goldenPath)
   } catch (err) {

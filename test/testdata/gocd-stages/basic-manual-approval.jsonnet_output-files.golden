@@ -1,0 +1,12 @@
+{
+   "example": {
+      "approval": {
+         "type": "manual"
+      },
+      "jobs": {
+         "example": {
+            "tasks": [ ]
+         }
+      }
+   }
+}

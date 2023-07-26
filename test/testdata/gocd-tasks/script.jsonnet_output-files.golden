@@ -1,0 +1,10 @@
+{
+   "tasks": [
+      {
+         "script": "echo 'hello'"
+      },
+      {
+         "script": "##!/bin/bash\n\n## A simple echo command\necho \"world\";\n"
+      }
+   ]
+}
