@@ -1,0 +1,13 @@
+{
+   "example": {
+      "approval": {
+         "allow_only_on_success": true,
+         "type": "success"
+      },
+      "jobs": {
+         "example": {
+            "tasks": [ ]
+         }
+      }
+   }
+}
