@@ -183,6 +183,90 @@
          }
       }
    },
+   "example-customer-5.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-customer-5": {
+            "display_order": 8,
+            "group": "example",
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git",
+                  "shallow_clone": true
+               }
+            },
+            "region": "customer-5",
+            "stages": [
+               {
+                  "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "approval": {
+                        "allow_only_on_success": true,
+                        "type": "success"
+                     },
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "example-customer-6.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-customer-6": {
+            "display_order": 9,
+            "group": "example",
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git",
+                  "shallow_clone": true
+               }
+            },
+            "region": "customer-6",
+            "stages": [
+               {
+                  "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "approval": {
+                        "allow_only_on_success": true,
+                        "type": "success"
+                     },
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
    "example-s4s.yaml": {
       "format_version": 10,
       "pipelines": {

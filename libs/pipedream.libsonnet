@@ -26,6 +26,11 @@ local REGIONS = [
   'customer-3',
   'customer-4',
 ];
+// Test regions will deploy in parallel to the regions above
+local TEST_REGIONS = [
+  'customer-5',
+  'customer-6',
+];
 local FINAL_STAGE_NAME = 'pipeline-complete';
 
 local pipeline_name(name, region=null) =
@@ -61,7 +66,7 @@ local pipedream_trigger_pipeline(pipedream_config) =
 local pipedream_rollback_pipeline(pipedream_config) =
   if std.objectHas(pipedream_config, 'rollback') then
     local name = pipedream_config.name;
-    local region_pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS);
+    local region_pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS) + std.map(function(r) pipeline_name(name, r), TEST_REGIONS);
     local region_pipeline_flags = std.join(' ', std.map(function(p) '--pipeline=' + p, region_pipeline_names));
     local all_pipeline_flags = if is_autodeploy(pipedream_config) then
       region_pipeline_flags
@@ -126,14 +131,14 @@ local pipedream_rollback_pipeline(pipedream_config) =
 local generate_region_pipeline(pipedream_config, region, weight, pipeline_fn) =
   // Get previous region's pipeline name
   local service_name = pipedream_config.name;
-  local index = std.find(region, REGIONS)[0];
-  local upstream_pipeline = if index == 0 then
+  local indexes = std.find(region, REGIONS);
+  local upstream_pipeline = if std.length(indexes) == 0 || indexes[0] == 0 then
     if is_autodeploy(pipedream_config) then
       null
     else
       pipeline_name(service_name)
   else
-    pipeline_name(service_name, REGIONS[index - 1]);
+    pipeline_name(service_name, REGIONS[indexes[0] - 1]);
 
   local service_pipeline = pipeline_fn(
     region,
@@ -170,19 +175,23 @@ local generate_region_pipeline(pipedream_config, region, weight, pipeline_fn) =
 
 // get_service_pipelines iterates over each region and generates the pipeline
 // for each region.
-local get_service_pipelines(pipedream_config, pipeline_fn) =
+local get_service_pipelines(pipedream_config, pipeline_fn, regions, display_offset) =
   {
-    [pipeline_name(pipedream_config.name, REGIONS[i])]: generate_region_pipeline(pipedream_config, REGIONS[i], i + 2, pipeline_fn)
-    for i in std.range(0, std.length(REGIONS) - 1)
+    [pipeline_name(pipedream_config.name, regions[i])]: generate_region_pipeline(pipedream_config, regions[i], display_offset + i, pipeline_fn)
+    for i in std.range(0, std.length(regions) - 1)
   };
 
 {
   // render will generate the trigger pipeline and all the region pipelines.
   render(pipedream_config, pipeline_fn)::
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
-    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn);
+    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, REGIONS, 2);
+    local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, TEST_REGIONS, std.length(REGIONS) + 2);
     local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config);
+
     if std.extVar('output-files') then
+      local test_pipeline_names = std.objectFields(test_pipelines);
+
       {
         [if trigger_pipeline == {} then null else pipedream_config.name + '.yaml']: {
           format_version: 10,
@@ -201,10 +210,18 @@ local get_service_pipelines(pipedream_config, pipeline_fn) =
           },
         }
         for i in std.range(0, std.length(REGIONS) - 1)
+      } + {
+        [pipedream_config.name + '-' + TEST_REGIONS[i] + '.yaml']: {
+          format_version: 10,
+          pipelines: {
+            [test_pipeline_names[i]]: test_pipelines[test_pipeline_names[i]],
+          },
+        }
+        for i in std.range(0, std.length(test_pipeline_names) - 1)
       }
     else
       {
         format_version: 10,
-        pipelines: trigger_pipeline + service_pipelines + rollback_pipeline,
+        pipelines: trigger_pipeline + service_pipelines + test_pipelines + rollback_pipeline,
       },
 }

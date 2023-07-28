@@ -1,7 +1,4 @@
-.DEFAULT_GOAL := all
-
-all: fmt lint test
-.PHONY: all
+.DEFAULT_GOAL := test
 
 fmt:
 	./scripts/fmt.sh
@@ -11,6 +8,6 @@ lint:
 	./scripts/lint.sh
 .PHONY: lint
 
-test:
+test: fmt lint
 	npm run test
 .PHONY: test
