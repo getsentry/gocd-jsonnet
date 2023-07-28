@@ -44,7 +44,7 @@ This is useful when you build using the `-m` flag in jsonnet as it'll
 output multiple files which makes reviewing pipeliens easier.
 
 ```bash
-jsonnet ./example.jsonnet -m --ext-code output-files=true
+jsonnet --ext-code output-files=true -m ./generated-pipelines ./example.jsonnet
 ```
 
 The GoCD plugin that can process jsonnet files directly doesn't support
