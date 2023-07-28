@@ -26,7 +26,7 @@ local REGIONS = [
   'customer-3',
   'customer-4',
 ];
-# Test regions will deploy in parallel to the regions above
+// Test regions will deploy in parallel to the regions above
 local TEST_REGIONS = [
   'customer-5',
   'customer-6',
