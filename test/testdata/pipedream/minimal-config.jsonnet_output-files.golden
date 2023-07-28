@@ -183,7 +183,7 @@
          }
       }
    },
-   "example-s4s.yaml": {
+   "example-customer-5.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-5": {
@@ -225,7 +225,7 @@
          }
       }
    },
-   "example-us.yaml": {
+   "example-customer-6.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-6": {
@@ -240,6 +240,94 @@
                }
             },
             "region": "customer-6",
+            "stages": [
+               {
+                  "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "approval": {
+                        "allow_only_on_success": true,
+                        "type": "success"
+                     },
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "example-s4s.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-s4s": {
+            "display_order": 2,
+            "group": "example",
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git",
+                  "shallow_clone": true
+               }
+            },
+            "region": "s4s",
+            "stages": [
+               {
+                  "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "approval": {
+                        "allow_only_on_success": true,
+                        "type": "success"
+                     },
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "example-us.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-us": {
+            "display_order": 3,
+            "group": "example",
+            "materials": {
+               "deploy-example-s4s-pipeline-complete": {
+                  "pipeline": "deploy-example-s4s",
+                  "stage": "pipeline-complete"
+               },
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git",
+                  "shallow_clone": true
+               }
+            },
+            "region": "us",
             "stages": [
                {
                   "example_stage": { }

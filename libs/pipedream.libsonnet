@@ -211,7 +211,7 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, display_offs
         }
         for i in std.range(0, std.length(REGIONS) - 1)
       } + {
-        [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: {
+        [pipedream_config.name + '-' + TEST_REGIONS[i] + '.yaml']: {
           format_version: 10,
           pipelines: {
             [test_pipeline_names[i]]: test_pipelines[test_pipeline_names[i]],
