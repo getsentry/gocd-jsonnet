@@ -137,57 +137,11 @@
          }
       }
    },
-   "example-customer-4.yaml": {
-      "format_version": 10,
-      "pipelines": {
-         "deploy-example-customer-4": {
-            "display_order": 7,
-            "group": "example",
-            "materials": {
-               "deploy-example-customer-3-pipeline-complete": {
-                  "pipeline": "deploy-example-customer-3",
-                  "stage": "pipeline-complete"
-               },
-               "example_repo": {
-                  "branch": "master",
-                  "destination": "example",
-                  "git": "git@github.com:getsentry/example.git",
-                  "shallow_clone": true
-               }
-            },
-            "region": "customer-4",
-            "stages": [
-               {
-                  "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "approval": {
-                        "allow_only_on_success": true,
-                        "type": "success"
-                     },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
-               }
-            ]
-         }
-      }
-   },
    "example-customer-5.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-5": {
-            "display_order": 8,
+            "display_order": 7,
             "group": "example",
             "materials": {
                "example_repo": {
@@ -229,7 +183,7 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-6": {
-            "display_order": 9,
+            "display_order": 8,
             "group": "example",
             "materials": {
                "example_repo": {
