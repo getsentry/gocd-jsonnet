@@ -7,7 +7,7 @@ Jsonnet libraries used to help structure GoCD pipelines for getsentry
 You'll need jsonnet-bundler to install these libraries:
 
 ```sh
-jb install https://github.com/getsentry/gocd-jsonnet.git/libs@v1.0.0
+jb install https://github.com/getsentry/gocd-jsonnet.git/libs@v1.4.1
 ```
 
 ## Build
