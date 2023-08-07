@@ -66,7 +66,7 @@ local pipedream_trigger_pipeline(pipedream_config) =
 local pipedream_rollback_pipeline(pipedream_config) =
   if std.objectHas(pipedream_config, 'rollback') then
     local name = pipedream_config.name;
-    local region_pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS) + std.map(function(r) pipeline_name(name, r), TEST_REGIONS);
+    local region_pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS);
     local region_pipeline_flags = std.join(' ', std.map(function(p) '--pipeline=' + p, region_pipeline_names));
     local all_pipeline_flags = if is_autodeploy(pipedream_config) then
       region_pipeline_flags
