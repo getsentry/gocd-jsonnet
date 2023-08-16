@@ -1,0 +1,321 @@
+{
+   "format_version": 10,
+   "pipelines": {
+      "deploy-example-customer-1": {
+         "display_order": 4,
+         "group": "example",
+         "materials": {
+            "deploy-example-us-pipeline-complete": {
+               "pipeline": "deploy-example-us",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "customer-1",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "approval": {
+                     "allow_only_on_success": true,
+                     "type": "success"
+                  },
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-customer-2": {
+         "display_order": 5,
+         "group": "example",
+         "materials": {
+            "deploy-example-customer-1-pipeline-complete": {
+               "pipeline": "deploy-example-customer-1",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "customer-2",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "approval": {
+                     "allow_only_on_success": true,
+                     "type": "success"
+                  },
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-customer-3": {
+         "display_order": 6,
+         "group": "example",
+         "materials": {
+            "deploy-example-customer-2-pipeline-complete": {
+               "pipeline": "deploy-example-customer-2",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "customer-3",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "approval": {
+                     "allow_only_on_success": true,
+                     "type": "success"
+                  },
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-customer-4": {
+         "display_order": 7,
+         "group": "example",
+         "materials": {
+            "deploy-example-customer-3-pipeline-complete": {
+               "pipeline": "deploy-example-customer-3",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "customer-4",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "approval": {
+                     "allow_only_on_success": true,
+                     "type": "success"
+                  },
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-customer-5": {
+         "display_order": 8,
+         "group": "example",
+         "materials": {
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "customer-5",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "approval": {
+                     "allow_only_on_success": true,
+                     "type": "success"
+                  },
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-customer-6": {
+         "display_order": 9,
+         "group": "example",
+         "materials": {
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "customer-6",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "approval": {
+                     "allow_only_on_success": true,
+                     "type": "success"
+                  },
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-s4s": {
+         "display_order": 2,
+         "group": "example",
+         "materials": {
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "s4s",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "approval": {
+                     "allow_only_on_success": true,
+                     "type": "success"
+                  },
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-us": {
+         "display_order": 3,
+         "group": "example",
+         "materials": {
+            "deploy-example-s4s-pipeline-complete": {
+               "pipeline": "deploy-example-s4s",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "us",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "approval": {
+                     "allow_only_on_success": true,
+                     "type": "success"
+                  },
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      }
+   }
+}

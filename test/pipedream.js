@@ -5,6 +5,7 @@ const files = [
   'pipedream/no-autodeploy.jsonnet',
   'pipedream/autodeploy.jsonnet',
   'pipedream/minimal-config.jsonnet',
+  'pipedream/exclude-regions.jsonnet',
 ];
 for (const f of files) {
   test(`render ${f} as files`, async t => {

@@ -184,8 +184,12 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, display_offs
 {
   // render will generate the trigger pipeline and all the region pipelines.
   render(pipedream_config, pipeline_fn)::
+    local regions_to_render = std.filter(
+      function(r) !std.objectHas(pipedream_config, 'exclude_regions') || std.length(std.find(r, pipedream_config.exclude_regions)) == 0,
+      REGIONS,
+    );
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
-    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, REGIONS, 2);
+    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, 2);
     local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, TEST_REGIONS, std.length(REGIONS) + 2);
     local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config);
 
@@ -222,6 +226,8 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, display_offs
     else
       {
         format_version: 10,
+        regions: regions_to_render,
+        regions_exclude: pipedream_config.exclude_regions,
         pipelines: trigger_pipeline + service_pipelines + test_pipelines + rollback_pipeline,
       },
 }

@@ -1,4 +1,4 @@
-local getsentry = import '../../../libs/getsentry.libsonnet';
+local getsentry = import '../../../../libs/getsentry.libsonnet';
 
 {
   s4s: getsentry.is_st('s4s'),
