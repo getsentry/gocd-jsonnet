@@ -1,9 +1,8 @@
-local pipedream = import '../../../libs/pipedream.libsonnet';
+local pipedream = import '../../../../libs/pipedream.libsonnet';
 
 local pipedream_config = {
   name: 'example',
-  auto_deploy: false,
-  auto_pipeline_progression: false,
+  auto_deploy: true,
   rollback: {
     material_name: 'example_repo',
     stage: 'example_stage',
