@@ -29,3 +29,8 @@ export async function assert_testdata(t, filename, outputfiles=true) {
   // We still want the golden to match exactly
   t.is(got, want);
 }
+
+export async function get_fixtures(fixture_subdir) {
+  const files = await fs.readdir(path.join('test/testdata/fixtures', fixture_subdir));
+  return files.map((f) => path.join(fixture_subdir, f));
+}
