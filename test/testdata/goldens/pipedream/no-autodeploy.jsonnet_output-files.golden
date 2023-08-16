@@ -1,5 +1,5 @@
 {
-   "example-customer-1.yaml": {
+   "deploy-example-customer-1.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-1": {
@@ -78,7 +78,7 @@
          }
       }
    },
-   "example-customer-2.yaml": {
+   "deploy-example-customer-2.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-2": {
@@ -157,7 +157,7 @@
          }
       }
    },
-   "example-customer-3.yaml": {
+   "deploy-example-customer-3.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-3": {
@@ -236,7 +236,7 @@
          }
       }
    },
-   "example-customer-4.yaml": {
+   "deploy-example-customer-4.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-4": {
@@ -315,7 +315,7 @@
          }
       }
    },
-   "example-customer-5.yaml": {
+   "deploy-example-customer-5.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-5": {
@@ -394,7 +394,7 @@
          }
       }
    },
-   "example-customer-6.yaml": {
+   "deploy-example-customer-6.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-customer-6": {
@@ -473,7 +473,7 @@
          }
       }
    },
-   "example-s4s.yaml": {
+   "deploy-example-s4s.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-s4s": {
@@ -552,7 +552,7 @@
          }
       }
    },
-   "example-us.yaml": {
+   "deploy-example-us.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-us": {

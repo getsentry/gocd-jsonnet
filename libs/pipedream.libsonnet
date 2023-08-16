@@ -128,17 +128,17 @@ local pipedream_rollback_pipeline(pipedream_config) =
 
 // generate_region_pipeline will call the pipeline callback function, and then
 // name the pipeline, add an upstream material, and append a final stage.
-local generate_region_pipeline(pipedream_config, region, weight, pipeline_fn) =
+local generate_region_pipeline(pipedream_config, regions_to_chain, region, weight, pipeline_fn) =
   // Get previous region's pipeline name
   local service_name = pipedream_config.name;
-  local indexes = std.find(region, REGIONS);
+  local indexes = std.find(region, regions_to_chain);
   local upstream_pipeline = if std.length(indexes) == 0 || indexes[0] == 0 then
     if is_autodeploy(pipedream_config) then
       null
     else
       pipeline_name(service_name)
   else
-    pipeline_name(service_name, REGIONS[indexes[0] - 1]);
+    pipeline_name(service_name, regions_to_chain[indexes[0] - 1]);
 
   local service_pipeline = pipeline_fn(
     region,
@@ -175,21 +175,30 @@ local generate_region_pipeline(pipedream_config, region, weight, pipeline_fn) =
 
 // get_service_pipelines iterates over each region and generates the pipeline
 // for each region.
-local get_service_pipelines(pipedream_config, pipeline_fn, regions, display_offset) =
+local get_service_pipelines(pipedream_config, pipeline_fn, regions, regions_to_chain, display_offset) =
   {
-    [pipeline_name(pipedream_config.name, regions[i])]: generate_region_pipeline(pipedream_config, regions[i], display_offset + i, pipeline_fn)
+    [pipeline_name(pipedream_config.name, regions[i])]: generate_region_pipeline(pipedream_config, regions_to_chain, regions[i], display_offset + i, pipeline_fn)
     for i in std.range(0, std.length(regions) - 1)
   };
 
 {
   // render will generate the trigger pipeline and all the region pipelines.
   render(pipedream_config, pipeline_fn)::
+    local regions_to_render = std.filter(
+      function(r) !std.objectHas(pipedream_config, 'exclude_regions') || std.length(std.find(r, pipedream_config.exclude_regions)) == 0,
+      REGIONS,
+    );
+    local test_regions_to_render = std.filter(
+      function(r) !std.objectHas(pipedream_config, 'exclude_regions') || std.length(std.find(r, pipedream_config.exclude_regions)) == 0,
+      TEST_REGIONS,
+    );
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
-    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, REGIONS, 2);
-    local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, TEST_REGIONS, std.length(REGIONS) + 2);
+    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, regions_to_render, 2);
+    local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, test_regions_to_render, [], std.length(regions_to_render) + 2);
     local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config);
 
     if std.extVar('output-files') then
+      local service_pipeline_names = std.objectFields(service_pipelines);
       local test_pipeline_names = std.objectFields(test_pipelines);
 
       {
@@ -203,15 +212,15 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, display_offs
           pipelines: rollback_pipeline,
         },
       } + {
-        [pipedream_config.name + '-' + REGIONS[i] + '.yaml']: {
+        [service_pipeline_names[i] + '.yaml']: {
           format_version: 10,
           pipelines: {
-            [pipeline_name(pipedream_config.name, REGIONS[i])]: service_pipelines[pipeline_name(pipedream_config.name, REGIONS[i])],
+            [service_pipeline_names[i]]: service_pipelines[service_pipeline_names[i]],
           },
         }
-        for i in std.range(0, std.length(REGIONS) - 1)
+        for i in std.range(0, std.length(service_pipeline_names) - 1)
       } + {
-        [pipedream_config.name + '-' + TEST_REGIONS[i] + '.yaml']: {
+        [test_pipeline_names[i] + '.yaml']: {
           format_version: 10,
           pipelines: {
             [test_pipeline_names[i]]: test_pipelines[test_pipeline_names[i]],

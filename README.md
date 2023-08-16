@@ -114,6 +114,10 @@ local pipedream_config = {
   auto_deploy: false,
   # Set to true if you want each pipeline to require manual approval
   auto_pipeline_progression: false,
+
+  # If there is ever a situation where you need to remove a region from
+  # a pipedream, add the region name to this array.
+  exclude_regions: [],
 };
 
 # You'll need to define a jsonnet function that describes your pipeline
