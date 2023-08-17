@@ -2,6 +2,14 @@
 
 Jsonnet libraries used to help structure GoCD pipelines for getsentry
 
+## Dependencies
+
+You'll need go-jsonnet, jsonnet-bundler and yq for using this in sentry.
+
+```sh
+brew install go-jsonnet jsonnet-bundler yq
+```
+
 ## Install
 
 You'll need jsonnet-bundler to install these libraries:
