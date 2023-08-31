@@ -110,6 +110,9 @@ local pipedream_rollback_pipeline(pipedream_config) =
           },
           {
             start_rollback: {
+              approval: {
+                type: 'manual',
+              },
               jobs: {
                 rollback: {
                   elastic_profile_id: pipedream_config.rollback.elastic_profile_id,
