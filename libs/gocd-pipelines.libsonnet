@@ -1,12 +1,15 @@
+local final_stage_name(pipeline) =
+  local final_stage = pipeline.pipeline.stages[std.length(pipeline.pipeline.stages) - 1];
+  std.objectFields(final_stage)[0];
+
 local chain_materials(current_pipeline, previous_pipeline) =
-  local final_stage = previous_pipeline.pipeline.stages[std.length(previous_pipeline.pipeline.stages) - 1];
-  local final_stage_name = std.objectFields(final_stage)[0];
+  local final_stage = final_stage_name(previous_pipeline);
   current_pipeline {
     pipeline+: {
       materials+: {
-        [previous_pipeline.name + '-' + final_stage_name]: {
+        [previous_pipeline.name + '-' + final_stage]: {
           pipeline: previous_pipeline.name,
-          stage: final_stage_name,
+          stage: final_stage,
         },
       },
     },
@@ -46,4 +49,5 @@ local pipelines_to_object(pipelines) =
   chain_pipelines(pipelines):: chain_pipelines(pipelines),
   pipelines_to_files_object(pipelines):: pipelines_to_files_object(pipelines),
   pipelines_to_object(pipelines):: pipelines_to_object(pipelines),
+  final_stage_name(pipeline):: final_stage_name(pipeline),
 }

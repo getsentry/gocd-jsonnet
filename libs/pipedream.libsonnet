@@ -73,8 +73,7 @@ local pipedream_rollback_pipeline(pipedream_config, final_pipeline) =
     else
       region_pipeline_flags + ' --pipeline=' + pipeline_name(name);
 
-    local final_stage = final_pipeline.pipeline.stages[std.length(final_pipeline.pipeline.stages) - 1];
-    local final_stage_name = std.objectFields(final_stage)[0];
+    local final_stage = gocd_pipelines.final_stage_name(final_pipeline);
 
     {
       ['rollback-' + name]: {
@@ -88,9 +87,9 @@ local pipedream_rollback_pipeline(pipedream_config, final_pipeline) =
           ALL_PIPELINE_FLAGS: all_pipeline_flags,
         },
         materials: {
-          [final_pipeline.name + '-' + final_stage_name]: {
+          [final_pipeline.name + '-' + final_stage]: {
             pipeline: final_pipeline.name,
-            stage: final_stage_name,
+            stage: final_stage,
           },
         },
         lock_behavior: 'unlockWhenFinished',
