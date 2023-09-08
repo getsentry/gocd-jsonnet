@@ -6,9 +6,9 @@
             "display_order": 4,
             "group": "example",
             "materials": {
-               "deploy-example-us-pipeline-complete": {
+               "deploy-example-us-example_stage": {
                   "pipeline": "deploy-example-us",
-                  "stage": "pipeline-complete"
+                  "stage": "example_stage"
                },
                "example_repo": {
                   "branch": "master",
@@ -21,25 +21,6 @@
             "stages": [
                {
                   "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "approval": {
-                        "allow_only_on_success": true,
-                        "type": "success"
-                     },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
                }
             ]
          }
@@ -52,9 +33,9 @@
             "display_order": 5,
             "group": "example",
             "materials": {
-               "deploy-example-customer-1-pipeline-complete": {
+               "deploy-example-customer-1-example_stage": {
                   "pipeline": "deploy-example-customer-1",
-                  "stage": "pipeline-complete"
+                  "stage": "example_stage"
                },
                "example_repo": {
                   "branch": "master",
@@ -67,25 +48,6 @@
             "stages": [
                {
                   "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "approval": {
-                        "allow_only_on_success": true,
-                        "type": "success"
-                     },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
                }
             ]
          }
@@ -98,9 +60,9 @@
             "display_order": 6,
             "group": "example",
             "materials": {
-               "deploy-example-customer-2-pipeline-complete": {
+               "deploy-example-customer-2-example_stage": {
                   "pipeline": "deploy-example-customer-2",
-                  "stage": "pipeline-complete"
+                  "stage": "example_stage"
                },
                "example_repo": {
                   "branch": "master",
@@ -113,25 +75,6 @@
             "stages": [
                {
                   "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "approval": {
-                        "allow_only_on_success": true,
-                        "type": "success"
-                     },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
                }
             ]
          }
@@ -144,9 +87,9 @@
             "display_order": 7,
             "group": "example",
             "materials": {
-               "deploy-example-customer-3-pipeline-complete": {
+               "deploy-example-customer-3-example_stage": {
                   "pipeline": "deploy-example-customer-3",
-                  "stage": "pipeline-complete"
+                  "stage": "example_stage"
                },
                "example_repo": {
                   "branch": "master",
@@ -159,25 +102,6 @@
             "stages": [
                {
                   "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "approval": {
-                        "allow_only_on_success": true,
-                        "type": "success"
-                     },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
                }
             ]
          }
@@ -201,25 +125,6 @@
             "stages": [
                {
                   "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "approval": {
-                        "allow_only_on_success": true,
-                        "type": "success"
-                     },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
                }
             ]
          }
@@ -243,25 +148,6 @@
             "stages": [
                {
                   "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "approval": {
-                        "allow_only_on_success": true,
-                        "type": "success"
-                     },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
                }
             ]
          }
@@ -285,25 +171,6 @@
             "stages": [
                {
                   "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "approval": {
-                        "allow_only_on_success": true,
-                        "type": "success"
-                     },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
                }
             ]
          }
@@ -316,9 +183,9 @@
             "display_order": 3,
             "group": "example",
             "materials": {
-               "deploy-example-s4s-pipeline-complete": {
+               "deploy-example-s4s-example_stage": {
                   "pipeline": "deploy-example-s4s",
-                  "stage": "pipeline-complete"
+                  "stage": "example_stage"
                },
                "example_repo": {
                   "branch": "master",
@@ -331,25 +198,6 @@
             "stages": [
                {
                   "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "approval": {
-                        "allow_only_on_success": true,
-                        "type": "success"
-                     },
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
                }
             ]
          }
