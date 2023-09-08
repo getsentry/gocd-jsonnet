@@ -15,6 +15,7 @@ and a final stage. The upstream material and final stage is to make GoCD
 chain the pipelines together.
 
 */
+local gocd_pipelines = import './gocd-pipelines.libsonnet';
 local gocd_stages = import './gocd-stages.libsonnet';
 local gocd_tasks = import './gocd-tasks.libsonnet';
 
@@ -31,7 +32,6 @@ local TEST_REGIONS = [
   'customer-5',
   'customer-6',
 ];
-local FINAL_STAGE_NAME = 'pipeline-complete';
 
 local pipeline_name(name, region=null) =
   if region != null then 'deploy-' + name + '-' + region else 'deploy-' + name;
@@ -58,12 +58,12 @@ local pipedream_trigger_pipeline(pipedream_config) =
         materials: materials,
         lock_behavior: 'unlockWhenFinished',
         stages: [
-          gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], { approval: approval_type }),
+          gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { approval: approval_type }),
         ],
       },
     };
 
-local pipedream_rollback_pipeline(pipedream_config) =
+local pipedream_rollback_pipeline(pipedream_config, final_pipeline) =
   if std.objectHas(pipedream_config, 'rollback') then
     local name = pipedream_config.name;
     local region_pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS);
@@ -72,7 +72,8 @@ local pipedream_rollback_pipeline(pipedream_config) =
       region_pipeline_flags
     else
       region_pipeline_flags + ' --pipeline=' + pipeline_name(name);
-    local final_pipeline = pipeline_name(name, REGIONS[std.length(REGIONS) - 1]);
+
+    local final_stage = gocd_pipelines.final_stage_name(final_pipeline);
 
     {
       ['rollback-' + name]: {
@@ -86,9 +87,9 @@ local pipedream_rollback_pipeline(pipedream_config) =
           ALL_PIPELINE_FLAGS: all_pipeline_flags,
         },
         materials: {
-          [final_pipeline + '-' + FINAL_STAGE_NAME]: {
-            pipeline: final_pipeline,
-            stage: FINAL_STAGE_NAME,
+          [final_pipeline.name + '-' + final_stage]: {
+            pipeline: final_pipeline.name,
+            stage: final_stage,
           },
         },
         lock_behavior: 'unlockWhenFinished',
@@ -131,14 +132,6 @@ local pipedream_rollback_pipeline(pipedream_config) =
 local generate_region_pipeline(pipedream_config, regions_to_chain, region, weight, pipeline_fn) =
   // Get previous region's pipeline name
   local service_name = pipedream_config.name;
-  local indexes = std.find(region, regions_to_chain);
-  local upstream_pipeline = if std.length(indexes) == 0 || indexes[0] == 0 then
-    if is_autodeploy(pipedream_config) then
-      null
-    else
-      pipeline_name(service_name)
-  else
-    pipeline_name(service_name, regions_to_chain[indexes[0] - 1]);
 
   local service_pipeline = pipeline_fn(
     region,
@@ -162,24 +155,20 @@ local generate_region_pipeline(pipedream_config, regions_to_chain, region, weigh
   service_pipeline {
     group: service_name,
     display_order: weight,
-    materials+: {
-      [if upstream_pipeline == null then null else upstream_pipeline + '-' + FINAL_STAGE_NAME]: {
-        pipeline: upstream_pipeline,
-        stage: FINAL_STAGE_NAME,
-      },
-    },
-    stages: prepend_stages + stages + [
-      gocd_stages.basic(FINAL_STAGE_NAME, [gocd_tasks.noop], { approval: 'success' }),
-    ],
+    stages: prepend_stages + stages,
   };
 
 // get_service_pipelines iterates over each region and generates the pipeline
 // for each region.
 local get_service_pipelines(pipedream_config, pipeline_fn, regions, regions_to_chain, display_offset) =
-  {
-    [pipeline_name(pipedream_config.name, regions[i])]: generate_region_pipeline(pipedream_config, regions_to_chain, regions[i], display_offset + i, pipeline_fn)
+  [
+    {
+      name: pipeline_name(pipedream_config.name, regions[i]),
+      pipeline: generate_region_pipeline(pipedream_config, regions_to_chain, regions[i], display_offset + i, pipeline_fn),
+    }
     for i in std.range(0, std.length(regions) - 1)
-  };
+  ];
+
 
 {
   // render will generate the trigger pipeline and all the region pipelines.
@@ -193,14 +182,12 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, regions_to_c
       TEST_REGIONS,
     );
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
-    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, regions_to_render, 2);
+    local unchained_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, regions_to_render, 2);
+    local service_pipelines = gocd_pipelines.chain_pipelines(unchained_pipelines);
     local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, test_regions_to_render, [], std.length(regions_to_render) + 2);
-    local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config);
+    local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config, service_pipelines[std.length(service_pipelines) - 1]);
 
     if std.extVar('output-files') then
-      local service_pipeline_names = std.objectFields(service_pipelines);
-      local test_pipeline_names = std.objectFields(test_pipelines);
-
       {
         [if trigger_pipeline == {} then null else pipedream_config.name + '.yaml']: {
           format_version: 10,
@@ -211,26 +198,14 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, regions_to_c
           format_version: 10,
           pipelines: rollback_pipeline,
         },
-      } + {
-        [service_pipeline_names[i] + '.yaml']: {
-          format_version: 10,
-          pipelines: {
-            [service_pipeline_names[i]]: service_pipelines[service_pipeline_names[i]],
-          },
-        }
-        for i in std.range(0, std.length(service_pipeline_names) - 1)
-      } + {
-        [test_pipeline_names[i] + '.yaml']: {
-          format_version: 10,
-          pipelines: {
-            [test_pipeline_names[i]]: test_pipelines[test_pipeline_names[i]],
-          },
-        }
-        for i in std.range(0, std.length(test_pipeline_names) - 1)
-      }
+      } +
+      gocd_pipelines.pipelines_to_files_object(service_pipelines) +
+      gocd_pipelines.pipelines_to_files_object(test_pipelines)
     else
       {
         format_version: 10,
-        pipelines: trigger_pipeline + service_pipelines + test_pipelines + rollback_pipeline,
+        pipelines: trigger_pipeline + rollback_pipeline +
+                   gocd_pipelines.pipelines_to_object(service_pipelines) +
+                   gocd_pipelines.pipelines_to_object(test_pipelines),
       },
 }
