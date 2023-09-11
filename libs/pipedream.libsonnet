@@ -39,8 +39,9 @@ local pipeline_name(name, region=null) =
 local is_autodeploy(pipedream_config) =
   !std.objectHas(pipedream_config, 'auto_deploy') || pipedream_config.auto_deploy == true;
 
-// The "trigger pipeline" is a pipeline that doesn't do anything special,
-// but it serves as a nice way to start the pipedream for end users.
+// This function returns a "trigger pipeline", if configured for manual deploys.
+// The pipeline doesn't do anything special, but it serves as a nice way to
+// start the pipedream for end users.
 local pipedream_trigger_pipelines(pipedream_config) =
   local name = pipedream_config.name;
   local materials = pipedream_config.materials;
