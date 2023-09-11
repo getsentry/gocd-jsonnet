@@ -467,7 +467,7 @@
          }
       }
    },
-   "example.yaml": {
+   "deploy-example.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example": {

@@ -41,8 +41,11 @@ local pipelines_to_files_object(pipelines) =
 // This is used to output all pipelines in a single file.
 local pipelines_to_object(pipelines) =
   {
-    [pipelines[i].name]: pipelines[i].pipeline
-    for i in std.range(0, std.length(pipelines) - 1)
+    format_version: 10,
+    pipelines: {
+      [pipelines[i].name]: pipelines[i].pipeline
+      for i in std.range(0, std.length(pipelines) - 1)
+    },
   };
 
 {

@@ -1,0 +1,13 @@
+{
+   "format_version": 10,
+   "pipelines": {
+      "example-1": {
+         "group": "example-1",
+         "materials": [ ]
+      },
+      "example-2": {
+         "group": "example-2",
+         "materials": [ ]
+      }
+   }
+}
