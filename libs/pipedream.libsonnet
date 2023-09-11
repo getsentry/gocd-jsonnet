@@ -41,7 +41,7 @@ local is_autodeploy(pipedream_config) =
 
 // The "trigger pipeline" is a pipeline that doesn't do anything special,
 // but it serves as a nice way to start the pipedream for end users.
-local pipedream_trigger_pipeline(pipedream_config) =
+local pipedream_trigger_pipelines(pipedream_config) =
   local name = pipedream_config.name;
   local materials = pipedream_config.materials;
   local autodeploy = is_autodeploy(pipedream_config);
@@ -49,21 +49,24 @@ local pipedream_trigger_pipeline(pipedream_config) =
     'manual' else null;
 
   if autodeploy == true then
-    {}
+    []
   else
-    {
-      [pipeline_name(name)]: {
-        group: name,
-        display_order: 0,
-        materials: materials,
-        lock_behavior: 'unlockWhenFinished',
-        stages: [
-          gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { approval: approval_type }),
-        ],
+    [
+      {
+        name: pipeline_name(name),
+        pipeline: {
+          group: name,
+          display_order: 0,
+          materials: materials,
+          lock_behavior: 'unlockWhenFinished',
+          stages: [
+            gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { approval: approval_type }),
+          ],
+        },
       },
-    };
+    ];
 
-local pipedream_rollback_pipeline(pipedream_config, final_pipeline) =
+local pipedream_rollback_pipelines(pipedream_config, final_pipeline) =
   if std.objectHas(pipedream_config, 'rollback') then
     local name = pipedream_config.name;
     local region_pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS);
@@ -75,57 +78,60 @@ local pipedream_rollback_pipeline(pipedream_config, final_pipeline) =
 
     local final_stage = gocd_pipelines.final_stage_name(final_pipeline);
 
-    {
-      ['rollback-' + name]: {
-        group: name,
-        display_order: 1,
-        environment_variables: {
-          GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}',
-          ROLLBACK_MATERIAL_NAME: pipedream_config.rollback.material_name,
-          ROLLBACK_STAGE: pipedream_config.rollback.stage,
-          REGION_PIPELINE_FLAGS: region_pipeline_flags,
-          ALL_PIPELINE_FLAGS: all_pipeline_flags,
-        },
-        materials: {
-          [final_pipeline.name + '-' + final_stage]: {
-            pipeline: final_pipeline.name,
-            stage: final_stage,
+    [
+      {
+        name: 'rollback-' + name,
+        pipeline: {
+          group: name,
+          display_order: 1,
+          environment_variables: {
+            GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}',
+            ROLLBACK_MATERIAL_NAME: pipedream_config.rollback.material_name,
+            ROLLBACK_STAGE: pipedream_config.rollback.stage,
+            REGION_PIPELINE_FLAGS: region_pipeline_flags,
+            ALL_PIPELINE_FLAGS: all_pipeline_flags,
           },
-        },
-        lock_behavior: 'unlockWhenFinished',
-        stages: [
-          {
-            pause_pipelines: {
-              approval: {
-                type: 'manual',
-              },
-              jobs: {
-                rollback: {
-                  elastic_profile_id: pipedream_config.rollback.elastic_profile_id,
-                  tasks: [
-                    gocd_tasks.script(importstr './bash/pause-pipelines.sh'),
-                  ],
+          materials: {
+            [final_pipeline.name + '-' + final_stage]: {
+              pipeline: final_pipeline.name,
+              stage: final_stage,
+            },
+          },
+          lock_behavior: 'unlockWhenFinished',
+          stages: [
+            {
+              pause_pipelines: {
+                approval: {
+                  type: 'manual',
+                },
+                jobs: {
+                  rollback: {
+                    elastic_profile_id: pipedream_config.rollback.elastic_profile_id,
+                    tasks: [
+                      gocd_tasks.script(importstr './bash/pause-pipelines.sh'),
+                    ],
+                  },
                 },
               },
             },
-          },
-          {
-            start_rollback: {
-              jobs: {
-                rollback: {
-                  elastic_profile_id: pipedream_config.rollback.elastic_profile_id,
-                  tasks: [
-                    gocd_tasks.script(importstr './bash/rollback.sh'),
-                  ],
+            {
+              start_rollback: {
+                jobs: {
+                  rollback: {
+                    elastic_profile_id: pipedream_config.rollback.elastic_profile_id,
+                    tasks: [
+                      gocd_tasks.script(importstr './bash/rollback.sh'),
+                    ],
+                  },
                 },
               },
             },
-          },
-        ],
+          ],
+        },
       },
-    }
+    ]
   else
-    {};
+    [];
 
 // generate_region_pipeline will call the pipeline callback function, and then
 // name the pipeline, add an upstream material, and append a final stage.
@@ -181,31 +187,16 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, regions_to_c
       function(r) !std.objectHas(pipedream_config, 'exclude_regions') || std.length(std.find(r, pipedream_config.exclude_regions)) == 0,
       TEST_REGIONS,
     );
-    local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
+    local trigger_pipelines = pipedream_trigger_pipelines(pipedream_config);
     local unchained_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, regions_to_render, 2);
     local service_pipelines = gocd_pipelines.chain_pipelines(unchained_pipelines);
     local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, test_regions_to_render, [], std.length(regions_to_render) + 2);
-    local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config, service_pipelines[std.length(service_pipelines) - 1]);
+    local rollback_pipelines = pipedream_rollback_pipelines(pipedream_config, service_pipelines[std.length(service_pipelines) - 1]);
+
+    local all_pipelines = trigger_pipelines + rollback_pipelines + service_pipelines + test_pipelines;
 
     if std.extVar('output-files') then
-      {
-        [if trigger_pipeline == {} then null else pipedream_config.name + '.yaml']: {
-          format_version: 10,
-          pipelines: trigger_pipeline,
-        },
-      } + {
-        [if rollback_pipeline == {} then null else 'rollback-' + pipedream_config.name + '.yaml']: {
-          format_version: 10,
-          pipelines: rollback_pipeline,
-        },
-      } +
-      gocd_pipelines.pipelines_to_files_object(service_pipelines) +
-      gocd_pipelines.pipelines_to_files_object(test_pipelines)
+      gocd_pipelines.pipelines_to_files_object(all_pipelines)
     else
-      {
-        format_version: 10,
-        pipelines: trigger_pipeline + rollback_pipeline +
-                   gocd_pipelines.pipelines_to_object(service_pipelines) +
-                   gocd_pipelines.pipelines_to_object(test_pipelines),
-      },
+      gocd_pipelines.pipelines_to_object(all_pipelines),
 }
