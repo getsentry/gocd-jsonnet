@@ -58,7 +58,6 @@ local pipedream_trigger_pipeline(pipedream_config) =
         group: name,
         display_order: 0,
         materials: materials,
-        [if std.objectHas(pipedream_config, 'environment_variables') then 'environment_variables' else null]: pipedream_config.environment_variables,
         lock_behavior: 'unlockWhenFinished',
         stages: [
           gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { approval: approval_type }),
