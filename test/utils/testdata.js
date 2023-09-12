@@ -2,9 +2,17 @@ import * as fs from 'node:fs/promises';
 import * as path from 'path';
 import {execSync} from 'node:child_process';
 
+async function get_fixture_content(filename, outputfiles) {
+  const buff = execSync(`jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles} --ext-code random=true`);
+  return buff.toString();
+}
+
+export async function render_fixture(filename, outputfiles=false) {
+  return JSON.parse(await get_fixture_content(filename, outputfiles));
+}
+
 export async function assert_testdata(t, filename, outputfiles=true) {
-  const gotBuff = execSync(`jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles} --ext-code random=true`);
-  const got = gotBuff.toString();
+  const got = await get_fixture_content(filename, outputfiles);
 
   const suffix = [];
   if (outputfiles) {
@@ -28,6 +36,22 @@ export async function assert_testdata(t, filename, outputfiles=true) {
   t.deepEqual(JSON.parse(got), JSON.parse(want));
   // We still want the golden to match exactly
   t.is(got, want);
+}
+
+function check_gocd_structure(t, config) {
+  t.deepEqual(Object.keys(config), ['format_version', 'pipelines']);
+}
+
+export async function assert_gocd_structure(t, filename, outputfiles) {
+  const got = await render_fixture(filename, outputfiles);
+  if (outputfiles) {
+    for (const fn of Object.keys(got)) {
+      const config = got[fn];
+      check_gocd_structure(t, config);
+    }
+  } else {
+    check_gocd_structure(t, got);
+  }
 }
 
 export async function get_fixtures(fixture_subdir) {

@@ -258,6 +258,10 @@
          "display_order": 8,
          "group": "example",
          "materials": {
+            "deploy-example-pipeline-complete": {
+               "pipeline": "deploy-example",
+               "stage": "pipeline-complete"
+            },
             "example_repo": {
                "branch": "master",
                "destination": "example",
@@ -309,6 +313,10 @@
          "display_order": 9,
          "group": "example",
          "materials": {
+            "deploy-example-pipeline-complete": {
+               "pipeline": "deploy-example",
+               "stage": "pipeline-complete"
+            },
             "example_repo": {
                "branch": "master",
                "destination": "example",
@@ -360,6 +368,10 @@
          "display_order": 2,
          "group": "example",
          "materials": {
+            "deploy-example-pipeline-complete": {
+               "pipeline": "deploy-example",
+               "stage": "pipeline-complete"
+            },
             "example_repo": {
                "branch": "master",
                "destination": "example",
