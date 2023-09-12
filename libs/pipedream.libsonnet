@@ -44,6 +44,7 @@ local is_autodeploy(pipedream_config) =
 // start the pipedream for end users.
 local pipedream_trigger_pipeline(pipedream_config) =
   local name = pipedream_config.name;
+  local environment_variables = pipedream_config.environment_variablesl
   local materials = pipedream_config.materials;
   local autodeploy = is_autodeploy(pipedream_config);
   local approval_type = if autodeploy == false then
