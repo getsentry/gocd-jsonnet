@@ -94,3 +94,98 @@ test(`ensure auto deploys is expected structure`, async t => {
     },
   });
 });
+
+test(`ensure exclude regions removes regions without trigger pipeline`, async t => {
+  const got = await render_fixture('pipedream/exclude-regions.jsonnet', false);
+
+  t.deepEqual(Object.keys(got.pipelines).sort(), [
+    'deploy-example-customer-1',
+    'deploy-example-customer-2',
+    'deploy-example-customer-4',
+    'deploy-example-customer-6',
+    'rollback-example',
+  ]);
+
+  // Ensure customer-1 has just the repo material
+  const c1 = got.pipelines['deploy-example-customer-1'];
+  t.deepEqual(c1.materials, {
+    'example_repo': {
+      branch: 'master',
+      destination: 'example',
+      git: 'git@github.com:getsentry/example.git',
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure customer-2 has pipeline material too
+  const c2 = got.pipelines['deploy-example-customer-2'];
+  t.deepEqual(c2.materials, {
+    'deploy-example-customer-1-example_stage': {
+      pipeline: 'deploy-example-customer-1',
+      stage: 'example_stage',
+    },
+    'example_repo': {
+      branch: 'master',
+      destination: 'example',
+      git: 'git@github.com:getsentry/example.git',
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure rollback has the expected rollback pipelines
+  const r = got.pipelines['rollback-example'];
+  const allPipelines = r.environment_variables['ALL_PIPELINE_FLAGS'];
+  const regionPipelines = r.environment_variables['REGION_PIPELINE_FLAGS'];
+  t.deepEqual(allPipelines, '--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4');
+  t.deepEqual(regionPipelines, '--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4');
+});
+
+test(`ensure exclude regions removes regions with trigger pipeline`, async t => {
+  const got = await render_fixture('pipedream/exclude-regions-no-autodeploy.jsonnet', false);
+
+  t.deepEqual(Object.keys(got.pipelines).sort(), [
+    'deploy-example',
+    'deploy-example-customer-1',
+    'deploy-example-customer-2',
+    'deploy-example-customer-4',
+    'deploy-example-customer-6',
+    'rollback-example',
+  ]);
+
+  // Ensure customer-1 has just the repo material
+  const c1 = got.pipelines['deploy-example-customer-1'];
+  t.deepEqual(c1.materials, {
+    'deploy-example-pipeline-complete': {
+      pipeline: 'deploy-example',
+      stage: 'pipeline-complete',
+    },
+    'example_repo': {
+      branch: 'master',
+      destination: 'example',
+      git: 'git@github.com:getsentry/example.git',
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure customer-2 has pipeline material too
+  const c2 = got.pipelines['deploy-example-customer-2'];
+  t.deepEqual(c2.materials, {
+    'deploy-example-customer-1-example_stage': {
+      pipeline: 'deploy-example-customer-1',
+      stage: 'example_stage',
+    },
+    'example_repo': {
+      branch: 'master',
+      destination: 'example',
+      git: 'git@github.com:getsentry/example.git',
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure rollback has the expected rollback pipelines
+  const r = got.pipelines['rollback-example'];
+  const allPipelines = r.environment_variables['ALL_PIPELINE_FLAGS'];
+  const regionPipelines = r.environment_variables['REGION_PIPELINE_FLAGS'];
+  t.deepEqual(allPipelines, '--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example');
+  t.deepEqual(regionPipelines, '--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4');
+});
