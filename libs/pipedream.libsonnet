@@ -65,15 +65,15 @@ local pipedream_trigger_pipeline(pipedream_config) =
       },
     };
 
-local pipedream_rollback_pipeline(pipedream_config, final_pipeline) =
+local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_pipeline) =
   if std.objectHas(pipedream_config, 'rollback') then
     local name = pipedream_config.name;
-    local region_pipeline_names = std.map(function(r) pipeline_name(name, r), REGIONS);
-    local region_pipeline_flags = std.join(' ', std.map(function(p) '--pipeline=' + p, region_pipeline_names));
-    local all_pipeline_flags = if is_autodeploy(pipedream_config) then
+    local final_pipeline = service_pipelines[std.length(service_pipelines) - 1];
+    local region_pipeline_flags = std.join(' ', std.map(function(p) '--pipeline=' + p.name, service_pipelines));
+    local all_pipeline_flags = if trigger_pipeline == null then
       region_pipeline_flags
     else
-      region_pipeline_flags + ' --pipeline=' + pipeline_name(name);
+      region_pipeline_flags + ' --pipeline=' + trigger_pipeline.name;
 
     local final_stage = gocd_pipelines.final_stage_name(final_pipeline);
 
@@ -202,7 +202,7 @@ local add_trigger_material(should_add, trigger_pipeline) =
     local unchained_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, 2);
     local service_pipelines = gocd_pipelines.chain_pipelines(unchained_pipelines);
     local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, test_regions_to_render, std.length(regions_to_render) + 2);
-    local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config, service_pipelines[std.length(service_pipelines) - 1]);
+    local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_pipeline);
 
 
     local all_pipelines = pipeline_to_array(trigger_pipeline) +

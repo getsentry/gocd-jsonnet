@@ -2,6 +2,7 @@ local pipedream = import '../../../../libs/pipedream.libsonnet';
 
 local pipedream_config = {
   name: 'example',
+  auto_deploy: false,
   exclude_regions: ['s4s', 'us', 'customer-3', 'customer-5'],
   materials: {
     init_repo: {
