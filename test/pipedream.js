@@ -120,9 +120,9 @@ test(`ensure exclude regions removes regions without trigger pipeline`, async t 
   // Ensure customer-2 has pipeline material too
   const c2 = got.pipelines['deploy-example-customer-2'];
   t.deepEqual(c2.materials, {
-    'deploy-example-customer-1-example_stage': {
+    'deploy-example-customer-1-pipeline-complete': {
       pipeline: 'deploy-example-customer-1',
-      stage: 'example_stage',
+      stage: 'pipeline-complete',
     },
     'example_repo': {
       branch: 'master',
@@ -170,9 +170,9 @@ test(`ensure exclude regions removes regions with trigger pipeline`, async t => 
   // Ensure customer-2 has pipeline material too
   const c2 = got.pipelines['deploy-example-customer-2'];
   t.deepEqual(c2.materials, {
-    'deploy-example-customer-1-example_stage': {
+    'deploy-example-customer-1-pipeline-complete': {
       pipeline: 'deploy-example-customer-1',
-      stage: 'example_stage',
+      stage: 'pipeline-complete',
     },
     'example_repo': {
       branch: 'master',

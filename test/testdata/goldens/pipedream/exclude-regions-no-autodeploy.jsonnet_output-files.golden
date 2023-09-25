@@ -21,6 +21,21 @@
             "stages": [
                {
                   "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
                }
             ]
          }
@@ -33,9 +48,9 @@
             "display_order": 3,
             "group": "example",
             "materials": {
-               "deploy-example-customer-1-example_stage": {
+               "deploy-example-customer-1-pipeline-complete": {
                   "pipeline": "deploy-example-customer-1",
-                  "stage": "example_stage"
+                  "stage": "pipeline-complete"
                },
                "example_repo": {
                   "branch": "master",
@@ -48,6 +63,21 @@
             "stages": [
                {
                   "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
                }
             ]
          }
@@ -60,9 +90,9 @@
             "display_order": 4,
             "group": "example",
             "materials": {
-               "deploy-example-customer-2-example_stage": {
+               "deploy-example-customer-2-pipeline-complete": {
                   "pipeline": "deploy-example-customer-2",
-                  "stage": "example_stage"
+                  "stage": "pipeline-complete"
                },
                "example_repo": {
                   "branch": "master",
@@ -75,6 +105,21 @@
             "stages": [
                {
                   "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
                }
             ]
          }
@@ -102,6 +147,21 @@
             "stages": [
                {
                   "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
                }
             ]
          }
@@ -159,9 +219,9 @@
             "group": "example",
             "lock_behavior": "unlockWhenFinished",
             "materials": {
-               "deploy-example-customer-4-example_stage": {
+               "deploy-example-customer-4-pipeline-complete": {
                   "pipeline": "deploy-example-customer-4",
-                  "stage": "example_stage"
+                  "stage": "pipeline-complete"
                }
             },
             "stages": [

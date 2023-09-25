@@ -158,7 +158,16 @@ local generate_region_pipeline(pipedream_config, region, weight, pipeline_fn) =
   service_pipeline {
     group: service_name,
     display_order: weight,
-    stages: prepend_stages + stages,
+    stages: prepend_stages + stages + [
+      // This stage is added to ensure a rollback doesn't cause
+      // a deployment train.
+      //
+      // i.e. During a rollback, s4s and us re-runs the final stage
+      // The s4s final stage completes and causes us pipeline to
+      // re-run. Pipeline-complete being the final stage isn't
+      // re-run by rollback, so this domino effect doesn't occur.
+      gocd_stages.basic('pipeline-complete', [gocd_tasks.noop]),
+    ],
   };
 
 // get_service_pipelines iterates over each region and generates the pipeline
