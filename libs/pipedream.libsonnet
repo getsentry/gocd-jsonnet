@@ -124,6 +124,21 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
               },
             },
           },
+          {
+            incident_resolved: {
+              approval: {
+                type: 'manual',
+              },
+              jobs: {
+                rollback: {
+                  elastic_profile_id: pipedream_config.rollback.elastic_profile_id,
+                  tasks: [
+                    gocd_tasks.script(importstr './bash/unpause-pipelines.sh'),
+                  ],
+                },
+              },
+            },
+          },
         ],
       },
     }
