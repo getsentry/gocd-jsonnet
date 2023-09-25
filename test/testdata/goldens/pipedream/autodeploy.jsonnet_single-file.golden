@@ -5,9 +5,9 @@
          "display_order": 4,
          "group": "example",
          "materials": {
-            "deploy-example-us-example_stage": {
+            "deploy-example-us-pipeline-complete": {
                "pipeline": "deploy-example-us",
-               "stage": "example_stage"
+               "stage": "pipeline-complete"
             },
             "example_repo": {
                "branch": "master",
@@ -20,6 +20,21 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
             }
          ]
       },
@@ -27,9 +42,9 @@
          "display_order": 5,
          "group": "example",
          "materials": {
-            "deploy-example-customer-1-example_stage": {
+            "deploy-example-customer-1-pipeline-complete": {
                "pipeline": "deploy-example-customer-1",
-               "stage": "example_stage"
+               "stage": "pipeline-complete"
             },
             "example_repo": {
                "branch": "master",
@@ -42,6 +57,21 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
             }
          ]
       },
@@ -49,9 +79,9 @@
          "display_order": 6,
          "group": "example",
          "materials": {
-            "deploy-example-customer-2-example_stage": {
+            "deploy-example-customer-2-pipeline-complete": {
                "pipeline": "deploy-example-customer-2",
-               "stage": "example_stage"
+               "stage": "pipeline-complete"
             },
             "example_repo": {
                "branch": "master",
@@ -64,6 +94,21 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
             }
          ]
       },
@@ -71,9 +116,9 @@
          "display_order": 7,
          "group": "example",
          "materials": {
-            "deploy-example-customer-3-example_stage": {
+            "deploy-example-customer-3-pipeline-complete": {
                "pipeline": "deploy-example-customer-3",
-               "stage": "example_stage"
+               "stage": "pipeline-complete"
             },
             "example_repo": {
                "branch": "master",
@@ -86,6 +131,21 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
             }
          ]
       },
@@ -104,6 +164,21 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
             }
          ]
       },
@@ -122,6 +197,21 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
             }
          ]
       },
@@ -140,6 +230,21 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
             }
          ]
       },
@@ -147,9 +252,9 @@
          "display_order": 3,
          "group": "example",
          "materials": {
-            "deploy-example-s4s-example_stage": {
+            "deploy-example-s4s-pipeline-complete": {
                "pipeline": "deploy-example-s4s",
-               "stage": "example_stage"
+               "stage": "pipeline-complete"
             },
             "example_repo": {
                "branch": "master",
@@ -162,6 +267,21 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
             }
          ]
       },
@@ -177,9 +297,9 @@
          "group": "example",
          "lock_behavior": "unlockWhenFinished",
          "materials": {
-            "deploy-example-customer-4-example_stage": {
+            "deploy-example-customer-4-pipeline-complete": {
                "pipeline": "deploy-example-customer-4",
-               "stage": "example_stage"
+               "stage": "pipeline-complete"
             }
          },
          "stages": [
