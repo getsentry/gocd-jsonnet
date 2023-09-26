@@ -6,6 +6,6 @@ if [[ "${ALL_PIPELINE_FLAGS:-}" ]]; then
   set -- $ALL_PIPELINE_FLAGS
 fi
 
-# Unpause all pipelines in the pipedream
+# Unpause and unlock all pipelines in the pipedream
 gocd-unpause-and-unlock-pipelines \
   "$@"

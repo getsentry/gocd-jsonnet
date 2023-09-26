@@ -699,7 +699,7 @@
                            "elastic_profile_id": "example_profile",
                            "tasks": [
                               {
-                                 "script": "##!/bin/bash\n\n## Note: $ALL_PIPELINE_FLAGS has no quoting, for word expansion\n## shellcheck disable=SC2086\nif [[ \"${ALL_PIPELINE_FLAGS:-}\" ]]; then\n  set -- $ALL_PIPELINE_FLAGS\nfi\n\n## Unpause all pipelines in the pipedream\ngocd-unpause-and-unlock-pipelines \\\n  \"$@\"\n"
+                                 "script": "##!/bin/bash\n\n## Note: $ALL_PIPELINE_FLAGS has no quoting, for word expansion\n## shellcheck disable=SC2086\nif [[ \"${ALL_PIPELINE_FLAGS:-}\" ]]; then\n  set -- $ALL_PIPELINE_FLAGS\nfi\n\n## Unpause and unlock all pipelines in the pipedream\ngocd-unpause-and-unlock-pipelines \\\n  \"$@\"\n"
                               }
                            ]
                         }
