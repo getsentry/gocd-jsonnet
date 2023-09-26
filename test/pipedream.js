@@ -71,6 +71,7 @@ test(`ensure auto deploys is expected structure`, async t => {
   t.falsy(got.pipelines['deploy-example']);
   t.truthy(got.pipelines['deploy-example-s4s']);
   t.truthy(got.pipelines['deploy-example-customer-5']);
+  t.truthy(got.pipelines['rollback-example']);
 
   // Ensure s4s has just the repo material
   const s4s = got.pipelines['deploy-example-s4s'];
@@ -93,6 +94,22 @@ test(`ensure auto deploys is expected structure`, async t => {
       shallow_clone: true,
     },
   });
+
+  const r = got.pipelines['rollback-example'];
+  t.deepEqual(r['environment_variables'], {
+    ALL_PIPELINE_FLAGS: '--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4',
+    GOCD_ACCESS_TOKEN: '{{SECRET:[devinfra][gocd_access_token]}}',
+    REGION_PIPELINE_FLAGS: '--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4',
+    ROLLBACK_MATERIAL_NAME: 'example_repo',
+    ROLLBACK_STAGE: 'example_stage',
+  });
+  t.deepEqual(r['materials'], {
+    'deploy-example-customer-4-pipeline-complete': {
+      pipeline: 'deploy-example-customer-4',
+      stage: 'pipeline-complete',
+    },
+  });
+  t.deepEqual(r.stages.length, 3);
 });
 
 test(`ensure exclude regions removes regions without trigger pipeline`, async t => {
