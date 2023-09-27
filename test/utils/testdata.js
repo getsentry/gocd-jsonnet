@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'path';
 import {execSync} from 'node:child_process';
 
-async function get_fixture_content(filename, outputfiles) {
+export async function get_fixture_content(filename, outputfiles) {
   const buff = execSync(`jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles} --ext-code random=true`);
   return buff.toString();
 }
