@@ -8,7 +8,7 @@ local pipedream_config = {
     stage: 'example_stage',
     // NOTE: This should only be used during a transition where the final stage
     // of a pipeline is will impact rollbacks
-    final_stage: 'custom_final_stage',
+    final_stage: 'other_stage',
     elastic_profile_id: 'example_profile',
   },
   materials: {
@@ -35,6 +35,9 @@ local sample = {
     stages: [
       {
         example_stage: {},
+      },
+      {
+        other_stage: {},
       },
     ],
   },

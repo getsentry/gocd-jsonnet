@@ -76,7 +76,7 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
       region_pipeline_flags + ' --pipeline=' + trigger_pipeline.name;
 
     local final_stage = if std.objectHas(pipedream_config.rollback, 'final_stage') then
-      pipedream_config.rollback.final_stage
+      gocd_pipelines.check_stage_exists(final_pipeline, pipedream_config.rollback.final_stage)
     else
       gocd_pipelines.final_stage_name(final_pipeline);
 

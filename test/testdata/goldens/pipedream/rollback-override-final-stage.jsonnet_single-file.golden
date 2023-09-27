@@ -22,6 +22,9 @@
                "example_stage": { }
             },
             {
+               "other_stage": { }
+            },
+            {
                "pipeline-complete": {
                   "jobs": {
                      "pipeline-complete": {
@@ -57,6 +60,9 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "other_stage": { }
             },
             {
                "pipeline-complete": {
@@ -96,6 +102,9 @@
                "example_stage": { }
             },
             {
+               "other_stage": { }
+            },
+            {
                "pipeline-complete": {
                   "jobs": {
                      "pipeline-complete": {
@@ -133,6 +142,9 @@
                "example_stage": { }
             },
             {
+               "other_stage": { }
+            },
+            {
                "pipeline-complete": {
                   "jobs": {
                      "pipeline-complete": {
@@ -164,6 +176,9 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "other_stage": { }
             },
             {
                "pipeline-complete": {
@@ -199,6 +214,9 @@
                "example_stage": { }
             },
             {
+               "other_stage": { }
+            },
+            {
                "pipeline-complete": {
                   "jobs": {
                      "pipeline-complete": {
@@ -230,6 +248,9 @@
          "stages": [
             {
                "example_stage": { }
+            },
+            {
+               "other_stage": { }
             },
             {
                "pipeline-complete": {
@@ -269,6 +290,9 @@
                "example_stage": { }
             },
             {
+               "other_stage": { }
+            },
+            {
                "pipeline-complete": {
                   "jobs": {
                      "pipeline-complete": {
@@ -297,9 +321,9 @@
          "group": "example",
          "lock_behavior": "unlockWhenFinished",
          "materials": {
-            "deploy-example-customer-4-custom_final_stage": {
+            "deploy-example-customer-4-other_stage": {
                "pipeline": "deploy-example-customer-4",
-               "stage": "custom_final_stage"
+               "stage": "other_stage"
             }
          },
          "stages": [
