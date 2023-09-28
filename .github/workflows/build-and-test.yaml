@@ -34,5 +34,5 @@ jobs:
         with:
           jb-install: true
           check-for-changes: false
-          jsonnet-dir: ./libs
+          jsonnet-dir: .
           generated-dir: ./generated-pipelines

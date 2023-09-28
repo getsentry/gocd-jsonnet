@@ -56,5 +56,5 @@ export async function assert_gocd_structure(t, filename, outputfiles) {
 
 export async function get_fixtures(fixture_subdir) {
   const files = await fs.readdir(path.join('test/testdata/fixtures', fixture_subdir));
-  return files.map((f) => path.join(fixture_subdir, f));
+  return files.filter((f) => f.endsWith('.jsonnet')).map((f) => path.join(fixture_subdir, f));
 }
