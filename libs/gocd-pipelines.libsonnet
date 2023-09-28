@@ -7,7 +7,7 @@ local check_stage_exists(pipeline, stage_name) =
   if std.length(stages) == 0 then
     error "Stage '" + stage_name + "' does not exist"
   else
-    stage_name;
+    true;
 
 local chain_materials(current_pipeline, previous_pipeline) =
   local final_stage = final_stage_name(previous_pipeline);
