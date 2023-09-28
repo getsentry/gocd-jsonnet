@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'path';
 import {execSync} from 'node:child_process';
 
-async function get_fixture_content(filename, outputfiles) {
+export async function get_fixture_content(filename, outputfiles) {
   const buff = execSync(`jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles} --ext-code random=true`);
   return buff.toString();
 }
@@ -56,5 +56,5 @@ export async function assert_gocd_structure(t, filename, outputfiles) {
 
 export async function get_fixtures(fixture_subdir) {
   const files = await fs.readdir(path.join('test/testdata/fixtures', fixture_subdir));
-  return files.map((f) => path.join(fixture_subdir, f));
+  return files.filter((f) => !f.endsWith('.failing.jsonnet')).map((f) => path.join(fixture_subdir, f));
 }

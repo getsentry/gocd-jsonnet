@@ -2,6 +2,13 @@ local final_stage_name(pipeline) =
   local final_stage = pipeline.pipeline.stages[std.length(pipeline.pipeline.stages) - 1];
   std.objectFields(final_stage)[0];
 
+local check_stage_exists(pipeline, stage_name) =
+  local stages = std.filter(function(s) std.objectFields(s)[0] == stage_name, pipeline.pipeline.stages);
+  if std.length(stages) == 0 then
+    error "Stage '" + stage_name + "' does not exist"
+  else
+    true;
+
 local chain_materials(current_pipeline, previous_pipeline) =
   local final_stage = final_stage_name(previous_pipeline);
   current_pipeline {
@@ -53,4 +60,5 @@ local pipelines_to_object(pipelines) =
   pipelines_to_files_object(pipelines):: pipelines_to_files_object(pipelines),
   pipelines_to_object(pipelines):: pipelines_to_object(pipelines),
   final_stage_name(pipeline):: final_stage_name(pipeline),
+  check_stage_exists(pipeline, stage_name):: check_stage_exists(pipeline, stage_name),
 }

@@ -30,9 +30,10 @@ jobs:
       - name: Test
         run: npm run test
 
-      - uses: getsentry/action-gocd-jsonnet@v0
+      - uses: getsentry/action-gocd-jsonnet@v1
         with:
           jb-install: true
           check-for-changes: false
           jsonnet-dir: .
           generated-dir: ./generated-pipelines
+          render-jsonnet-files: false

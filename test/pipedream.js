@@ -1,5 +1,5 @@
 import test from 'ava';
-import {assert_testdata, assert_gocd_structure, get_fixtures, render_fixture} from './utils/testdata.js';
+import {assert_testdata, assert_gocd_structure, get_fixtures, render_fixture, get_fixture_content} from './utils/testdata.js';
 
 const files = await get_fixtures('pipedream');
 for (const f of files) {
@@ -205,4 +205,9 @@ test(`ensure exclude regions removes regions with trigger pipeline`, async t => 
   const regionPipelines = r.environment_variables['REGION_PIPELINE_FLAGS'];
   t.deepEqual(allPipelines, '--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example');
   t.deepEqual(regionPipelines, '--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4');
+});
+
+test(`error for invalid final rollback stage`, async t => {
+  const err = await t.throwsAsync(() => get_fixture_content('pipedream/rollback-fail-override.failing.jsonnet', false));
+  t.truthy(err.message.includes("RUNTIME ERROR: Stage 'this-stage-does-not-exist' does not exist"));
 });
