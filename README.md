@@ -195,3 +195,33 @@ Run formatting, lint and tests using make:
 ```shell
 make
 ```
+
+## Testing
+
+You can run this repos tests with:
+
+```shell
+make test
+```
+
+If you want to run your tests on GoCD, the best option is to create a pipedream
+pipeline for a dev environment. You can see
+[an example dev pipedream here](https://github.com/getsentry/dicd-mattgaunt-3-saas/blob/main/gocd/templates/example.jsonnet)
+and set the version in the `jsonnetfile.json` to a branch in in this repo,
+for example
+[main is used in the previous example](https://github.com/getsentry/dicd-mattgaunt-3-saas/blob/4e408f20452ab4e93864b1d24c0a0d42c023c5e4/gocd/templates/jsonnetfile.json#L11).
+
+Lastly, you can use a branch name in a services `jsonnetfile.json` if you want
+to examine the generated pipeline.
+
+## Release Process
+
+Creating a new release typically looks like:
+
+1. Make the changes to the gocd-jsonnet (this repo)
+1. Create a release on GitHub when ready: https://github.com/getsentry/gocd-jsonnet/releases
+
+To roll out your changes:
+
+1. Update the version in projects `jsonnetfile.json` (which is typically in `gocd/templates/`, see [example here](https://github.com/getsentry/snuba/blob/f4a99cb98a4784311fc198a14f7bcd8def961f94/gocd/templates/jsonnetfile.json#L11))
+1. Run `make gocd` to update the lock file and check the generated pipelines (see [example Makefile here](https://github.com/getsentry/snuba/blob/f4a99cb98a4784311fc198a14f7bcd8def961f94/Makefile#L97))
