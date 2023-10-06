@@ -15,23 +15,10 @@ and a final stage. The upstream material and final stage is to make GoCD
 chain the pipelines together.
 
 */
+local getsentry = import './getsentry.libsonnet';
 local gocd_pipelines = import './gocd-pipelines.libsonnet';
 local gocd_stages = import './gocd-stages.libsonnet';
 local gocd_tasks = import './gocd-tasks.libsonnet';
-
-local REGIONS = [
-  's4s',
-  'us',
-  'customer-1',
-  'customer-2',
-  'customer-3',
-  'customer-4',
-];
-// Test regions will deploy in parallel to the regions above
-local TEST_REGIONS = [
-  'customer-5',
-  'customer-6',
-];
 
 local pipeline_name(name, region=null) =
   if region != null then 'deploy-' + name + '-' + region else 'deploy-' + name;
@@ -219,11 +206,11 @@ local add_trigger_material(should_add, trigger_pipeline) =
   render(pipedream_config, pipeline_fn)::
     local regions_to_render = std.filter(
       function(r) !std.objectHas(pipedream_config, 'exclude_regions') || std.length(std.find(r, pipedream_config.exclude_regions)) == 0,
-      REGIONS,
+      getsentry.regions,
     );
     local test_regions_to_render = std.filter(
       function(r) !std.objectHas(pipedream_config, 'exclude_regions') || std.length(std.find(r, pipedream_config.exclude_regions)) == 0,
-      TEST_REGIONS,
+      getsentry.test_regions,
     );
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
     local unchained_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, 2);
