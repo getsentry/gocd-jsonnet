@@ -211,8 +211,9 @@ and set the version in the `jsonnetfile.json` to a branch in in this repo,
 for example
 [main is used in the previous example](https://github.com/getsentry/dicd-mattgaunt-3-saas/blob/4e408f20452ab4e93864b1d24c0a0d42c023c5e4/gocd/templates/jsonnetfile.json#L11).
 
-Lastly, you can use a branch name in a services `jsonnetfile.json` if you want
-to examine the generated pipeline.
+Lastly, you can use a branch name in an existing services `jsonnetfile.json` to
+generate and examine pipelines (i.e. you can test changes to the getsentry backend
+pipelines by changing the version to a branch name).
 
 ## Release Process
 
