@@ -2,17 +2,17 @@ import * as fs from 'node:fs/promises';
 import * as path from 'path';
 import {execSync} from 'node:child_process';
 
-export async function get_fixture_content(filename, outputfiles) {
-  const buff = execSync(`jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles} --ext-code random=true`);
+export function get_fixture_content(filename, outputfiles) {
+  const buff = execSync(`jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles}`);
   return buff.toString();
 }
 
 export async function render_fixture(filename, outputfiles=false) {
-  return JSON.parse(await get_fixture_content(filename, outputfiles));
+  return JSON.parse(get_fixture_content(filename, outputfiles));
 }
 
 export async function assert_testdata(t, filename, outputfiles=true) {
-  const got = await get_fixture_content(filename, outputfiles);
+  const got = get_fixture_content(filename, outputfiles);
 
   const suffix = [];
   if (outputfiles) {
