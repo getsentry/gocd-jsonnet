@@ -191,8 +191,12 @@ local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_or
   // `auto_pipeline_progression` was added as a utility for folks new to
   // pipedream. When this is false, each region will need manual approval
   // before doing any of the deployment stages.
-  // ready is a noop that is helpful to show where the pipedream is up-to
-  // while waiting on the manual approval for the 'wait' stage.
+  // We add ready + wait stages to improve the GoCD UI since it will start
+  // the regions pipeline, show a green check and then a manual approval arrow.
+  // If the first stage had manual approval, GoCD assumes the pipeline itself
+  // needs manual approval and expects the user to manually trigger the
+  // pipeline through the play+ icon, which isn't clear where in a pipedream
+  // deployment we are waiting for a manual approval.
   local prepend_stages = if std.objectHas(pipedream_config, 'auto_pipeline_progression') && pipedream_config.auto_pipeline_progression == false then
     [
       // Ready runs when the upstream pipeline is complete, indicating that
