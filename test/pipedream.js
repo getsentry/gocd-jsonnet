@@ -208,6 +208,11 @@ test(`ensure exclude regions removes regions with trigger pipeline`, async t => 
 });
 
 test(`error for invalid final rollback stage`, async t => {
-  const err = await t.throwsAsync(() => get_fixture_content('pipedream/rollback-fail-override.failing.jsonnet', false));
+  const err = await t.throwsAsync(() => get_fixture_content('pipedream/rollback-bad-final-stage.failing.jsonnet', false));
+  t.truthy(err.message.includes("RUNTIME ERROR: Stage 'this-stage-does-not-exist' does not exist"));
+});
+
+test(`error for invalid rollback stage`, async t => {
+  const err = await t.throwsAsync(() => get_fixture_content('pipedream/rollback-bad-stage.failing.jsonnet', false));
   t.truthy(err.message.includes("RUNTIME ERROR: Stage 'this-stage-does-not-exist' does not exist"));
 });
