@@ -43,6 +43,7 @@ local is_autodeploy(pipedream_config) =
 // This function returns a "trigger pipeline", if configured for manual deploys.
 // This pipeline is used so users don't need to know what the first pipedream
 // region is, instead they just look for the `deploy-<service name>` pipeline.
+// For autodeploy pipedreams we don't need a trigger so null is returned.
 local pipedream_trigger_pipeline(pipedream_config) =
   if is_autodeploy(pipedream_config) == true then
     null
@@ -178,7 +179,9 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
 // generate_region_pipeline will call the pipeline callback function, and then
 // name the pipeline, add an upstream material, and append a final stage.
 // pipedream_config: The configuration passed into the render() function
-// pipeline_fn:      The callback function passed in to render() function
+// pipeline_fn:      The callback function passed in to render() function.
+//                   This function is from users of the library and should
+//                   take in a region and return a GoCD pipeline.
 // region:           The region to create pipelines for
 // display_order:    The order of the pipeline in GoCD UI
 local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_order) =
@@ -188,12 +191,8 @@ local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_or
   // `auto_pipeline_progression` was added as a utility for folks new to
   // pipedream. When this is false, each region will need manual approval
   // before doing any of the deployment stages.
-  // We add ready + wait stages to improve the GoCD UI since it will start
-  // the regions pipeline, show a green check and then a manual approval arrow.
-  // If the first stage had manual approval, GoCD assumes the pipeline itself
-  // needs manual approval and expects the user to manually trigger the
-  // pipeline through the play+ icon, which isn't clear where in pipedream a
-  // deploy is.
+  // ready is a noop that is helpful to show where the pipedream is up-to
+  // while waiting on the manual approval for the 'wait' stage.
   local prepend_stages = if std.objectHas(pipedream_config, 'auto_pipeline_progression') && pipedream_config.auto_pipeline_progression == false then
     [
       // Ready runs when the upstream pipeline is complete, indicating that
@@ -228,7 +227,9 @@ local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_or
 // for each region.
 //
 // pipedream_config: The configuration passed into the render() function
-// pipeline_fn:      The callback function passed in to render() function
+// pipeline_fn:      The callback function passed in to render() function.
+//                   This function is from users of the library and should
+//                   take in a region and return a GoCD pipeline.
 // regions:          The regions to create pipelines for
 // display_offset:   Used to offset the display order (i.e. test regions are
 //                   display order => trigger + rollback + user regions length)
@@ -279,6 +280,12 @@ local pipeline_to_array(pipeline) =
     //     {<file name>: <pipeline>, <file name>: <pipeline>},
     // Otherwise we want to return:
     //     { pipelines: [ <pipeline>, <pipeline> ] },
+    // This toggle is useful for a few reasons:
+    //     1. Multiple files (output-files=true) is helpful when reviewing
+    //        the pipelines locally (i.e. you can quickly look up the customer-1
+    //        pipeline file).
+    //     2. The jsonnet plugin for GoCD and the GitHub validation action work
+    //        best with a single file containing all pipelines.
     if std.extVar('output-files') then
       gocd_pipelines.pipelines_to_files_object(all_pipelines)
     else
