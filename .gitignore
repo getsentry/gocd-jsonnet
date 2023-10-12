@@ -1,0 +1,5 @@
+vendor/
+node_modules/
+
+# usually it's best to check these in, but `brew` has no way to use it:
+Brewfile.lock.json
