@@ -99,7 +99,7 @@ The tasks library is a simple helper to simplify common tasks:
 
 The stages library provides helper methods to define a stage.
 
-[examples/gocd-tasks.jsonnet]
+[examples/gocd-stages.jsonnet]
 
 ## Development
 
