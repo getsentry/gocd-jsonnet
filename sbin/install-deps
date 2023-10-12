@@ -1,0 +1,8 @@
+#!/bin/sh
+# a five-line script to install all our dependencies
+set -eu
+
+brew bundle  # for detail, see Brewfile
+jb install   # for detail, see jsonnetfile.json
+volta install npm  # https://docs.npmjs.com/about-npm
+npm install  # for detail, see package.json

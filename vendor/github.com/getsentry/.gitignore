@@ -1,0 +1,3 @@
+# ... except for our self-symlink
+!.
+!gocd-jsonnet
