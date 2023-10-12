@@ -2,15 +2,26 @@
 
 Jsonnet libraries used to help structure GoCD pipelines for getsentry
 
-## Dependencies
+## Users
 
-This will use homebrew to ensure you have everything you need installed.
+### Dependencies
+
+You'll need go-jsonnet, jsonnet-bundler and yq for using this in sentry.
 
 ```sh
-make devenv
+brew install go-jsonnet jsonnet-bundler yq
 ```
 
-## Build
+### Install
+
+Now you can use jsonnet-bundler to install these libraries:
+
+```sh
+jb init
+jb install https://github.com/getsentry/gocd-jsonnet.git/libs@v1.4.2
+```
+
+### Build
 
 When using this library, you'll need to build with the following external
 variable:
@@ -66,7 +77,7 @@ format:
 }
 ```
 
-## `pipedream.libsonnet`
+### `pipedream.libsonnet`
 
 This library's main purpose is to generate a set of pipelines that constitute a
 pipedream.
@@ -85,36 +96,39 @@ chain the pipelines together.
 The end result will be a pipeline `deploy-<service name>` that starts the run of
 each pipeline, and a pipeline for each region.
 
-### Example Usage
+#### Example Usage
 
 See [examples/pipedream.jsonnet].
 
-## `gocd-tasks.libsonnet`
+### `gocd-tasks.libsonnet`
 
 The tasks library is a simple helper to simplify common tasks:
 
 [examples/gocd-tasks.jsonnet]
 
-## `gocd-stages.libsonnet`
+### `gocd-stages.libsonnet`
 
 The stages library provides helper methods to define a stage.
 
 [examples/gocd-stages.jsonnet]
 
-## Development
+## Contributors
+
+### Dependencies
+
+This will use homebrew to ensure everything you need is properly installed. This
+runs automatically before test, when necessary.
+
+```sh
+make devenv
+```
+
+### Testing
 
 Run formatting, lint and tests using make:
 
 ```shell
 make
-```
-
-## Testing
-
-You can run this repo's tests with:
-
-```shell
-make test
 ```
 
 Most tests use fixtures and goldens to check functionality.
@@ -145,7 +159,9 @@ Lastly, to see what your changes do to a services pipeline, change the version
 in a services `jsonnetfile.json` to your branch name and run `make gocd`. This
 should generate the pipeline yaml locally which you can then look over.
 
-## Release Process
+## Maintainers
+
+### Release Process
 
 Creating a new release typically looks like:
 
