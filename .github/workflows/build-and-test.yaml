@@ -12,23 +12,14 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      # Get the code
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - name: Get the code
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
 
-      # Install dependencies
-      - name: Install NPM Deps
-        run: npm install
-
-      - name: Install go
-        uses: actions/setup-go@v4
-      - name: Install Jsonnet
-        run: |
-          go install github.com/google/go-jsonnet/cmd/jsonnet@latest
-          go install github.com/google/go-jsonnet/cmd/jsonnetfmt@latest
-          go install github.com/google/go-jsonnet/cmd/jsonnet-lint@latest
+      - name: Install dependencies
+        run: make devenv
 
       - name: Test
-        run: npm run test
+        run: make test
 
       - uses: getsentry/action-gocd-jsonnet@v1
         with:
