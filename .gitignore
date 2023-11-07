@@ -1,0 +1,7 @@
+# developer environment:
+node_modules/
+
+# dirty hacks:
+trash/
+*.bak
+*.log
