@@ -7,7 +7,7 @@
   prod_regions: [
     's4s',
     'us',
-    //'de',   // pending https://github.com/getsentry/devinfra-deployment-service/pull/496
+    'de',
     'customer-1',
     'customer-2',
     'customer-3',
