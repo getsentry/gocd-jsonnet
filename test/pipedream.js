@@ -7,20 +7,22 @@ import {
   get_fixture_content,
 } from "./utils/testdata.js";
 
-const files = await get_fixtures("pipedream");
-for (const f of files) {
-  test(`render ${f} as multiple files`, async (t) => {
-    await assert_testdata(t, f, true);
-    await assert_gocd_structure(t, f, true);
-  });
+(async () => {
+  const files = await get_fixtures("pipedream");
+  for (const f of files) {
+    test(`render ${f} as multiple files`, async (t) => {
+      await assert_testdata(t, f, true);
+      await assert_gocd_structure(t, f, true);
+    });
 
-  test(`render ${f} as a single file`, async (t) => {
-    await assert_testdata(t, f, false);
-    await assert_gocd_structure(t, f, true);
-  });
-}
+    test(`render ${f} as a single file`, async (t) => {
+      await assert_testdata(t, f, false);
+      await assert_gocd_structure(t, f, true);
+    });
+  }
+})();
 
-test(`ensure manual deploys is expected structure`, async (t) => {
+test("ensure manual deploys is expected structure", async (t) => {
   const got = await render_fixture("pipedream/no-autodeploy.jsonnet", false);
 
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
@@ -70,7 +72,7 @@ test(`ensure manual deploys is expected structure`, async (t) => {
   });
 });
 
-test(`ensure auto deploys is expected structure`, async (t) => {
+test("ensure auto deploys is expected structure", async (t) => {
   const got = await render_fixture("pipedream/autodeploy.jsonnet", false);
 
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
@@ -120,7 +122,7 @@ test(`ensure auto deploys is expected structure`, async (t) => {
   t.deepEqual(r.stages.length, 3);
 });
 
-test(`ensure exclude regions removes regions without trigger pipeline`, async (t) => {
+test("ensure exclude regions removes regions without trigger pipeline", async (t) => {
   const got = await render_fixture("pipedream/exclude-regions.jsonnet", false);
 
   t.deepEqual(Object.keys(got.pipelines).sort(), [
@@ -163,18 +165,18 @@ test(`ensure exclude regions removes regions without trigger pipeline`, async (t
   const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
   t.deepEqual(
     allPipelines,
-    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4"
+    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
   );
   t.deepEqual(
     regionPipelines,
-    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4"
+    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
   );
 });
 
-test(`ensure exclude regions removes regions with trigger pipeline`, async (t) => {
+test("ensure exclude regions removes regions with trigger pipeline", async (t) => {
   const got = await render_fixture(
     "pipedream/exclude-regions-no-autodeploy.jsonnet",
-    false
+    false,
   );
 
   t.deepEqual(Object.keys(got.pipelines).sort(), [
@@ -222,35 +224,35 @@ test(`ensure exclude regions removes regions with trigger pipeline`, async (t) =
   const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
   t.deepEqual(
     allPipelines,
-    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example"
+    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example",
   );
   t.deepEqual(
     regionPipelines,
-    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4"
+    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
   );
 });
 
-test(`error for invalid final rollback stage`, async (t) => {
-  const err = await t.throws(() =>
+test("error for invalid final rollback stage", async (t) => {
+  const err = t.throws(() =>
     get_fixture_content(
       "pipedream/rollback-bad-final-stage.failing.jsonnet",
-      false
-    )
+      false,
+    ),
   );
   t.truthy(
     err?.message.includes(
-      "RUNTIME ERROR: Stage 'this-stage-does-not-exist' does not exist"
-    )
+      "RUNTIME ERROR: Stage 'this-stage-does-not-exist' does not exist",
+    ),
   );
 });
 
-test(`error for invalid rollback stage`, async (t) => {
-  const err = await t.throws(() =>
-    get_fixture_content("pipedream/rollback-bad-stage.failing.jsonnet", false)
+test("error for invalid rollback stage", async (t) => {
+  const err = t.throws(() =>
+    get_fixture_content("pipedream/rollback-bad-stage.failing.jsonnet", false),
   );
   t.truthy(
     err?.message.includes(
-      "RUNTIME ERROR: Stage 'this-stage-does-not-exist' does not exist"
-    )
+      "RUNTIME ERROR: Stage 'this-stage-does-not-exist' does not exist",
+    ),
   );
 });

@@ -3,10 +3,16 @@
   "description": "Jsonnet libraries to help with GoCD",
   "type": "module",
   "scripts": {
-    "test": "ava"
+    "test": "ava",
+    "eslint": "eslint --config './.eslintrc.json' .",
+    "prettier": "prettier .",
+    "lint": "npm run eslint && npm run prettier -- --check",
+    "lint:fix": "npm run eslint -- --fix && npm run prettier -- -w"
   },
   "devDependencies": {
-    "ava": "^5.3.0"
+    "ava": "^5.3.0",
+    "eslint": "^8.53.0",
+    "prettier": "^3.1.0"
   },
   "ava": {
     "files": [
