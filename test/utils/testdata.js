@@ -1,31 +1,38 @@
-import * as fs from 'node:fs/promises';
-import * as path from 'path';
-import {execSync} from 'node:child_process';
+import * as fs from "node:fs/promises";
+import * as path from "path";
+import { execSync } from "node:child_process";
 
 export function get_fixture_content(filename, outputfiles) {
-  const buff = execSync(`jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles}`);
+  const buff = execSync(
+    `jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles}`
+  );
   return buff.toString();
 }
 
-export async function render_fixture(filename, outputfiles=false) {
+export async function render_fixture(filename, outputfiles = false) {
   return JSON.parse(get_fixture_content(filename, outputfiles));
 }
 
-export async function assert_testdata(t, filename, outputfiles=true) {
+export async function assert_testdata(t, filename, outputfiles = true) {
   const got = get_fixture_content(filename, outputfiles);
 
   const suffix = [];
   if (outputfiles) {
-    suffix.push('output-files');
+    suffix.push("output-files");
   } else {
-    suffix.push('single-file');
+    suffix.push("single-file");
   }
-  const goldenPath = path.join('test', 'testdata', 'goldens', `${filename}_${suffix.join('-')}.golden`);
+  const goldenPath = path.join(
+    "test",
+    "testdata",
+    "goldens",
+    `${filename}_${suffix.join("-")}.golden`
+  );
   try {
-    await fs.stat(goldenPath)
+    await fs.stat(goldenPath);
   } catch (err) {
     console.log(`Golden file ${goldenPath} does not exist. Creating it.`);
-    await fs.mkdir(path.dirname(goldenPath), {recursive: true});
+    await fs.mkdir(path.dirname(goldenPath), { recursive: true });
     await fs.writeFile(goldenPath, got);
   }
 
@@ -39,7 +46,7 @@ export async function assert_testdata(t, filename, outputfiles=true) {
 }
 
 function check_gocd_structure(t, config) {
-  t.deepEqual(Object.keys(config), ['format_version', 'pipelines']);
+  t.deepEqual(Object.keys(config), ["format_version", "pipelines"]);
 }
 
 export async function assert_gocd_structure(t, filename, outputfiles) {
@@ -55,6 +62,10 @@ export async function assert_gocd_structure(t, filename, outputfiles) {
 }
 
 export async function get_fixtures(fixture_subdir) {
-  const files = await fs.readdir(path.join('test/testdata/fixtures', fixture_subdir));
-  return files.filter((f) => !f.endsWith('.failing.jsonnet')).map((f) => path.join(fixture_subdir, f));
+  const files = await fs.readdir(
+    path.join("test/testdata/fixtures", fixture_subdir)
+  );
+  return files
+    .filter((f) => !f.endsWith(".failing.jsonnet"))
+    .map((f) => path.join(fixture_subdir, f));
 }

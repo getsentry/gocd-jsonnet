@@ -10,8 +10,8 @@
   },
   "ava": {
     "files": [
-			"test/**/*",
-			"!test/utils"
-		]
+      "test/**/*",
+      "!test/utils"
+    ]
   }
 }
