@@ -4,7 +4,7 @@ import { execSync } from "node:child_process";
 
 export function get_fixture_content(filename, outputfiles) {
   const buff = execSync(
-    `jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles}`
+    `jsonnet test/testdata/fixtures/${filename} --ext-code output-files=${outputfiles}`,
   );
   return buff.toString();
 }
@@ -26,7 +26,7 @@ export async function assert_testdata(t, filename, outputfiles = true) {
     "test",
     "testdata",
     "goldens",
-    `${filename}_${suffix.join("-")}.golden`
+    `${filename}_${suffix.join("-")}.golden`,
   );
   try {
     await fs.stat(goldenPath);
@@ -63,7 +63,7 @@ export async function assert_gocd_structure(t, filename, outputfiles) {
 
 export async function get_fixtures(fixture_subdir) {
   const files = await fs.readdir(
-    path.join("test/testdata/fixtures", fixture_subdir)
+    path.join("test/testdata/fixtures", fixture_subdir),
   );
   return files
     .filter((f) => !f.endsWith(".failing.jsonnet"))
