@@ -7,7 +7,6 @@
   prod_regions: [
     's4s',
     'us',
-    'de',
     'customer-1',
     'customer-2',
     'customer-3',
@@ -17,6 +16,7 @@
   test_regions: [
     'customer-5',
     'customer-6',
+    'de',
   ],
   is_st(region):: (region == 's4s' || std.startsWith(region, 'customer-')),
 }
