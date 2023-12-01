@@ -91,8 +91,8 @@ test("ensure auto deploys is expected structure", async (t) => {
   });
 
   // Ensure a test region has just the repo material
-  const c5 = got.pipelines["deploy-example-customer-5"];
-  t.deepEqual(c5.materials, {
+  const c6 = got.pipelines["deploy-example-customer-6"];
+  t.deepEqual(c6.materials, {
     example_repo: {
       branch: "master",
       destination: "example",
