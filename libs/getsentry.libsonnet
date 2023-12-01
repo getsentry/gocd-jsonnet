@@ -14,7 +14,6 @@
   ],
   // Test regions will deploy in parallel to the regions above
   test_regions: [
-    'customer-5',
     'customer-6',
     'de',
   ],
