@@ -28,7 +28,7 @@ test("ensure manual deploys is expected structure", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.truthy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s"]);
-  t.truthy(got.pipelines["deploy-example-customer-5"]);
+  t.truthy(got.pipelines["deploy-example-customer-6"]);
 
   // Ensure the trigger has the right initial material
   const trigger = got.pipelines["deploy-example"];
@@ -57,8 +57,8 @@ test("ensure manual deploys is expected structure", async (t) => {
   });
 
   // Ensure a test region depends on the trigger material
-  const c5 = got.pipelines["deploy-example-customer-5"];
-  t.deepEqual(c5.materials, {
+  const c6 = got.pipelines["deploy-example-customer-6"];
+  t.deepEqual(c6.materials, {
     "deploy-example-pipeline-complete": {
       pipeline: "deploy-example",
       stage: "pipeline-complete",
@@ -78,7 +78,7 @@ test("ensure auto deploys is expected structure", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.falsy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s"]);
-  t.truthy(got.pipelines["deploy-example-customer-5"]);
+  t.truthy(got.pipelines["deploy-example-customer-6"]);
   t.truthy(got.pipelines["rollback-example"]);
 
   // Ensure s4s has just the repo material
@@ -93,8 +93,8 @@ test("ensure auto deploys is expected structure", async (t) => {
   });
 
   // Ensure a test region has just the repo material
-  const c5 = got.pipelines["deploy-example-customer-5"];
-  t.deepEqual(c5.materials, {
+  const c6 = got.pipelines["deploy-example-customer-6"];
+  t.deepEqual(c6.materials, {
     example_repo: {
       branch: "master",
       destination: "example",
