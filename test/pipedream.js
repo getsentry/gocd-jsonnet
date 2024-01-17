@@ -130,12 +130,13 @@ test("ensure exclude regions removes regions without trigger pipeline", async (t
     "deploy-example-customer-2",
     "deploy-example-customer-4",
     "deploy-example-customer-6",
+    "deploy-example-de",
     "rollback-example",
   ]);
 
-  // Ensure customer-1 has just the repo material
-  const c1 = got.pipelines["deploy-example-customer-1"];
-  t.deepEqual(c1.materials, {
+  // Ensure de has just the repo material
+  const de = got.pipelines["deploy-example-de"];
+  t.deepEqual(de.materials, {
     example_repo: {
       branch: "master",
       destination: "example",
@@ -185,12 +186,13 @@ test("ensure exclude regions removes regions with trigger pipeline", async (t) =
     "deploy-example-customer-2",
     "deploy-example-customer-4",
     "deploy-example-customer-6",
+    "deploy-example-de",
     "rollback-example",
   ]);
 
-  // Ensure customer-1 has just the repo material
-  const c1 = got.pipelines["deploy-example-customer-1"];
-  t.deepEqual(c1.materials, {
+  // Ensure de has just the repo material
+  const de = got.pipelines["deploy-example-de"];
+  t.deepEqual(de.materials, {
     "deploy-example-pipeline-complete": {
       pipeline: "deploy-example",
       stage: "pipeline-complete",
