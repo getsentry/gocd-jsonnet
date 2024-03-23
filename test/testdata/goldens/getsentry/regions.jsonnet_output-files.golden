@@ -1,12 +1,12 @@
 {
    "all_regions": [
       "s4s",
+      "de",
       "us",
       "customer-1",
       "customer-2",
       "customer-3",
       "customer-4",
-      "de",
       "customer-6"
    ]
 }

@@ -6,6 +6,7 @@
   // These regions are user facing deployments
   prod_regions: [
     's4s',
+    'de',
     'us',
     'customer-1',
     'customer-2',
@@ -14,7 +15,6 @@
   ],
   // Test regions will deploy in parallel to the regions above
   test_regions: [
-    'de',
     'customer-6',
   ],
   is_st(region):: (region == 's4s' || std.startsWith(region, 'customer-')),
