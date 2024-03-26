@@ -106,10 +106,10 @@ test("ensure auto deploys is expected structure", async (t) => {
   const r = got.pipelines["rollback-example"];
   t.deepEqual(r["environment_variables"], {
     ALL_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4",
+      "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4",
     GOCD_ACCESS_TOKEN: "{{SECRET:[devinfra][gocd_access_token]}}",
     REGION_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4",
+      "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4",
     ROLLBACK_MATERIAL_NAME: "example_repo",
     ROLLBACK_STAGE: "example_stage",
   });
@@ -166,11 +166,11 @@ test("ensure exclude regions removes regions without trigger pipeline", async (t
   const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
   t.deepEqual(
     allPipelines,
-    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
+    "--pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
   );
   t.deepEqual(
     regionPipelines,
-    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
+    "--pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
   );
 });
 
@@ -226,11 +226,11 @@ test("ensure exclude regions removes regions with trigger pipeline", async (t) =
   const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
   t.deepEqual(
     allPipelines,
-    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example",
+    "--pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example",
   );
   t.deepEqual(
     regionPipelines,
-    "--pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
+    "--pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
   );
 });
 
