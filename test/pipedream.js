@@ -130,6 +130,7 @@ test("ensure exclude regions removes regions without trigger pipeline", async (t
     "deploy-example-customer-2",
     "deploy-example-customer-4",
     "deploy-example-customer-6",
+    "deploy-example-customer-7",
     "deploy-example-de",
     "rollback-example",
   ]);
@@ -186,6 +187,7 @@ test("ensure exclude regions removes regions with trigger pipeline", async (t) =
     "deploy-example-customer-2",
     "deploy-example-customer-4",
     "deploy-example-customer-6",
+    "deploy-example-customer-7",
     "deploy-example-de",
     "rollback-example",
   ]);
