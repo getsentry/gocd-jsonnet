@@ -12,7 +12,7 @@ brew install go-jsonnet jsonnet-bundler yq
 
 ## Install
 
-You'll need jsonnet-bundler to install these libraries:
+You'll need [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler) to install these libraries:
 
 ```sh
 jb init
