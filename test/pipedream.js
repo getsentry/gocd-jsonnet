@@ -112,6 +112,7 @@ test("ensure auto deploys is expected structure", async (t) => {
       "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4",
     ROLLBACK_MATERIAL_NAME: "example_repo",
     ROLLBACK_STAGE: "example_stage",
+    TRIGGERED_BY: "",
   });
   t.deepEqual(r["materials"], {
     "deploy-example-customer-4-pipeline-complete": {

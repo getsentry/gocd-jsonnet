@@ -105,6 +105,7 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
           ROLLBACK_STAGE: pipedream_config.rollback.stage,
           REGION_PIPELINE_FLAGS: region_pipeline_flags,
           ALL_PIPELINE_FLAGS: all_pipeline_flags,
+          TRIGGERED_BY: '',
         },
         materials: {
           [final_pipeline.name + '-' + final_stage]: {
