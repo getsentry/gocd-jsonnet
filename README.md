@@ -16,7 +16,7 @@ You'll need [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler
 
 ```sh
 jb init
-jb install https://github.com/getsentry/gocd-jsonnet.git/libs@v2.10.2
+jb install https://github.com/getsentry/gocd-jsonnet.git/libs@v2.11.0
 ```
 
 ## Build
