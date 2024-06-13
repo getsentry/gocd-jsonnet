@@ -12,10 +12,10 @@
     'customer-2',
     'customer-3',
     'customer-4',
+    'customer-7',
   ],
   // Test regions will deploy in parallel to the regions above
   test_regions: [
-    'customer-7',
   ],
   is_st(region):: (region == 's4s' || std.startsWith(region, 'customer-')),
 }
