@@ -179,47 +179,6 @@
          }
       }
    },
-   "deploy-example-customer-6.yaml": {
-      "format_version": 10,
-      "pipelines": {
-         "deploy-example-customer-6": {
-            "display_order": 10,
-            "group": "example",
-            "materials": {
-               "example_repo": {
-                  "branch": "master",
-                  "destination": "example",
-                  "git": "git@github.com:getsentry/example.git",
-                  "shallow_clone": true
-               }
-            },
-            "region": "customer-6",
-            "stages": [
-               {
-                  "example_stage": { }
-               },
-               {
-                  "other_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
-               }
-            ]
-         }
-      }
-   },
    "deploy-example-de.yaml": {
       "format_version": 10,
       "pipelines": {

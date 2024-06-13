@@ -28,7 +28,6 @@ test("ensure manual deploys is expected structure", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.truthy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s"]);
-  t.truthy(got.pipelines["deploy-example-customer-6"]);
 
   // Ensure the trigger has the right initial material
   const trigger = got.pipelines["deploy-example"];
@@ -55,21 +54,6 @@ test("ensure manual deploys is expected structure", async (t) => {
       shallow_clone: true,
     },
   });
-
-  // Ensure a test region depends on the trigger material
-  const c6 = got.pipelines["deploy-example-customer-6"];
-  t.deepEqual(c6.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
 });
 
 test("ensure auto deploys is expected structure", async (t) => {
@@ -78,23 +62,11 @@ test("ensure auto deploys is expected structure", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.falsy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s"]);
-  t.truthy(got.pipelines["deploy-example-customer-6"]);
   t.truthy(got.pipelines["rollback-example"]);
 
   // Ensure s4s has just the repo material
   const s4s = got.pipelines["deploy-example-s4s"];
   t.deepEqual(s4s.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure a test region has just the repo material
-  const c6 = got.pipelines["deploy-example-customer-6"];
-  t.deepEqual(c6.materials, {
     example_repo: {
       branch: "master",
       destination: "example",
@@ -130,7 +102,6 @@ test("ensure exclude regions removes regions without trigger pipeline", async (t
     "deploy-example-customer-1",
     "deploy-example-customer-2",
     "deploy-example-customer-4",
-    "deploy-example-customer-6",
     "deploy-example-customer-7",
     "deploy-example-de",
     "rollback-example",
@@ -187,7 +158,6 @@ test("ensure exclude regions removes regions with trigger pipeline", async (t) =
     "deploy-example-customer-1",
     "deploy-example-customer-2",
     "deploy-example-customer-4",
-    "deploy-example-customer-6",
     "deploy-example-customer-7",
     "deploy-example-de",
     "rollback-example",
