@@ -3,7 +3,7 @@ local pipedream = import '../../../../libs/pipedream.libsonnet';
 local pipedream_config = {
   name: 'example',
   auto_deploy: false,
-  exclude_regions: ['s4s', 'us', 'customer-3'],
+  exclude_regions: ['s4s', 'us'],
   materials: {
     init_repo: {
       git: 'git@github.com:getsentry/init.git',

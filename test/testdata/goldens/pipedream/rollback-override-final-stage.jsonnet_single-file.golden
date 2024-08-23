@@ -81,52 +81,12 @@
             }
          ]
       },
-      "deploy-example-customer-3": {
-         "display_order": 7,
-         "group": "example",
-         "materials": {
-            "deploy-example-customer-2-pipeline-complete": {
-               "pipeline": "deploy-example-customer-2",
-               "stage": "pipeline-complete"
-            },
-            "example_repo": {
-               "branch": "master",
-               "destination": "example",
-               "git": "git@github.com:getsentry/example.git",
-               "shallow_clone": true
-            }
-         },
-         "region": "customer-3",
-         "stages": [
-            {
-               "example_stage": { }
-            },
-            {
-               "other_stage": { }
-            },
-            {
-               "pipeline-complete": {
-                  "jobs": {
-                     "pipeline-complete": {
-                        "tasks": [
-                           {
-                              "exec": {
-                                 "command": true
-                              }
-                           }
-                        ]
-                     }
-                  }
-               }
-            }
-         ]
-      },
       "deploy-example-customer-4": {
          "display_order": 8,
          "group": "example",
          "materials": {
-            "deploy-example-customer-3-pipeline-complete": {
-               "pipeline": "deploy-example-customer-3",
+            "deploy-example-customer-2-pipeline-complete": {
+               "pipeline": "deploy-example-customer-2",
                "stage": "pipeline-complete"
             },
             "example_repo": {
@@ -280,9 +240,9 @@
       "rollback-example": {
          "display_order": 1,
          "environment_variables": {
-            "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4",
+            "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
             "GOCD_ACCESS_TOKEN": "{{SECRET:[devinfra][gocd_access_token]}}",
-            "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4",
+            "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-us --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4",
             "ROLLBACK_MATERIAL_NAME": "example_repo",
             "ROLLBACK_STAGE": "example_stage"
          },
