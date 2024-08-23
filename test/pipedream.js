@@ -78,10 +78,10 @@ test("ensure auto deploys is expected structure", async (t) => {
   const r = got.pipelines["rollback-example"];
   t.deepEqual(r["environment_variables"], {
     ALL_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+      "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
     GOCD_ACCESS_TOKEN: "{{SECRET:[devinfra][gocd_access_token]}}",
     REGION_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-3 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+      "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
     ROLLBACK_MATERIAL_NAME: "example_repo",
     ROLLBACK_STAGE: "example_stage",
     TRIGGERED_BY: "",
