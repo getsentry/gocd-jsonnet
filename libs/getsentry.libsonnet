@@ -8,6 +8,8 @@
     's4s',
     'de',
     'us',
+    // 'control' is excluded by default and must be explicitly included
+    'control',
     'customer-1',
     'customer-2',
     'customer-4',

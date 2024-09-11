@@ -207,6 +207,180 @@ test("ensure exclude regions removes regions with trigger pipeline", async (t) =
   );
 });
 
+test("ensure include regions adds regions without trigger pipeline", async (t) => {
+  const got = await render_fixture("pipedream/include-regions.jsonnet", false);
+
+  t.deepEqual(Object.keys(got.pipelines).sort(), [
+    "deploy-example-control",
+    "deploy-example-customer-1",
+    "deploy-example-customer-2",
+    "deploy-example-customer-4",
+    "deploy-example-customer-7",
+    "deploy-example-de",
+    "rollback-example",
+  ]);
+
+  // Ensure de has just the repo material
+  const de = got.pipelines["deploy-example-de"];
+  t.deepEqual(de.materials, {
+    example_repo: {
+      branch: "master",
+      destination: "example",
+      git: "git@github.com:getsentry/example.git",
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure control is included
+  const control = got.pipelines["deploy-example-control"];
+  t.deepEqual(control.materials, {
+    "deploy-example-de-pipeline-complete": {
+      pipeline: "deploy-example-de",
+      stage: "pipeline-complete",
+    },
+    example_repo: {
+      branch: "master",
+      destination: "example",
+      git: "git@github.com:getsentry/example.git",
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure customer-1 depends on control
+  const c1 = got.pipelines["deploy-example-customer-1"];
+  t.deepEqual(c1.materials, {
+    "deploy-example-control-pipeline-complete": {
+      pipeline: "deploy-example-control",
+      stage: "pipeline-complete",
+    },
+    example_repo: {
+      branch: "master",
+      destination: "example",
+      git: "git@github.com:getsentry/example.git",
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure customer-2 has pipeline material too
+  const c2 = got.pipelines["deploy-example-customer-2"];
+  t.deepEqual(c2.materials, {
+    "deploy-example-customer-1-pipeline-complete": {
+      pipeline: "deploy-example-customer-1",
+      stage: "pipeline-complete",
+    },
+    example_repo: {
+      branch: "master",
+      destination: "example",
+      git: "git@github.com:getsentry/example.git",
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure rollback has the expected rollback pipelines
+  const r = got.pipelines["rollback-example"];
+  const allPipelines = r.environment_variables["ALL_PIPELINE_FLAGS"];
+  const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
+  t.deepEqual(
+    allPipelines,
+    "--pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+  );
+  t.deepEqual(
+    regionPipelines,
+    "--pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+  );
+});
+
+test("ensure include regions adds regions with trigger pipeline", async (t) => {
+  const got = await render_fixture(
+    "pipedream/include-regions-no-autodeploy.jsonnet",
+    false,
+  );
+
+  t.deepEqual(Object.keys(got.pipelines).sort(), [
+    "deploy-example",
+    "deploy-example-control",
+    "deploy-example-customer-1",
+    "deploy-example-customer-2",
+    "deploy-example-customer-4",
+    "deploy-example-customer-7",
+    "deploy-example-de",
+    "rollback-example",
+  ]);
+
+  // Ensure de has just the repo material
+  const de = got.pipelines["deploy-example-de"];
+  t.deepEqual(de.materials, {
+    "deploy-example-pipeline-complete": {
+      pipeline: "deploy-example",
+      stage: "pipeline-complete",
+    },
+    example_repo: {
+      branch: "master",
+      destination: "example",
+      git: "git@github.com:getsentry/example.git",
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure control is included
+  const control = got.pipelines["deploy-example-control"];
+  t.deepEqual(control.materials, {
+    "deploy-example-de-pipeline-complete": {
+      pipeline: "deploy-example-de",
+      stage: "pipeline-complete",
+    },
+    example_repo: {
+      branch: "master",
+      destination: "example",
+      git: "git@github.com:getsentry/example.git",
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure customer-1 depends on control
+  const c1 = got.pipelines["deploy-example-customer-1"];
+  t.deepEqual(c1.materials, {
+    "deploy-example-control-pipeline-complete": {
+      pipeline: "deploy-example-control",
+      stage: "pipeline-complete",
+    },
+    example_repo: {
+      branch: "master",
+      destination: "example",
+      git: "git@github.com:getsentry/example.git",
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure customer-2 has pipeline material too
+  const c2 = got.pipelines["deploy-example-customer-2"];
+  t.deepEqual(c2.materials, {
+    "deploy-example-customer-1-pipeline-complete": {
+      pipeline: "deploy-example-customer-1",
+      stage: "pipeline-complete",
+    },
+    example_repo: {
+      branch: "master",
+      destination: "example",
+      git: "git@github.com:getsentry/example.git",
+      shallow_clone: true,
+    },
+  });
+
+  // Ensure rollback has the expected rollback pipelines
+  const r = got.pipelines["rollback-example"];
+  const allPipelines = r.environment_variables["ALL_PIPELINE_FLAGS"];
+  const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
+  t.deepEqual(
+    allPipelines,
+    "--pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7 --pipeline=deploy-example",
+  );
+  t.deepEqual(
+    regionPipelines,
+    "--pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+  );
+});
+
 test("error for invalid final rollback stage", async (t) => {
   const err = t.throws(() =>
     get_fixture_content(
