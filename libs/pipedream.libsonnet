@@ -241,6 +241,7 @@ local pipeline_to_array(pipeline) =
 {
   // render will generate the trigger pipeline and all the region pipelines.
   render(pipedream_config, pipeline_fn)::
+    // Regions that are excluded by default and must be explicitly included
     local default_excluded_regions = ['control'];
 
     local is_excluded_region = function(region, config)
@@ -255,8 +256,7 @@ local pipeline_to_array(pipeline) =
     local should_include_region = function(region, config)
       !is_excluded_region(region, config) && (!is_default_excluded_region(region) || is_included_region(region, config));
 
-    // Filter out any regions that are listed in the `exclude_regions`
-    // attribute.
+    // Filter out any regions that are listed in the `exclude_regions` attribute.
     local regions_to_render = std.filter(
       function(region) should_include_region(region, pipedream_config),
       getsentry.prod_regions,
