@@ -240,7 +240,7 @@ local pipeline_to_array(pipeline) =
 
 {
   // render will generate the trigger pipeline and all the region pipelines.
-  render(pipedream_config, pipeline_fn)::
+  render(pipedream_config, pipeline_fn, parallel=false)::
     // Regions that are excluded by default and must be explicitly included
     local default_excluded_regions = ['control'];
 
@@ -271,15 +271,23 @@ local pipeline_to_array(pipeline) =
     local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, test_regions_to_render, std.length(regions_to_render) + 2);
     local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_pipeline);
 
+    local all_pipelines = if parallel then pipeline_to_array(rollback_pipeline) +
+                                           pipeline_to_array(trigger_pipeline) +
+                                           // Chain the service pipelines together with
+                                           // the trigger pipeline
+                                           std.map(function(p) gocd_pipelines.chain_materials(p, trigger_pipeline), service_pipelines)
+                                           +
+                                           // Chain each test region to the trigger pipeline
+                                           std.map(function(p) gocd_pipelines.chain_materials(p, trigger_pipeline), test_pipelines)
+    else pipeline_to_array(rollback_pipeline) +
+         // Chain the service pipelines together with
+         // the trigger pipeline
+         gocd_pipelines.chain_pipelines(
+           pipeline_to_array(trigger_pipeline) + service_pipelines,
+         ) +
+         // Chain each test region to the trigger pipeline
+         std.map(function(p) gocd_pipelines.chain_materials(p, trigger_pipeline), test_pipelines);
 
-    local all_pipelines = pipeline_to_array(rollback_pipeline) +
-                          // Chain the service pipelines together with
-                          // the trigger pipeline
-                          gocd_pipelines.chain_pipelines(
-                            pipeline_to_array(trigger_pipeline) + service_pipelines,
-                          ) +
-                          // Chain each test region to the trigger pipeline
-                          std.map(function(p) gocd_pipelines.chain_materials(p, trigger_pipeline), test_pipelines);
 
     // If --ext-var=output-files=true we want to return:
     //     {<file name>: <pipeline>, <file name>: <pipeline>},
