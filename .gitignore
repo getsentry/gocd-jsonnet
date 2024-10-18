@@ -1,6 +1,9 @@
 # developer environment:
 node_modules/
 
+# Ignore vendored dependencies
+vendor/
+
 # dirty hacks:
 trash/
 *.bak
