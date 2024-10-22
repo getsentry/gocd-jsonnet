@@ -23,7 +23,10 @@ import {
 })();
 
 test("ensure manual deploys is expected structure in serial", async (t) => {
-  const got = await render_fixture("pipedream/no-autodeploy-serial.jsonnet", false);
+  const got = await render_fixture(
+    "pipedream/no-autodeploy-serial.jsonnet",
+    false,
+  );
 
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.truthy(got.pipelines["deploy-example"]);
@@ -57,7 +60,10 @@ test("ensure manual deploys is expected structure in serial", async (t) => {
 });
 
 test("ensure manual deploys is expected structure in parallel", async (t) => {
-  const got = await render_fixture("pipedream/no-autodeploy-parallel.jsonnet", false);
+  const got = await render_fixture(
+    "pipedream/no-autodeploy-parallel.jsonnet",
+    false,
+  );
 
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.truthy(got.pipelines["deploy-example"]);
@@ -91,7 +97,10 @@ test("ensure manual deploys is expected structure in parallel", async (t) => {
 });
 
 test("ensure auto deploys is expected structure in serial", async (t) => {
-  const got = await render_fixture("pipedream/autodeploy-serial.jsonnet", false);
+  const got = await render_fixture(
+    "pipedream/autodeploy-serial.jsonnet",
+    false,
+  );
 
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.falsy(got.pipelines["deploy-example"]);
@@ -130,7 +139,10 @@ test("ensure auto deploys is expected structure in serial", async (t) => {
 });
 
 test("ensure auto deploys is expected structure in parallel", async (t) => {
-  const got = await render_fixture("pipedream/autodeploy-parallel.jsonnet", false);
+  const got = await render_fixture(
+    "pipedream/autodeploy-parallel.jsonnet",
+    false,
+  );
 
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.falsy(got.pipelines["deploy-example"]);
@@ -169,7 +181,10 @@ test("ensure auto deploys is expected structure in parallel", async (t) => {
 });
 
 test("ensure exclude regions removes regions without trigger pipeline in serial", async (t) => {
-  const got = await render_fixture("pipedream/exclude-regions-autodeploy-serial.jsonnet", false);
+  const got = await render_fixture(
+    "pipedream/exclude-regions-autodeploy-serial.jsonnet",
+    false,
+  );
 
   t.deepEqual(Object.keys(got.pipelines).sort(), [
     "deploy-example-customer-1",
@@ -221,7 +236,10 @@ test("ensure exclude regions removes regions without trigger pipeline in serial"
 });
 
 test("ensure exclude regions removes regions without trigger pipeline in parallel", async (t) => {
-  const got = await render_fixture("pipedream/exclude-regions-autodeploy-parallel.jsonnet", false);
+  const got = await render_fixture(
+    "pipedream/exclude-regions-autodeploy-parallel.jsonnet",
+    false,
+  );
 
   t.deepEqual(Object.keys(got.pipelines).sort(), [
     "deploy-example-customer-1",
@@ -389,7 +407,10 @@ test("ensure exclude regions removes regions with trigger pipeline in parallel",
 });
 
 test("ensure include regions adds regions without trigger pipeline in serial", async (t) => {
-  const got = await render_fixture("pipedream/include-regions-autodeploy-serial.jsonnet", false);
+  const got = await render_fixture(
+    "pipedream/include-regions-autodeploy-serial.jsonnet",
+    false,
+  );
 
   t.deepEqual(Object.keys(got.pipelines).sort(), [
     "deploy-example-control",
@@ -472,7 +493,10 @@ test("ensure include regions adds regions without trigger pipeline in serial", a
 });
 
 test("ensure include regions adds regions without trigger pipeline in parallel", async (t) => {
-  const got = await render_fixture("pipedream/include-regions-autodeploy-parallel.jsonnet", false);
+  const got = await render_fixture(
+    "pipedream/include-regions-autodeploy-parallel.jsonnet",
+    false,
+  );
 
   t.deepEqual(Object.keys(got.pipelines).sort(), [
     "deploy-example-control",
