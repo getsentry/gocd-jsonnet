@@ -1,8 +1,5 @@
 import test from "ava";
-import {
-  render_fixture,
-  get_fixture_content,
-} from "./utils/testdata.js";
+import { render_fixture, get_fixture_content } from "./utils/testdata.js";
 
 test("ensure manual deploys is expected structure", async (t) => {
   const got = await render_fixture("pipedream/no-autodeploy.jsonnet", false);
