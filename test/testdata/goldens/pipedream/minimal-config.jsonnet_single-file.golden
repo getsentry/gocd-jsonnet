@@ -5,8 +5,8 @@
          "display_order": 5,
          "group": "example",
          "materials": {
-            "deploy-example-de-pipeline-complete": {
-               "pipeline": "deploy-example-de",
+            "deploy-example-us-pipeline-complete": {
+               "pipeline": "deploy-example-us",
                "stage": "pipeline-complete"
             },
             "example_repo": {
@@ -76,7 +76,7 @@
          ]
       },
       "deploy-example-customer-4": {
-         "display_order": 8,
+         "display_order": 7,
          "group": "example",
          "materials": {
             "deploy-example-customer-2-pipeline-complete": {
@@ -112,12 +112,49 @@
             }
          ]
       },
-      "deploy-example-de": {
-         "display_order": 4,
+      "deploy-example-customer-7": {
+         "display_order": 8,
          "group": "example",
          "materials": {
-            "deploy-example-us-pipeline-complete": {
-               "pipeline": "deploy-example-us",
+            "deploy-example-customer-4-pipeline-complete": {
+               "pipeline": "deploy-example-customer-4",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "customer-7",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-de": {
+         "display_order": 3,
+         "group": "example",
+         "materials": {
+            "deploy-example-s4s-pipeline-complete": {
+               "pipeline": "deploy-example-s4s",
                "stage": "pipeline-complete"
             },
             "example_repo": {
@@ -183,11 +220,11 @@
          ]
       },
       "deploy-example-us": {
-         "display_order": 3,
+         "display_order": 4,
          "group": "example",
          "materials": {
-            "deploy-example-s4s-pipeline-complete": {
-               "pipeline": "deploy-example-s4s",
+            "deploy-example-de-pipeline-complete": {
+               "pipeline": "deploy-example-de",
                "stage": "pipeline-complete"
             },
             "example_repo": {
