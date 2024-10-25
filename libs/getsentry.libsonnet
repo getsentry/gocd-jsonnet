@@ -19,4 +19,20 @@
   test_regions: [
   ],
   is_st(region):: (region == 's4s' || std.startsWith(region, 'customer-')),
+  prod_region_pops: {
+    de: [
+      'de',
+      'de-pop-regional-1',
+      'de-pop-regional-2',
+    ],
+    us: [
+      'us',
+      'us-pop-regional-1',
+      'us-pop-regional-2',
+      'us-pop-regional-3',
+      'us-pop-regional-4',
+      'us-pop-1',
+      'us-pop-2',
+    ],
+  };
 }

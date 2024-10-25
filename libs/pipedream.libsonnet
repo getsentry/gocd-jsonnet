@@ -20,8 +20,13 @@ local gocd_pipelines = import './gocd-pipelines.libsonnet';
 local gocd_stages = import './gocd-stages.libsonnet';
 local gocd_tasks = import './gocd-tasks.libsonnet';
 
-local pipeline_name(name, region=null) =
-  if region != null then 'deploy-' + name + '-' + region else 'deploy-' + name;
+local pipeline_name(name, region=null, pop=null) =
+  if pop != null && region != null then
+    'deploy-' + name + '-' + region + '-' + pop
+  else if region != null then
+    'deploy-' + name + '-' + region
+  else
+    'deploy-' + name;
 
 local is_autodeploy(pipedream_config) =
   !std.objectHas(pipedream_config, 'auto_deploy') || pipedream_config.auto_deploy == true;
@@ -171,9 +176,9 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
 //                   take in a region and return a GoCD pipeline.
 // region:           The region to create pipelines for
 // display_order:    The order of the pipeline in GoCD UI
-local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_order) =
+local generate_region_pipeline(pipedream_config, pipeline_fn, region, pop, display_order) =
   local service_name = pipedream_config.name;
-  local service_pipeline = pipeline_fn(region);
+  local service_pipeline = pipeline_fn(region, pop);
 
   // `auto_pipeline_progression` was added as a utility for folks new to
   // pipedream. When this is false, each region will need manual approval
@@ -224,13 +229,23 @@ local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_or
 // regions:          The regions to create pipelines for
 // display_offset:   Used to offset the display order (i.e. test regions are
 //                   display order => trigger + rollback + user regions length)
-local get_service_pipelines(pipedream_config, pipeline_fn, regions, display_offset) =
+local get_service_pipelines(pipedream_config, pipeline_fn, regions, pops=null, display_offset) =
   [
-    {
-      name: pipeline_name(pipedream_config.name, regions[i]),
-      pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[i], display_offset + i),
-    }
-    for i in std.range(0, std.length(regions) - 1)
+    if pops != null then [
+      {
+        name: pipeline_name(pipedream_config.name, regions[region_count], pops[regions[region_count]]),
+        pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[region_count], display_offset + region_count * pop_count),
+      }
+      for region_count in std.range(0, std.length(regions) - 1)
+      for pop_count in std.range(0, std.length(pops[region_count]) - 1)
+    ]
+    else [
+      {
+        name: pipeline_name(pipedream_config.name, regions[region_count], null),
+        pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[region_count], display_offset + region_count),
+      }
+      for region_count in std.range(0, std.length(regions) - 1)
+    ],
   ];
 
 // This is a helper function that handles pipelines that may be null
@@ -240,7 +255,7 @@ local pipeline_to_array(pipeline) =
 
 {
   // render will generate the trigger pipeline and all the region pipelines.
-  render(pipedream_config, pipeline_fn)::
+  render(pipedream_config, pipeline_fn, split_pops=false)::
     // Regions that are excluded by default and must be explicitly included
     local default_excluded_regions = ['control'];
 
@@ -265,10 +280,20 @@ local pipeline_to_array(pipeline) =
       function(region) should_include_region(region, pipedream_config),
       getsentry.test_regions,
     );
+    local prod_pops_to_render =
+      if split_pops then std.filter(
+        function(region) should_include_region(region, pipedream_config),
+        getsentry.prod_region_pops,
+      ) else null;
+    local test_pops_to_render =
+      if split_pops then std.filter(
+        function(region) should_include_region(region, pipedream_config),
+        getsentry.test_pops_to_render,
+      ) else null;
 
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
-    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, 2);
-    local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, test_regions_to_render, std.length(regions_to_render) + 2);
+    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, prod_pops_to_render, 2);
+    local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, test_regions_to_render, test_pops_to_render, std.length(regions_to_render) + 2);
     local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_pipeline);
 
 
