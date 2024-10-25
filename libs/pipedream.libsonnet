@@ -234,10 +234,10 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, pops=null, d
     if pops != null then [
       {
         name: pipeline_name(pipedream_config.name, regions[region_count], pops[regions[region_count]]),
-        pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[region_count], pops[pop_count], display_offset + region_count * pop_count),
+        pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[region_count], pops[pop_name], display_offset + region_count),
       }
       for region_count in std.range(0, std.length(regions) - 1)
-      for pop_count in std.range(0, std.length(pops[region_count]) - 1)
+      for pop_name in std.objectFields(pops)
     ]
     else [
       {
@@ -284,12 +284,12 @@ local pipeline_to_array(pipeline) =
       if split_pops then std.filter(
         function(region) should_include_region(region, pipedream_config),
         getsentry.prod_region_pops,
-      ) else null;
+      );
     local test_pops_to_render =
       if split_pops then std.filter(
         function(region) should_include_region(region, pipedream_config),
         getsentry.test_region_pops,
-      ) else null;
+      );
 
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
     local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, prod_pops_to_render, 2);
