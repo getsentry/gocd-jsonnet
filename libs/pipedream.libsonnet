@@ -234,7 +234,7 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, pops=null, d
     if pops != null then [
       {
         name: pipeline_name(pipedream_config.name, regions[region_count], pops[regions[region_count]]),
-        pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[region_count], display_offset + region_count * pop_count),
+        pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[region_count], pops[pop_count], display_offset + region_count * pop_count),
       }
       for region_count in std.range(0, std.length(regions) - 1)
       for pop_count in std.range(0, std.length(pops[region_count]) - 1)
@@ -242,7 +242,7 @@ local get_service_pipelines(pipedream_config, pipeline_fn, regions, pops=null, d
     else [
       {
         name: pipeline_name(pipedream_config.name, regions[region_count], null),
-        pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[region_count], display_offset + region_count),
+        pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[region_count], null, display_offset + region_count),
       }
       for region_count in std.range(0, std.length(regions) - 1)
     ],
