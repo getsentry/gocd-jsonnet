@@ -35,4 +35,5 @@
       'us-pop-2',
     ],
   },
+  test_region_pops: null
 }

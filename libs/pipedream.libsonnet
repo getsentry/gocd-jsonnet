@@ -288,7 +288,7 @@ local pipeline_to_array(pipeline) =
     local test_pops_to_render =
       if split_pops then std.filter(
         function(region) should_include_region(region, pipedream_config),
-        getsentry.test_pops_to_render,
+        getsentry.test_region_pops,
       ) else null;
 
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
