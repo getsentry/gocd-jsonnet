@@ -242,7 +242,7 @@ local pipeline_to_array(pipeline) =
   // render will generate the trigger pipeline and all the region pipelines.
   render(pipedream_config, pipeline_fn, parallel=false)::
     // Regions that are excluded by default and must be explicitly included
-    local default_excluded_regions = ['control'];
+    local default_excluded_regions = ['control', 'snty-tools'];
 
     local is_excluded_region = function(region, config)
       std.objectHas(config, 'exclude_regions') && std.length(std.find(region, config.exclude_regions)) > 0;
