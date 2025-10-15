@@ -219,6 +219,39 @@
             }
          ]
       },
+      "deploy-example-s4s2": {
+         "display_order": 8,
+         "group": "example",
+         "materials": {
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git",
+               "shallow_clone": true
+            }
+         },
+         "region": "s4s2",
+         "stages": [
+            {
+               "example_stage": { }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
       "rollback-example": {
          "display_order": 1,
          "environment_variables": {
