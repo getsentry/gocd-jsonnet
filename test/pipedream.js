@@ -171,6 +171,7 @@ test("ensure exclude regions removes regions without trigger pipeline in serial"
     "deploy-example-customer-4",
     "deploy-example-customer-7",
     "deploy-example-de",
+    "deploy-example-s4s2",
     "rollback-example",
   ]);
 
@@ -226,6 +227,7 @@ test("ensure exclude regions removes regions without trigger pipeline in paralle
     "deploy-example-customer-4",
     "deploy-example-customer-7",
     "deploy-example-de",
+    "deploy-example-s4s2",
     "rollback-example",
   ]);
 
@@ -278,6 +280,7 @@ test("ensure exclude regions removes regions with trigger pipeline in serial", a
     "deploy-example-customer-4",
     "deploy-example-customer-7",
     "deploy-example-de",
+    "deploy-example-s4s2",
     "rollback-example",
   ]);
 
@@ -338,6 +341,7 @@ test("ensure exclude regions removes regions with trigger pipeline in parallel",
     "deploy-example-customer-4",
     "deploy-example-customer-7",
     "deploy-example-de",
+    "deploy-example-s4s2",
     "rollback-example",
   ]);
 
@@ -398,6 +402,7 @@ test("ensure include regions adds regions without trigger pipeline in serial", a
     "deploy-example-customer-4",
     "deploy-example-customer-7",
     "deploy-example-de",
+    "deploy-example-s4s2",
     "rollback-example",
   ]);
 
@@ -484,6 +489,7 @@ test("ensure include regions adds regions without trigger pipeline in parallel",
     "deploy-example-customer-4",
     "deploy-example-customer-7",
     "deploy-example-de",
+    "deploy-example-s4s2",
     "rollback-example",
   ]);
 
@@ -559,6 +565,7 @@ test("ensure include regions adds regions with trigger pipeline in parallel", as
     "deploy-example-customer-4",
     "deploy-example-customer-7",
     "deploy-example-de",
+    "deploy-example-s4s2",
     "rollback-example",
   ]);
 
@@ -637,6 +644,7 @@ test("ensure include regions adds regions with trigger pipeline in serial", asyn
     "deploy-example-customer-4",
     "deploy-example-customer-7",
     "deploy-example-de",
+    "deploy-example-s4s2",
     "rollback-example",
   ]);
 

@@ -227,6 +227,44 @@
          }
       }
    },
+   "deploy-example-s4s2.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-s4s2": {
+            "display_order": 9,
+            "group": "example",
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git",
+                  "shallow_clone": true
+               }
+            },
+            "region": "s4s2",
+            "stages": [
+               {
+                  "example_stage": { }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
    "deploy-example-us.yaml": {
       "format_version": 10,
       "pipelines": {
