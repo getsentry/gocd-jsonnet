@@ -1,13 +1,10 @@
 local pipedream = import '../../../../libs/pipedream.libsonnet';
 
+// Exclude all customer regions → st group is skipped entirely
 local pipedream_config = {
   name: 'example',
   auto_deploy: true,
-  rollback: {
-    material_name: 'example_repo',
-    stage: 'this-stage-does-not-exist',
-    elastic_profile_id: 'example',
-  },
+  exclude_regions: ['customer-1', 'customer-2', 'customer-4', 'customer-7'],
 };
 
 local sample = {

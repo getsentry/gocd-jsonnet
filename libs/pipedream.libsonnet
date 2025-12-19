@@ -3,16 +3,24 @@
 This libraries main purpose is to generate a set of pipelines that constitute
 a pipedream.
 
-"pipedream" is what we're calling the overall deployment process for a service
-at sentry, where that service is expected to be deployed to multiple regions.
+"pipedream" is the overall deployment process for a service at Sentry, where
+that service is deployed to multiple regions organized into groups.
 
-The entry point for this library is the `render()` function which takes
-some configuration and a callback function. The callback function is expected
-to return a pipeline definition for a given region.
+Key concepts:
+- Groups: Collections of regions that are deployed together
+- Regions: Individual deployment targets within a group
+- Regions within a group run as parallel jobs within a single pipeline
+- Groups are chained sequentially (or fan out in parallel mode)
 
-Pipedream will name the returned pipeline, add an upstream pipeline material
-and a final stage. The upstream material and final stage is to make GoCD
-chain the pipelines together.
+The entry point is `render(config, pipeline_fn)` where:
+- config: Pipedream configuration (name, materials, rollback, etc.)
+- pipeline_fn(region): Callback that returns a pipeline definition for a region
+
+Pipedream will:
+1. Generate one pipeline per group
+2. Aggregate jobs from all regions in the group (running in parallel)
+3. Chain pipelines together with upstream materials
+4. Append a final 'pipeline-complete' stage
 
 */
 local getsentry = import './getsentry.libsonnet';
@@ -25,6 +33,36 @@ local pipeline_name(name, region=null) =
 
 local is_autodeploy(pipedream_config) =
   !std.objectHas(pipedream_config, 'auto_deploy') || pipedream_config.auto_deploy == true;
+
+// Regions that are excluded by default and must be explicitly included
+local default_excluded_regions = ['control', 'snty-tools'];
+
+local is_excluded_region = function(region, config)
+  std.objectHas(config, 'exclude_regions') && std.length(std.find(region, config.exclude_regions)) > 0;
+
+local is_included_region = function(region, config)
+  std.objectHas(config, 'include_regions') && std.length(std.find(region, config.include_regions)) > 0;
+
+local is_default_excluded_region = function(region)
+  std.length(std.find(region, default_excluded_regions)) > 0;
+
+local should_include_region = function(region, config)
+  !is_excluded_region(region, config) && (!is_default_excluded_region(region) || is_included_region(region, config));
+
+local get_stage_name(stage) =
+  std.objectFields(stage)[0];
+
+local get_stage_jobs(stage) =
+  local stage_name = get_stage_name(stage);
+  if std.objectHas(stage[stage_name], 'jobs') then
+    stage[stage_name].jobs
+  else
+    {};
+
+local get_stage_props(stage) =
+  local stage_name = get_stage_name(stage);
+  local props = stage[stage_name];
+  { [k]: props[k] for k in std.objectFields(props) if k != 'jobs' };
 
 // This function returns a "trigger pipeline", if configured for manual deploys.
 // This pipeline is used so users don't need to know what the first pipedream
@@ -163,17 +201,68 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
   else
     null;
 
-// generate_region_pipeline will call the pipeline callback function, and then
-// name the pipeline, add an upstream material, and append a final stage.
-// pipedream_config: The configuration passed into the render() function
-// pipeline_fn:      The callback function passed in to render() function.
-//                   This function is from users of the library and should
-//                   take in a region and return a GoCD pipeline.
-// region:           The region to create pipelines for
-// display_order:    The order of the pipeline in GoCD UI
-local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_order) =
+// generate_group_pipeline creates a single pipeline for a group by:
+// 1. Getting all regions in the group
+// 2. Filtering regions based on exclude/include config
+// 3. Aggregating jobs from all regions into parallel jobs per stage
+// 4. Appending a 'pipeline-complete' stage
+//
+// pipedream_config: The configuration passed into render()
+// pipeline_fn:      Callback that takes a region and returns a GoCD pipeline
+// group:            The group name to create a pipeline for
+// display_order:    The order of the pipeline in the GoCD UI
+local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_order) =
   local service_name = pipedream_config.name;
-  local service_pipeline = pipeline_fn(region);
+
+  local all_regions = getsentry.get_targets(group);
+  local regions = std.filter(
+    function(r) should_include_region(r, pipedream_config),
+    all_regions
+  );
+
+  local template_pipeline = pipeline_fn(regions[0]);
+
+  // Collect all unique stages across all regions in the group
+  local all_stages = std.foldl(
+    function(acc, region)
+      local p = pipeline_fn(region);
+      local region_stages = if std.objectHas(p, 'stages') then p.stages else [];
+      acc + [
+        stage
+        for stage in region_stages
+        if !std.member([get_stage_name(s) for s in acc], get_stage_name(stage))
+      ],
+    regions,
+    []
+  );
+
+  // Transforms a stage by aggregating jobs from all regions
+  local transform_stage(stage) =
+    local stage_name = get_stage_name(stage);
+    local stage_props = get_stage_props(stage);
+
+    local all_jobs = std.foldl(
+      function(acc, region)
+        local p = pipeline_fn(region);
+        local matching_stages = std.filter(
+          function(s) get_stage_name(s) == stage_name,
+          if std.objectHas(p, 'stages') then p.stages else []
+        );
+        local stage_jobs = if std.length(matching_stages) > 0 then
+          get_stage_jobs(matching_stages[0])
+        else
+          {};
+        acc + {
+          [job_name + '-' + region]: stage_jobs[job_name]
+          for job_name in std.objectFields(stage_jobs)
+        },
+      regions,
+      {}
+    );
+
+    {
+      [stage_name]: stage_props { jobs: all_jobs },
+    };
 
   // `auto_pipeline_progression` was added as a utility for folks new to
   // pipedream. When this is false, each region will need manual approval
@@ -197,12 +286,17 @@ local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_or
   else
     [];
 
-  // Add the upstream pipeline material and append the final stage
-  local stages = service_pipeline.stages;
-  service_pipeline {
+  // Apply transform to all stages
+  local transformed_stages = [
+    transform_stage(stage)
+    for stage in all_stages
+  ];
+
+  // Assemble final pipeline from template
+  template_pipeline {
     group: service_name,
     display_order: display_order,
-    stages: prepend_stages + stages + [
+    stages: prepend_stages + transformed_stages + [
       // This stage is added to ensure a rollback doesn't cause
       // a deployment train.
       //
@@ -214,23 +308,19 @@ local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_or
     ],
   };
 
-// get_service_pipelines iterates over each region and generates the pipeline
-// for each region.
+// get_service_pipelines generates a pipeline for each group.
 //
-// pipedream_config: The configuration passed into the render() function
-// pipeline_fn:      The callback function passed in to render() function.
-//                   This function is from users of the library and should
-//                   take in a region and return a GoCD pipeline.
-// regions:          The regions to create pipelines for
-// display_offset:   Used to offset the display order (i.e. test regions are
-//                   display order => trigger + rollback + user regions length)
-local get_service_pipelines(pipedream_config, pipeline_fn, regions, display_offset) =
+// pipedream_config: The configuration passed into render()
+// pipeline_fn:      Callback that takes a region and returns a GoCD pipeline
+// groups:           The group names to create pipelines for
+// display_offset:   Offset for display_order (accounts for trigger/rollback)
+local get_service_pipelines(pipedream_config, pipeline_fn, groups, display_offset) =
   [
     {
-      name: pipeline_name(pipedream_config.name, regions[i]),
-      pipeline: generate_region_pipeline(pipedream_config, pipeline_fn, regions[i], display_offset + i),
+      name: pipeline_name(pipedream_config.name, groups[i]),
+      pipeline: generate_group_pipeline(pipedream_config, pipeline_fn, groups[i], display_offset + i),
     }
-    for i in std.range(0, std.length(regions) - 1)
+    for i in std.range(0, std.length(groups) - 1)
   ];
 
 // This is a helper function that handles pipelines that may be null
@@ -239,36 +329,31 @@ local pipeline_to_array(pipeline) =
   if pipeline == null then [] else [pipeline];
 
 {
-  // render will generate the trigger pipeline and all the region pipelines.
+  // render generates the trigger pipeline (if manual), group pipelines, and rollback pipeline.
   render(pipedream_config, pipeline_fn, parallel=false)::
-    // Regions that are excluded by default and must be explicitly included
-    local default_excluded_regions = ['control', 'snty-tools'];
-
-    local is_excluded_region = function(region, config)
-      std.objectHas(config, 'exclude_regions') && std.length(std.find(region, config.exclude_regions)) > 0;
-
-    local is_included_region = function(region, config)
-      std.objectHas(config, 'include_regions') && std.length(std.find(region, config.include_regions)) > 0;
-
-    local is_default_excluded_region = function(region)
-      std.length(std.find(region, default_excluded_regions)) > 0;
-
-    local should_include_region = function(region, config)
-      !is_excluded_region(region, config) && (!is_default_excluded_region(region) || is_included_region(region, config));
-
-    // Filter out any regions that are listed in the `exclude_regions` attribute.
-    local regions_to_render = std.filter(
-      function(region) should_include_region(region, pipedream_config),
-      getsentry.prod_regions,
+    local groups_to_render = std.filter(
+      function(group)
+        local regions = getsentry.get_targets(group);
+        std.length(std.filter(
+          function(r) should_include_region(r, pipedream_config),
+          regions
+        )) > 0,
+      getsentry.group_names
     );
-    local test_regions_to_render = std.filter(
-      function(region) should_include_region(region, pipedream_config),
-      getsentry.test_regions,
+
+    local test_groups_to_render = std.filter(
+      function(group)
+        local regions = getsentry.get_targets(group);
+        std.length(std.filter(
+          function(r) should_include_region(r, pipedream_config),
+          regions
+        )) > 0,
+      getsentry.test_group_names
     );
 
     local trigger_pipeline = pipedream_trigger_pipeline(pipedream_config);
-    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, regions_to_render, 2);
-    local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, test_regions_to_render, std.length(regions_to_render) + 2);
+    local service_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, groups_to_render, 2);
+    local test_pipelines = get_service_pipelines(pipedream_config, pipeline_fn, test_groups_to_render, std.length(groups_to_render) + 2);
     local rollback_pipeline = pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_pipeline);
 
     local all_pipelines = if parallel then pipeline_to_array(rollback_pipeline) +
@@ -277,7 +362,7 @@ local pipeline_to_array(pipeline) =
                                            // the trigger pipeline
                                            std.map(function(p) gocd_pipelines.chain_materials(p, trigger_pipeline), service_pipelines)
                                            +
-                                           // Chain each test region to the trigger pipeline
+                                           // Chain each test group to the trigger pipeline
                                            std.map(function(p) gocd_pipelines.chain_materials(p, trigger_pipeline), test_pipelines)
     else pipeline_to_array(rollback_pipeline) +
          // Chain the service pipelines together with
@@ -285,7 +370,7 @@ local pipeline_to_array(pipeline) =
          gocd_pipelines.chain_pipelines(
            pipeline_to_array(trigger_pipeline) + service_pipelines,
          ) +
-         // Chain each test region to the trigger pipeline
+         // Chain each test group to the trigger pipeline
          std.map(function(p) gocd_pipelines.chain_materials(p, trigger_pipeline), test_pipelines);
 
 

@@ -5,7 +5,7 @@ local pipedream_config = {
   auto_deploy: true,
   rollback: {
     material_name: 'example_repo',
-    stage: 'this-stage-does-not-exist',
+    stage: 'deploy',
     elastic_profile_id: 'example',
   },
 };

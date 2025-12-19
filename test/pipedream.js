@@ -1,918 +1,168 @@
 import test from "ava";
 import { render_fixture, get_fixture_content } from "./utils/testdata.js";
 
-test("ensure manual deploys is expected structure in serial", async (t) => {
-  const got = await render_fixture(
-    "pipedream/no-autodeploy-serial.jsonnet",
-    false,
-  );
-
-  t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
-  t.truthy(got.pipelines["deploy-example"]);
-  t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]); // s4s is now a test region
-
-  // Ensure the trigger has the right initial material
-  const trigger = got.pipelines["deploy-example"];
-  t.deepEqual(trigger.materials, {
-    init_repo: {
-      branch: "master",
-      destination: "init",
-      git: "git@github.com:getsentry/init.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure s4s2 depends on the trigger material (first prod region)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure s4s (test region) depends on trigger pipeline, deployed in parallel
-  const s4s = got.pipelines["deploy-example-s4s"];
-  t.deepEqual(s4s.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
+test("autodeploy: no trigger pipeline", async (t) => {
+  const got = await render_fixture("pipedream/basic-autodeploy.jsonnet", false);
+  t.falsy(got.pipelines["deploy-example"]);
 });
 
-test("ensure manual deploys is expected structure in parallel", async (t) => {
+test("manual deploy: has trigger pipeline with correct materials", async (t) => {
+  const got = await render_fixture("pipedream/basic-manual.jsonnet", false);
+  const trigger = got.pipelines["deploy-example"];
+
+  t.truthy(trigger);
+  t.truthy(trigger.materials.init_repo);
+  t.is(trigger.stages.length, 1);
+});
+
+test("generates pipeline per group in correct order", async (t) => {
+  const got = await render_fixture("pipedream/basic-autodeploy.jsonnet", false);
+
+  const pipelineNames = Object.keys(got.pipelines).filter((n) =>
+    n.startsWith("deploy-example-"),
+  );
+
+  // Should have s4s, de, us, st (control/snty-tools excluded by default)
+  t.true(pipelineNames.includes("deploy-example-s4s"));
+  t.true(pipelineNames.includes("deploy-example-de"));
+  t.true(pipelineNames.includes("deploy-example-us"));
+  t.true(pipelineNames.includes("deploy-example-st"));
+  t.false(pipelineNames.includes("deploy-example-control"));
+});
+
+test("multi-region group has parallel jobs for each region", async (t) => {
+  const got = await render_fixture("pipedream/basic-autodeploy.jsonnet", false);
+
+  // s4s group has s4s + s4s2 regions
+  const s4s = got.pipelines["deploy-example-s4s"];
+  const s4sJobs = Object.keys(s4s.stages[0].deploy.jobs);
+  t.deepEqual(s4sJobs.sort(), ["deploy-s4s", "deploy-s4s2"]);
+
+  // st group has customer-1, customer-2, customer-4, customer-7
+  const st = got.pipelines["deploy-example-st"];
+  const stJobs = Object.keys(st.stages[0].deploy.jobs);
+  t.deepEqual(stJobs.sort(), [
+    "deploy-customer-1",
+    "deploy-customer-2",
+    "deploy-customer-4",
+    "deploy-customer-7",
+  ]);
+});
+
+test("single-region group has one job", async (t) => {
+  const got = await render_fixture("pipedream/basic-autodeploy.jsonnet", false);
+
+  const de = got.pipelines["deploy-example-de"];
+  const deJobs = Object.keys(de.stages[0].deploy.jobs);
+  t.deepEqual(deJobs, ["deploy-de"]);
+});
+
+test("serial mode: pipelines chain sequentially", async (t) => {
+  const got = await render_fixture("pipedream/basic-manual.jsonnet", false);
+
+  // s4s depends on trigger
+  const s4s = got.pipelines["deploy-example-s4s"];
+  t.truthy(s4s.materials["deploy-example-pipeline-complete"]);
+
+  // de depends on s4s
+  const de = got.pipelines["deploy-example-de"];
+  t.truthy(de.materials["deploy-example-s4s-pipeline-complete"]);
+
+  // us depends on de
+  const us = got.pipelines["deploy-example-us"];
+  t.truthy(us.materials["deploy-example-de-pipeline-complete"]);
+});
+
+test("parallel mode: all pipelines depend on trigger only", async (t) => {
+  const got = await render_fixture("pipedream/parallel-mode.jsonnet", false);
+
+  const s4s = got.pipelines["deploy-example-s4s"];
+  const de = got.pipelines["deploy-example-de"];
+  const us = got.pipelines["deploy-example-us"];
+
+  // All depend on trigger
+  t.truthy(s4s.materials["deploy-example-pipeline-complete"]);
+  t.truthy(de.materials["deploy-example-pipeline-complete"]);
+  t.truthy(us.materials["deploy-example-pipeline-complete"]);
+
+  // None depend on each other
+  t.falsy(de.materials["deploy-example-s4s-pipeline-complete"]);
+  t.falsy(us.materials["deploy-example-de-pipeline-complete"]);
+});
+
+test("exclude region: removes job but keeps group", async (t) => {
+  const got = await render_fixture("pipedream/exclude-region.jsonnet", false);
+
+  const st = got.pipelines["deploy-example-st"];
+  const jobs = Object.keys(st.stages[0].deploy.jobs);
+
+  t.false(jobs.includes("deploy-customer-2"));
+  t.true(jobs.includes("deploy-customer-1"));
+  t.true(jobs.includes("deploy-customer-4"));
+  t.true(jobs.includes("deploy-customer-7"));
+});
+
+test("exclude all regions in group: skips entire group", async (t) => {
   const got = await render_fixture(
-    "pipedream/no-autodeploy-parallel.jsonnet",
+    "pipedream/exclude-entire-group.jsonnet",
     false,
   );
 
-  t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
-  t.truthy(got.pipelines["deploy-example"]);
-  t.truthy(got.pipelines["deploy-example-s4s2"]);
+  t.falsy(got.pipelines["deploy-example-st"]);
   t.truthy(got.pipelines["deploy-example-s4s"]);
-
-  // Ensure the trigger has the right initial material
-  const trigger = got.pipelines["deploy-example"];
-  t.deepEqual(trigger.materials, {
-    init_repo: {
-      branch: "master",
-      destination: "init",
-      git: "git@github.com:getsentry/init.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure s4s2 depends on the trigger material (first prod region in parallel)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure s4s also depends on the trigger material (parallel deploy)
-  const s4s = got.pipelines["deploy-example-s4s"];
-  t.deepEqual(s4s.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
 });
 
-test("ensure auto deploys is expected structure in serial", async (t) => {
+test("include region: adds default-excluded group", async (t) => {
   const got = await render_fixture(
-    "pipedream/autodeploy-serial.jsonnet",
+    "pipedream/include-default-excluded.jsonnet",
     false,
   );
 
-  t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
-  t.falsy(got.pipelines["deploy-example"]);
-  t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]); // s4s is now a test region
-  t.truthy(got.pipelines["rollback-example"]);
+  t.truthy(got.pipelines["deploy-example-control"]);
+});
 
-  // Ensure s4s2 has just the repo material (first prod region)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
+test("rollback pipeline structure", async (t) => {
+  const got = await render_fixture("pipedream/rollback.jsonnet", false);
 
-  // Ensure s4s (test region) has just the repo material (deployed in parallel)
-  const s4s = got.pipelines["deploy-example-s4s"];
-  t.deepEqual(s4s.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Rollback only includes prod regions, not test regions
   const r = got.pipelines["rollback-example"];
-  t.deepEqual(r["environment_variables"], {
-    ALL_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-    GOCD_ACCESS_TOKEN: "{{SECRET:[devinfra][gocd_access_token]}}",
-    REGION_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-    ROLLBACK_MATERIAL_NAME: "example_repo",
-    ROLLBACK_STAGE: "example_stage",
-    TRIGGERED_BY: "",
-  });
-  t.deepEqual(r["materials"], {
-    "deploy-example-customer-7-pipeline-complete": {
-      pipeline: "deploy-example-customer-7",
-      stage: "pipeline-complete",
-    },
-  });
-  t.deepEqual(r.stages.length, 3);
+  t.truthy(r);
+  t.is(r.stages.length, 3);
+  t.is(r.environment_variables.ROLLBACK_STAGE, "deploy");
+  t.truthy(r.environment_variables.REGION_PIPELINE_FLAGS);
+  t.truthy(r.environment_variables.ALL_PIPELINE_FLAGS);
 });
 
-test("ensure auto deploys is expected structure in parallel", async (t) => {
-  const got = await render_fixture(
-    "pipedream/autodeploy-parallel.jsonnet",
-    false,
+test("rollback: invalid stage errors", (t) => {
+  const err = t.throws(() =>
+    get_fixture_content("pipedream/rollback-bad-stage.failing.jsonnet", false),
   );
-
-  t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
-  t.falsy(got.pipelines["deploy-example"]);
-  t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]); // s4s is now a test region
-  t.truthy(got.pipelines["rollback-example"]);
-
-  // Ensure s4s2 has just the repo material (parallel deploy, no upstream)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure s4s (test region) also has just the repo material (parallel deploy)
-  const s4s = got.pipelines["deploy-example-s4s"];
-  t.deepEqual(s4s.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Rollback only includes prod regions, not test regions
-  const r = got.pipelines["rollback-example"];
-  t.deepEqual(r["environment_variables"], {
-    ALL_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-    GOCD_ACCESS_TOKEN: "{{SECRET:[devinfra][gocd_access_token]}}",
-    REGION_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-    ROLLBACK_MATERIAL_NAME: "example_repo",
-    ROLLBACK_STAGE: "example_stage",
-    TRIGGERED_BY: "",
-  });
-  t.deepEqual(r["materials"], {
-    "deploy-example-customer-7-pipeline-complete": {
-      pipeline: "deploy-example-customer-7",
-      stage: "pipeline-complete",
-    },
-  });
-  t.deepEqual(r.stages.length, 3);
-});
-
-test("ensure exclude regions removes regions without trigger pipeline in serial", async (t) => {
-  const got = await render_fixture(
-    "pipedream/exclude-regions-autodeploy-serial.jsonnet",
-    false,
-  );
-
-  t.deepEqual(Object.keys(got.pipelines).sort(), [
-    "deploy-example-customer-1",
-    "deploy-example-customer-2",
-    "deploy-example-customer-4",
-    "deploy-example-customer-7",
-    "deploy-example-de",
-    "deploy-example-s4s2",
-    "rollback-example",
-  ]);
-
-  // Ensure s4s2 has just the repo material (first region after exclusions)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure de depends on s4s2
-  const de = got.pipelines["deploy-example-de"];
-  t.deepEqual(de.materials, {
-    "deploy-example-s4s2-pipeline-complete": {
-      pipeline: "deploy-example-s4s2",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-2 has pipeline material too
-  const c2 = got.pipelines["deploy-example-customer-2"];
-  t.deepEqual(c2.materials, {
-    "deploy-example-customer-1-pipeline-complete": {
-      pipeline: "deploy-example-customer-1",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure rollback has the expected rollback pipelines
-  const r = got.pipelines["rollback-example"];
-  const allPipelines = r.environment_variables["ALL_PIPELINE_FLAGS"];
-  const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
-  t.deepEqual(
-    allPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-  t.deepEqual(
-    regionPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+  t.true(
+    err.message.includes("Stage 'this-stage-does-not-exist' does not exist"),
   );
 });
 
-test("ensure exclude regions removes regions without trigger pipeline in parallel", async (t) => {
-  const got = await render_fixture(
-    "pipedream/exclude-regions-autodeploy-parallel.jsonnet",
-    false,
-  );
-
-  t.deepEqual(Object.keys(got.pipelines).sort(), [
-    "deploy-example-customer-1",
-    "deploy-example-customer-2",
-    "deploy-example-customer-4",
-    "deploy-example-customer-7",
-    "deploy-example-de",
-    "deploy-example-s4s2",
-    "rollback-example",
-  ]);
-
-  // Ensure s4s2 has just the repo material (parallel deploy)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure de has just the repo material (parallel deploy)
-  const de = got.pipelines["deploy-example-de"];
-  t.deepEqual(de.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-2 has just the repo material (parallel deploy)
-  const c2 = got.pipelines["deploy-example-customer-2"];
-  t.deepEqual(c2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure rollback has the expected rollback pipelines
-  const r = got.pipelines["rollback-example"];
-  const allPipelines = r.environment_variables["ALL_PIPELINE_FLAGS"];
-  const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
-  t.deepEqual(
-    allPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-  t.deepEqual(
-    regionPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-});
-
-test("ensure exclude regions removes regions with trigger pipeline in serial", async (t) => {
-  const got = await render_fixture(
-    "pipedream/exclude-regions-no-autodeploy-serial.jsonnet",
-    false,
-  );
-
-  t.deepEqual(Object.keys(got.pipelines).sort(), [
-    "deploy-example",
-    "deploy-example-customer-1",
-    "deploy-example-customer-2",
-    "deploy-example-customer-4",
-    "deploy-example-customer-7",
-    "deploy-example-de",
-    "deploy-example-s4s2",
-    "rollback-example",
-  ]);
-
-  // Ensure s4s2 depends on trigger (first region after exclusions, serial)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure de depends on s4s2
-  const de = got.pipelines["deploy-example-de"];
-  t.deepEqual(de.materials, {
-    "deploy-example-s4s2-pipeline-complete": {
-      pipeline: "deploy-example-s4s2",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-2 has pipeline material too
-  const c2 = got.pipelines["deploy-example-customer-2"];
-  t.deepEqual(c2.materials, {
-    "deploy-example-customer-1-pipeline-complete": {
-      pipeline: "deploy-example-customer-1",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure rollback has the expected rollback pipelines
-  const r = got.pipelines["rollback-example"];
-  const allPipelines = r.environment_variables["ALL_PIPELINE_FLAGS"];
-  const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
-  t.deepEqual(
-    allPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7 --pipeline=deploy-example",
-  );
-  t.deepEqual(
-    regionPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-});
-
-test("ensure exclude regions removes regions with trigger pipeline in parallel", async (t) => {
-  const got = await render_fixture(
-    "pipedream/exclude-regions-no-autodeploy-parallel.jsonnet",
-    false,
-  );
-
-  t.deepEqual(Object.keys(got.pipelines).sort(), [
-    "deploy-example",
-    "deploy-example-customer-1",
-    "deploy-example-customer-2",
-    "deploy-example-customer-4",
-    "deploy-example-customer-7",
-    "deploy-example-de",
-    "deploy-example-s4s2",
-    "rollback-example",
-  ]);
-
-  // Ensure s4s2 depends on trigger (parallel deploy)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure de depends on trigger (parallel deploy)
-  const de = got.pipelines["deploy-example-de"];
-  t.deepEqual(de.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-2 depends on trigger (parallel deploy)
-  const c2 = got.pipelines["deploy-example-customer-2"];
-  t.deepEqual(c2.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure rollback has the expected rollback pipelines
-  const r = got.pipelines["rollback-example"];
-  const allPipelines = r.environment_variables["ALL_PIPELINE_FLAGS"];
-  const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
-  t.deepEqual(
-    allPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7 --pipeline=deploy-example",
-  );
-  t.deepEqual(
-    regionPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-});
-
-test("ensure include regions adds regions without trigger pipeline in serial", async (t) => {
-  const got = await render_fixture(
-    "pipedream/include-regions-autodeploy-serial.jsonnet",
-    false,
-  );
-
-  t.deepEqual(Object.keys(got.pipelines).sort(), [
-    "deploy-example-control",
-    "deploy-example-customer-1",
-    "deploy-example-customer-2",
-    "deploy-example-customer-4",
-    "deploy-example-customer-7",
-    "deploy-example-de",
-    "deploy-example-s4s2",
-    "rollback-example",
-  ]);
-
-  // Ensure s4s2 has just the repo material (first region)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure de depends on s4s2
-  const de = got.pipelines["deploy-example-de"];
-  t.deepEqual(de.materials, {
-    "deploy-example-s4s2-pipeline-complete": {
-      pipeline: "deploy-example-s4s2",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure control depends on de
-  const control = got.pipelines["deploy-example-control"];
-  t.deepEqual(control.materials, {
-    "deploy-example-de-pipeline-complete": {
-      pipeline: "deploy-example-de",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-1 depends on control
-  const c1 = got.pipelines["deploy-example-customer-1"];
-  t.deepEqual(c1.materials, {
-    "deploy-example-control-pipeline-complete": {
-      pipeline: "deploy-example-control",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-2 has pipeline material too
-  const c2 = got.pipelines["deploy-example-customer-2"];
-  t.deepEqual(c2.materials, {
-    "deploy-example-customer-1-pipeline-complete": {
-      pipeline: "deploy-example-customer-1",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure rollback has the expected rollback pipelines
-  const r = got.pipelines["rollback-example"];
-  const allPipelines = r.environment_variables["ALL_PIPELINE_FLAGS"];
-  const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
-  t.deepEqual(
-    allPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-  t.deepEqual(
-    regionPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-});
-
-test("ensure include regions adds regions without trigger pipeline in parallel", async (t) => {
-  const got = await render_fixture(
-    "pipedream/include-regions-autodeploy-parallel.jsonnet",
-    false,
-  );
-
-  t.deepEqual(Object.keys(got.pipelines).sort(), [
-    "deploy-example-control",
-    "deploy-example-customer-1",
-    "deploy-example-customer-2",
-    "deploy-example-customer-4",
-    "deploy-example-customer-7",
-    "deploy-example-de",
-    "deploy-example-s4s2",
-    "rollback-example",
-  ]);
-
-  // Ensure s4s2 has just the repo material (parallel deploy)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure de has just the repo material (parallel deploy)
-  const de = got.pipelines["deploy-example-de"];
-  t.deepEqual(de.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure control has just the repo material (parallel deploy)
-  const control = got.pipelines["deploy-example-control"];
-  t.deepEqual(control.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-1 has just the repo material (parallel deploy)
-  const c1 = got.pipelines["deploy-example-customer-1"];
-  t.deepEqual(c1.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-2 has just the repo material (parallel deploy)
-  const c2 = got.pipelines["deploy-example-customer-2"];
-  t.deepEqual(c2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure rollback has the expected rollback pipelines
-  const r = got.pipelines["rollback-example"];
-  const allPipelines = r.environment_variables["ALL_PIPELINE_FLAGS"];
-  const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
-  t.deepEqual(
-    allPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-  t.deepEqual(
-    regionPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-});
-
-test("ensure include regions adds regions with trigger pipeline in parallel", async (t) => {
-  const got = await render_fixture(
-    "pipedream/include-regions-no-autodeploy-parallel.jsonnet",
-    false,
-  );
-
-  t.deepEqual(Object.keys(got.pipelines).sort(), [
-    "deploy-example",
-    "deploy-example-control",
-    "deploy-example-customer-1",
-    "deploy-example-customer-2",
-    "deploy-example-customer-4",
-    "deploy-example-customer-7",
-    "deploy-example-de",
-    "deploy-example-s4s2",
-    "rollback-example",
-  ]);
-
-  // Ensure s4s2 depends on the trigger (parallel deploy)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure de depends on the trigger (parallel deploy)
-  const de = got.pipelines["deploy-example-de"];
-  t.deepEqual(de.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure control depends on the trigger (parallel deploy)
-  const control = got.pipelines["deploy-example-control"];
-  t.deepEqual(control.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-1 depends on the trigger (parallel deploy)
-  const c1 = got.pipelines["deploy-example-customer-1"];
-  t.deepEqual(c1.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-2 depends on the trigger (parallel deploy)
-  const c2 = got.pipelines["deploy-example-customer-2"];
-  t.deepEqual(c2.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-});
-
-test("ensure include regions adds regions with trigger pipeline in serial", async (t) => {
-  const got = await render_fixture(
-    "pipedream/include-regions-no-autodeploy-serial.jsonnet",
-    false,
-  );
-
-  t.deepEqual(Object.keys(got.pipelines).sort(), [
-    "deploy-example",
-    "deploy-example-control",
-    "deploy-example-customer-1",
-    "deploy-example-customer-2",
-    "deploy-example-customer-4",
-    "deploy-example-customer-7",
-    "deploy-example-de",
-    "deploy-example-s4s2",
-    "rollback-example",
-  ]);
-
-  // Ensure s4s2 depends on the trigger (first region)
-  const s4s2 = got.pipelines["deploy-example-s4s2"];
-  t.deepEqual(s4s2.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure de depends on s4s2
-  const de = got.pipelines["deploy-example-de"];
-  t.deepEqual(de.materials, {
-    "deploy-example-s4s2-pipeline-complete": {
-      pipeline: "deploy-example-s4s2",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure control depends on de
-  const control = got.pipelines["deploy-example-control"];
-  t.deepEqual(control.materials, {
-    "deploy-example-de-pipeline-complete": {
-      pipeline: "deploy-example-de",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-1 depends on control
-  const c1 = got.pipelines["deploy-example-customer-1"];
-  t.deepEqual(c1.materials, {
-    "deploy-example-control-pipeline-complete": {
-      pipeline: "deploy-example-control",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure customer-2 has pipeline material too
-  const c2 = got.pipelines["deploy-example-customer-2"];
-  t.deepEqual(c2.materials, {
-    "deploy-example-customer-1-pipeline-complete": {
-      pipeline: "deploy-example-customer-1",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure rollback has the expected rollback pipelines
-  const r = got.pipelines["rollback-example"];
-  const allPipelines = r.environment_variables["ALL_PIPELINE_FLAGS"];
-  const regionPipelines = r.environment_variables["REGION_PIPELINE_FLAGS"];
-  t.deepEqual(
-    allPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7 --pipeline=deploy-example",
-  );
-  t.deepEqual(
-    regionPipelines,
-    "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-control --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
-  );
-});
-
-test("error for invalid final rollback stage", async (t) => {
+test("rollback: invalid final stage errors", (t) => {
   const err = t.throws(() =>
     get_fixture_content(
       "pipedream/rollback-bad-final-stage.failing.jsonnet",
       false,
     ),
   );
-  t.truthy(
-    err?.message.includes(
-      "RUNTIME ERROR: Stage 'this-stage-does-not-exist' does not exist",
-    ),
+  t.true(
+    err.message.includes("Stage 'this-stage-does-not-exist' does not exist"),
   );
 });
 
-test("error for invalid rollback stage", async (t) => {
-  const err = t.throws(() =>
-    get_fixture_content("pipedream/rollback-bad-stage.failing.jsonnet", false),
-  );
-  t.truthy(
-    err?.message.includes(
-      "RUNTIME ERROR: Stage 'this-stage-does-not-exist' does not exist",
-    ),
-  );
+test("all pipelines end with pipeline-complete stage", async (t) => {
+  const got = await render_fixture("pipedream/basic-autodeploy.jsonnet", false);
+
+  for (const [name, pipeline] of Object.entries(got.pipelines)) {
+    const lastStage = pipeline.stages[pipeline.stages.length - 1];
+    const lastStageName = Object.keys(lastStage)[0];
+    t.is(
+      lastStageName,
+      "pipeline-complete",
+      `${name} should end with pipeline-complete`,
+    );
+  }
 });
