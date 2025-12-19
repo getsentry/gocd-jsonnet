@@ -3,23 +3,25 @@
 */
 
 {
-  // These regions are user facing deployments
-  prod_regions: [
-    's4s',
-    'de',
-    'us',
-    // 'control' is excluded by default and must be explicitly included
-    'control',
-    // 'snty-tools' is excluded by default and must be explicitly included
-    'snty-tools',
-    'customer-1',
-    'customer-2',
-    'customer-4',
-    'customer-7',
-  ],
-  // Test regions will deploy in parallel to the regions above
-  test_regions: [
-    's4s2',
-  ],
+  group_order: ['s4s', 'de', 'us', 'control', 'snty-tools', 'st'],
+  test_group_order: [],
+  // These groupings consist of user facing deployments
+  pipeline_groups: {
+    s4s: ['s4s', 's4s2'],
+    de: ['de'],
+    us: ['us'],
+    control: ['control'],
+    'snty-tools': ['snty-tools'],
+    st: ['customer-1', 'customer-2', 'customer-4', 'customer-7'],
+  },
+  // Test groups will deploy in parallel to the groups above
+  test_groups: {
+  },
+
+  group_names:: self.group_order,
+  test_group_names:: self.test_group_order,
+  get_targets(group)::
+    if std.objectHas(self.pipeline_groups, group) then self.pipeline_groups[group]
+    else self.test_groups[group],
   is_st(region):: (region == 's4s' || std.startsWith(region, 'customer-')),
 }

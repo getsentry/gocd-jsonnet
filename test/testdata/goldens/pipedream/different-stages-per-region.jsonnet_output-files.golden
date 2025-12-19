@@ -1,0 +1,370 @@
+{
+   "deploy-example-de.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-de": {
+            "display_order": 3,
+            "group": "example",
+            "materials": {
+               "deploy-example-s4s-pipeline-complete": {
+                  "pipeline": "deploy-example-s4s",
+                  "stage": "pipeline-complete"
+               },
+               "init_repo": {
+                  "branch": "main",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-de": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "deploy de"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "verify": {
+                     "jobs": {
+                        "verify-de": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "verify de"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "deploy-example-s4s.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-s4s": {
+            "display_order": 2,
+            "group": "example",
+            "materials": {
+               "init_repo": {
+                  "branch": "main",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-s4s": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "deploy s4s"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        },
+                        "deploy-s4s2": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "deploy s4s2"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "verify": {
+                     "jobs": {
+                        "verify-s4s2": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "verify s4s2"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "deploy-example-st.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-st": {
+            "display_order": 5,
+            "group": "example",
+            "materials": {
+               "deploy-example-us-pipeline-complete": {
+                  "pipeline": "deploy-example-us",
+                  "stage": "pipeline-complete"
+               },
+               "init_repo": {
+                  "branch": "main",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-customer-1": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "deploy customer-1"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        },
+                        "deploy-customer-2": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "deploy customer-2"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        },
+                        "deploy-customer-4": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "deploy customer-4"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        },
+                        "deploy-customer-7": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "deploy customer-7"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "verify": {
+                     "jobs": {
+                        "verify-customer-1": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "verify customer-1"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        },
+                        "verify-customer-2": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "verify customer-2"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        },
+                        "verify-customer-4": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "verify customer-4"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        },
+                        "verify-customer-7": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "verify customer-7"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "deploy-example-us.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-us": {
+            "display_order": 4,
+            "group": "example",
+            "materials": {
+               "deploy-example-de-pipeline-complete": {
+                  "pipeline": "deploy-example-de",
+                  "stage": "pipeline-complete"
+               },
+               "init_repo": {
+                  "branch": "main",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-us": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "deploy us"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "verify": {
+                     "jobs": {
+                        "verify-us": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "arguments": [
+                                       "verify us"
+                                    ],
+                                    "command": "echo"
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   }
+}
