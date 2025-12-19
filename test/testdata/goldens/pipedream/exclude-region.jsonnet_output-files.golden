@@ -1,0 +1,226 @@
+{
+   "deploy-example-de.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-de": {
+            "display_order": 3,
+            "group": "example",
+            "materials": {
+               "deploy-example-s4s-pipeline-complete": {
+                  "pipeline": "deploy-example-s4s",
+                  "stage": "pipeline-complete"
+               },
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-de": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=de"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "deploy-example-s4s.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-s4s": {
+            "display_order": 2,
+            "group": "example",
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-s4s": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=s4s"
+                              }
+                           ]
+                        },
+                        "deploy-s4s2": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=s4s2"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "deploy-example-st.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-st": {
+            "display_order": 5,
+            "group": "example",
+            "materials": {
+               "deploy-example-us-pipeline-complete": {
+                  "pipeline": "deploy-example-us",
+                  "stage": "pipeline-complete"
+               },
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-customer-1": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=customer-1"
+                              }
+                           ]
+                        },
+                        "deploy-customer-4": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=customer-4"
+                              }
+                           ]
+                        },
+                        "deploy-customer-7": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=customer-7"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "deploy-example-us.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-us": {
+            "display_order": 4,
+            "group": "example",
+            "materials": {
+               "deploy-example-de-pipeline-complete": {
+                  "pipeline": "deploy-example-de",
+                  "stage": "pipeline-complete"
+               },
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-us": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=us"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   }
+}
