@@ -153,8 +153,8 @@
          "display_order": 3,
          "group": "example",
          "materials": {
-            "deploy-example-s4s-pipeline-complete": {
-               "pipeline": "deploy-example-s4s",
+            "deploy-example-s4s2-pipeline-complete": {
+               "pipeline": "deploy-example-s4s2",
                "stage": "pipeline-complete"
             },
             "example_repo": {
@@ -187,7 +187,7 @@
          ]
       },
       "deploy-example-s4s": {
-         "display_order": 2,
+         "display_order": 9,
          "group": "example",
          "materials": {
             "example_repo": {
@@ -220,7 +220,7 @@
          ]
       },
       "deploy-example-s4s2": {
-         "display_order": 9,
+         "display_order": 2,
          "group": "example",
          "materials": {
             "example_repo": {
@@ -292,9 +292,9 @@
       "rollback-example": {
          "display_order": 1,
          "environment_variables": {
-            "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+            "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
             "GOCD_ACCESS_TOKEN": "{{SECRET:[devinfra][gocd_access_token]}}",
-            "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+            "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
             "ROLLBACK_MATERIAL_NAME": "example_repo",
             "ROLLBACK_STAGE": "example_stage",
             "TRIGGERED_BY": ""

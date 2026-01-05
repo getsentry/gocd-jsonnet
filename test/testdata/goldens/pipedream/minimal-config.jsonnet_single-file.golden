@@ -153,8 +153,8 @@
          "display_order": 3,
          "group": "example",
          "materials": {
-            "deploy-example-s4s-pipeline-complete": {
-               "pipeline": "deploy-example-s4s",
+            "deploy-example-s4s2-pipeline-complete": {
+               "pipeline": "deploy-example-s4s2",
                "stage": "pipeline-complete"
             },
             "example_repo": {
@@ -187,7 +187,7 @@
          ]
       },
       "deploy-example-s4s": {
-         "display_order": 2,
+         "display_order": 9,
          "group": "example",
          "materials": {
             "example_repo": {
@@ -220,7 +220,7 @@
          ]
       },
       "deploy-example-s4s2": {
-         "display_order": 9,
+         "display_order": 2,
          "group": "example",
          "materials": {
             "example_repo": {
