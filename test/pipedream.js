@@ -10,7 +10,7 @@ test("ensure manual deploys is expected structure in serial", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.truthy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]);
+  t.truthy(got.pipelines["deploy-example-s4s"]); // s4s is now a test region
 
   // Ensure the trigger has the right initial material
   const trigger = got.pipelines["deploy-example"];
@@ -38,11 +38,11 @@ test("ensure manual deploys is expected structure in serial", async (t) => {
     },
   });
 
-  // Ensure s4s depends on s4s2
+  // Ensure s4s (test region) depends on trigger pipeline, deployed in parallel
   const s4s = got.pipelines["deploy-example-s4s"];
   t.deepEqual(s4s.materials, {
-    "deploy-example-s4s2-pipeline-complete": {
-      pipeline: "deploy-example-s4s2",
+    "deploy-example-pipeline-complete": {
+      pipeline: "deploy-example",
       stage: "pipeline-complete",
     },
     example_repo: {
@@ -116,10 +116,10 @@ test("ensure auto deploys is expected structure in serial", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.falsy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]);
+  t.truthy(got.pipelines["deploy-example-s4s"]); // s4s is now a test region
   t.truthy(got.pipelines["rollback-example"]);
 
-  // Ensure s4s2 has just the repo material (first region)
+  // Ensure s4s2 has just the repo material (first prod region)
   const s4s2 = got.pipelines["deploy-example-s4s2"];
   t.deepEqual(s4s2.materials, {
     example_repo: {
@@ -130,13 +130,9 @@ test("ensure auto deploys is expected structure in serial", async (t) => {
     },
   });
 
-  // Ensure s4s depends on s4s2
+  // Ensure s4s (test region) has just the repo material (deployed in parallel)
   const s4s = got.pipelines["deploy-example-s4s"];
   t.deepEqual(s4s.materials, {
-    "deploy-example-s4s2-pipeline-complete": {
-      pipeline: "deploy-example-s4s2",
-      stage: "pipeline-complete",
-    },
     example_repo: {
       branch: "master",
       destination: "example",
@@ -145,13 +141,14 @@ test("ensure auto deploys is expected structure in serial", async (t) => {
     },
   });
 
+  // Rollback only includes prod regions, not test regions
   const r = got.pipelines["rollback-example"];
   t.deepEqual(r["environment_variables"], {
     ALL_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
     GOCD_ACCESS_TOKEN: "{{SECRET:[devinfra][gocd_access_token]}}",
     REGION_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
     ROLLBACK_MATERIAL_NAME: "example_repo",
     ROLLBACK_STAGE: "example_stage",
     TRIGGERED_BY: "",
@@ -174,7 +171,7 @@ test("ensure auto deploys is expected structure in parallel", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.falsy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]);
+  t.truthy(got.pipelines["deploy-example-s4s"]); // s4s is now a test region
   t.truthy(got.pipelines["rollback-example"]);
 
   // Ensure s4s2 has just the repo material (parallel deploy, no upstream)
@@ -188,7 +185,7 @@ test("ensure auto deploys is expected structure in parallel", async (t) => {
     },
   });
 
-  // Ensure s4s also has just the repo material (parallel deploy)
+  // Ensure s4s (test region) also has just the repo material (parallel deploy)
   const s4s = got.pipelines["deploy-example-s4s"];
   t.deepEqual(s4s.materials, {
     example_repo: {
@@ -199,13 +196,14 @@ test("ensure auto deploys is expected structure in parallel", async (t) => {
     },
   });
 
+  // Rollback only includes prod regions, not test regions
   const r = got.pipelines["rollback-example"];
   t.deepEqual(r["environment_variables"], {
     ALL_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
     GOCD_ACCESS_TOKEN: "{{SECRET:[devinfra][gocd_access_token]}}",
     REGION_PIPELINE_FLAGS:
-      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
+      "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-customer-1 --pipeline=deploy-example-customer-2 --pipeline=deploy-example-customer-4 --pipeline=deploy-example-customer-7",
     ROLLBACK_MATERIAL_NAME: "example_repo",
     ROLLBACK_STAGE: "example_stage",
     TRIGGERED_BY: "",
