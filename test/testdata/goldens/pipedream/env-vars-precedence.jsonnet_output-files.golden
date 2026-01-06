@@ -1,0 +1,68 @@
+{
+   "deploy-example-s4s.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-s4s": {
+            "display_order": 2,
+            "group": "example",
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-s4s": {
+                           "environment_variables": {
+                              "JOB_VAR": "job-s4s",
+                              "PIPELINE_VAR": "pipeline-s4s",
+                              "SHARED_VAR_JOB": "from-job",
+                              "SHARED_VAR_STAGE": "from-stage",
+                              "STAGE_VAR": "stage-s4s"
+                           },
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=s4s"
+                              }
+                           ]
+                        },
+                        "deploy-s4s2": {
+                           "environment_variables": {
+                              "JOB_VAR": "job-s4s2",
+                              "PIPELINE_VAR": "pipeline-s4s2",
+                              "SHARED_VAR_JOB": "from-job",
+                              "SHARED_VAR_STAGE": "from-stage",
+                              "STAGE_VAR": "stage-s4s2"
+                           },
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=s4s2"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   }
+}

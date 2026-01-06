@@ -1,0 +1,56 @@
+{
+   "format_version": 10,
+   "pipelines": {
+      "deploy-example-s4s": {
+         "display_order": 2,
+         "group": "example",
+         "materials": {
+            "example_repo": {
+               "branch": "master",
+               "git": "git@github.com:getsentry/example.git"
+            }
+         },
+         "stages": [
+            {
+               "deploy": {
+                  "approval": {
+                     "type": "manual"
+                  },
+                  "fetch_materials": true,
+                  "jobs": {
+                     "deploy-s4s": {
+                        "tasks": [
+                           {
+                              "script": "./deploy.sh --region=s4s"
+                           }
+                        ]
+                     },
+                     "deploy-s4s2": {
+                        "tasks": [
+                           {
+                              "script": "./deploy.sh --region=s4s2"
+                           }
+                        ]
+                     }
+                  }
+               }
+            },
+            {
+               "pipeline-complete": {
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      }
+   }
+}

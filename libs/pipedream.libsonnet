@@ -62,7 +62,19 @@ local get_stage_jobs(stage) =
 local get_stage_props(stage) =
   local stage_name = get_stage_name(stage);
   local props = stage[stage_name];
-  { [k]: props[k] for k in std.objectFields(props) if k != 'jobs' };
+  { [k]: props[k] for k in std.objectFields(props) if k != 'jobs' && k != 'environment_variables' };
+
+local get_stage_env_vars(stage) =
+  local stage_name = get_stage_name(stage);
+  local props = stage[stage_name];
+  if std.objectHas(props, 'environment_variables') then props.environment_variables else {};
+
+local get_pipeline_env_vars(pipeline) =
+  if std.objectHas(pipeline, 'environment_variables') then pipeline.environment_variables else {};
+
+// Cascade down environment variables with precedence: job > stage > pipeline
+local merge_env_vars(pipeline_env, stage_env, job_env) =
+  pipeline_env + stage_env + job_env;
 
 // This function returns a "trigger pipeline", if configured for manual deploys.
 // This pipeline is used so users don't need to know what the first pipedream
@@ -236,7 +248,9 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     []
   );
 
-  // Transforms a stage by aggregating jobs from all regions
+  // Transforms a stage by aggregating jobs from all regions.
+  // Cascades environment_variables from pipeline -> stage -> job level for each region.
+  // This is necessary as the pipeline/stage level is shared for all regions in a grouping.
   local transform_stage(stage) =
     local stage_name = get_stage_name(stage);
     local stage_props = get_stage_props(stage);
@@ -244,16 +258,26 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     local all_jobs = std.foldl(
       function(acc, region)
         local p = pipeline_fn(region);
+        local pipeline_env = get_pipeline_env_vars(p);
         local matching_stages = std.filter(
           function(s) get_stage_name(s) == stage_name,
           if std.objectHas(p, 'stages') then p.stages else []
         );
-        local stage_jobs = if std.length(matching_stages) > 0 then
-          get_stage_jobs(matching_stages[0])
-        else
-          {};
+        local region_stage = if std.length(matching_stages) > 0 then matching_stages[0] else null;
+        local stage_env = if region_stage != null then get_stage_env_vars(region_stage) else {};
+        local stage_jobs = if region_stage != null then get_stage_jobs(region_stage) else {};
+
         acc + {
-          [job_name + '-' + region]: stage_jobs[job_name]
+          [job_name + '-' + region]: (
+            local job = stage_jobs[job_name];
+            local job_env = if std.objectHas(job, 'environment_variables') then job.environment_variables else {};
+            local merged_env = merge_env_vars(pipeline_env, stage_env, job_env);
+            // Add merged env vars to job, or keep job as-is if no env vars
+            if std.length(std.objectFields(merged_env)) > 0 then
+              job { environment_variables: merged_env }
+            else
+              job
+          )
           for job_name in std.objectFields(stage_jobs)
         },
       regions,
@@ -292,8 +316,15 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     for stage in all_stages
   ];
 
+  // Strip pipeline and stage level environment variables
+  local filtered_template = {
+    [k]: template_pipeline[k]
+    for k in std.objectFields(template_pipeline)
+    if k != 'environment_variables'
+  };
+
   // Assemble final pipeline from template
-  template_pipeline {
+  filtered_template {
     group: service_name,
     display_order: display_order,
     stages: prepend_stages + transformed_stages + [
