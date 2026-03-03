@@ -50,7 +50,7 @@ When `output-files=true` it'll output pipelines in the format:
 ```
 
 This is useful when you build using the `-m` flag in jsonnet as it'll output
-multiple files which makes reviewing pipeliens easier.
+multiple files which makes reviewing pipelines easier.
 
 ```bash
 jsonnet --ext-code output-files=true -m ./generated-pipelines ./example.jsonnet
@@ -58,7 +58,7 @@ jsonnet --ext-code output-files=true -m ./generated-pipelines ./example.jsonnet
 
 The GoCD plugin that can process jsonnet files directly doesn't support
 outputting multiple files, so GoCD is configured to have
-`--ext-code output-filaes=false` which will output the pipelines in a flattened
+`--ext-code output-files=false` which will output the pipelines in a flattened
 format:
 
 ```json
@@ -87,8 +87,21 @@ Pipedream will name the returned pipeline, add an upstream pipeline material and
 a final stage. The upstream material and final stage is needed to make GoCD
 chain the pipelines together.
 
-The end result will be a pipeline `deploy-<service name>` that starts the run of
-each pipeline, and a pipeline for each region.
+Regions are organized into **groups** (defined in `getsentry.libsonnet`). Each
+group produces a single GoCD pipeline where regions within the group run as
+parallel jobs. Groups are chained sequentially by default, or can fan out in
+parallel via `pipedream.render(config, pipeline_fn, parallel=true)`.
+
+The end result is a trigger pipeline `deploy-<service name>` and a pipeline per
+group (e.g. `deploy-example-s4s`, `deploy-example-st`).
+
+`control` and `snty-tools` are excluded by default; use `include_regions` to
+opt in.
+
+Environment variables set at the pipeline or stage level in `pipeline_fn` are
+handled automatically: variables identical across all regions in a group stay at
+the stage level, while region-specific variables are cascaded to the job level.
+GoCD resolves precedence as job > stage > pipeline.
 
 ### Example Usage
 
