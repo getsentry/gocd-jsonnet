@@ -57,6 +57,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -132,6 +133,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -207,6 +209,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -282,6 +285,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -357,6 +361,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -432,6 +437,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -507,6 +513,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -582,6 +589,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -620,6 +628,7 @@
                      "approval": {
                         "type": "manual"
                      },
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [

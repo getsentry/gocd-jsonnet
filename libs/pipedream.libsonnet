@@ -45,7 +45,7 @@ local pipedream_trigger_pipeline(pipedream_config) =
         materials: materials,
         lock_behavior: 'unlockWhenFinished',
         stages: [
-          gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { approval: 'manual' }),
+          gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { approval: 'manual', fetch_materials: false }),
         ],
       },
     };
@@ -210,7 +210,7 @@ local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_or
       // The s4s final stage completes and causes the US pipeline to
       // re-run. With `pipeline-complete` as the final stage, it isn't
       // re-run by a rollback, preventing this domino effect.
-      gocd_stages.basic('pipeline-complete', [gocd_tasks.noop]),
+      gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { fetch_materials: false }),
     ],
   };
 
