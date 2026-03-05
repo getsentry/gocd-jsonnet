@@ -18,9 +18,12 @@ This library is a set of helpers for building GoCD pipelines.
       else
         null;
 
+    local fetch_materials = if std.objectHas(opts, 'fetch_materials') then opts.fetch_materials else null;
+
     {
       [name]: {
         [if approval != null then 'approval' else null]: approval,
+        [if fetch_materials != null then 'fetch_materials' else null]: fetch_materials,
         jobs: {
           [name]: {
             tasks: tasks,
