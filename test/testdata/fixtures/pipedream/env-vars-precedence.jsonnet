@@ -1,12 +1,12 @@
 local pipedream = import '../../../../libs/pipedream.libsonnet';
 
 // Test to demonstrate environment_variables precedence: job > stage > pipeline
-// Should show separate values for s4s and s4s2
+// Uses st group (multi-region) to show separate values per region
 
 local pipedream_config = {
   name: 'example',
   auto_deploy: true,
-  exclude_regions: ['de', 'us', 'customer-1', 'customer-2', 'customer-4', 'customer-7'],
+  exclude_regions: ['de', 'us', 's4s2'],
 };
 
 local pipeline_fn(region) = {

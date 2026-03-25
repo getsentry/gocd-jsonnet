@@ -1,7 +1,7 @@
 {
    "format_version": 10,
    "pipelines": {
-      "deploy-example-s4s": {
+      "deploy-example-st": {
          "display_order": 2,
          "group": "example",
          "materials": {
@@ -13,32 +13,60 @@
          "stages": [
             {
                "deploy": {
+                  "environment_variables": {
+                     "SHARED_VAR_JOB": "from-stage",
+                     "SHARED_VAR_STAGE": "from-stage"
+                  },
                   "jobs": {
-                     "deploy-s4s": {
+                     "deploy-customer-1": {
                         "environment_variables": {
-                           "JOB_VAR": "job-s4s",
-                           "PIPELINE_VAR": "pipeline-s4s",
+                           "JOB_VAR": "job-customer-1",
+                           "PIPELINE_VAR": "pipeline-customer-1",
                            "SHARED_VAR_JOB": "from-job",
-                           "SHARED_VAR_STAGE": "from-stage",
-                           "STAGE_VAR": "stage-s4s"
+                           "STAGE_VAR": "stage-customer-1"
                         },
                         "tasks": [
                            {
-                              "script": "./deploy.sh --region=s4s"
+                              "script": "./deploy.sh --region=customer-1"
                            }
                         ]
                      },
-                     "deploy-s4s2": {
+                     "deploy-customer-2": {
                         "environment_variables": {
-                           "JOB_VAR": "job-s4s2",
-                           "PIPELINE_VAR": "pipeline-s4s2",
+                           "JOB_VAR": "job-customer-2",
+                           "PIPELINE_VAR": "pipeline-customer-2",
                            "SHARED_VAR_JOB": "from-job",
-                           "SHARED_VAR_STAGE": "from-stage",
-                           "STAGE_VAR": "stage-s4s2"
+                           "STAGE_VAR": "stage-customer-2"
                         },
                         "tasks": [
                            {
-                              "script": "./deploy.sh --region=s4s2"
+                              "script": "./deploy.sh --region=customer-2"
+                           }
+                        ]
+                     },
+                     "deploy-customer-4": {
+                        "environment_variables": {
+                           "JOB_VAR": "job-customer-4",
+                           "PIPELINE_VAR": "pipeline-customer-4",
+                           "SHARED_VAR_JOB": "from-job",
+                           "STAGE_VAR": "stage-customer-4"
+                        },
+                        "tasks": [
+                           {
+                              "script": "./deploy.sh --region=customer-4"
+                           }
+                        ]
+                     },
+                     "deploy-customer-7": {
+                        "environment_variables": {
+                           "JOB_VAR": "job-customer-7",
+                           "PIPELINE_VAR": "pipeline-customer-7",
+                           "SHARED_VAR_JOB": "from-job",
+                           "STAGE_VAR": "stage-customer-7"
+                        },
+                        "tasks": [
+                           {
+                              "script": "./deploy.sh --region=customer-7"
                            }
                         ]
                      }

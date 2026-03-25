@@ -8,3 +8,8 @@ vendor/
 trash/
 *.bak
 *.log
+
+# Working notes (do not commit)
+PIPEDREAM_CELLULARIZATION_NOTES.md
+PIPEDREAM_USE_CASES.md
+notes.md
