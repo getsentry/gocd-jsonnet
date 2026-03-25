@@ -20,7 +20,7 @@ jobs:
         run: npm install
 
       - name: Install go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
       - name: Install Jsonnet
         run: |
           go install github.com/google/go-jsonnet/cmd/jsonnet@latest
@@ -33,7 +33,7 @@ jobs:
       - name: Test
         run: npm run test
 
-      - uses: getsentry/action-gocd-jsonnet@v1
+      - uses: getsentry/action-gocd-jsonnet@2a32414fa9e58a46d1afea9cbfa7b77a928678e2 # v1
         with:
           jb-install: true
           check-for-changes: false
