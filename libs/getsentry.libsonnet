@@ -7,7 +7,7 @@
   test_group_order: [],
   // These groupings consist of user facing deployments
   pipeline_groups: {
-    s4s: ['s4s', 's4s2'],
+    s4s: ['s4s2'],
     de: ['de'],
     us: ['us'],
     control: ['control'],

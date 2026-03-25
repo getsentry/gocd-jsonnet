@@ -232,12 +232,14 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     all_regions
   );
 
-  local template_pipeline = pipeline_fn(regions[0]);
+  // Cache pipeline_fn results to avoid redundant calls per region
+  local region_pipelines = { [r]: pipeline_fn(r) for r in regions };
+  local template_pipeline = region_pipelines[regions[0]];
 
   // Collect all unique stages across all regions in the group
   local all_stages = std.foldl(
     function(acc, region)
-      local p = pipeline_fn(region);
+      local p = region_pipelines[region];
       local region_stages = if std.objectHas(p, 'stages') then p.stages else [];
       acc + [
         stage
@@ -248,31 +250,60 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     []
   );
 
+  local get_matching_stage(p, stage_name) =
+    local matching = std.filter(
+      function(s) get_stage_name(s) == stage_name,
+      if std.objectHas(p, 'stages') then p.stages else []
+    );
+    if std.length(matching) > 0 then matching[0] else null;
+
   // Transforms a stage by aggregating jobs from all regions.
-  // Cascades environment_variables from pipeline -> stage -> job level for each region.
-  // This is necessary as the pipeline/stage level is shared for all regions in a grouping.
+  // Env vars identical across all regions are kept at stage level;
+  // region-specific env vars are cascaded down to the job level.
   local transform_stage(stage) =
     local stage_name = get_stage_name(stage);
     local stage_props = get_stage_props(stage);
 
+    // Collect merged pipeline+stage env vars for each region
+    local per_region_parent_envs = {
+      [region]: (
+        local p = region_pipelines[region];
+        local pipeline_env = get_pipeline_env_vars(p);
+        local region_stage = get_matching_stage(p, stage_name);
+        local stage_env = if region_stage != null then get_stage_env_vars(region_stage) else {};
+        merge_env_vars(pipeline_env, stage_env, {})
+      )
+      for region in regions
+    };
+
+    // Env vars identical across ALL regions stay at stage level
+    local first_env = per_region_parent_envs[regions[0]];
+    local common_env = {
+      [k]: first_env[k]
+      for k in std.objectFields(first_env)
+      if std.length(std.filter(
+        function(r) std.objectHas(per_region_parent_envs[r], k) && per_region_parent_envs[r][k] == first_env[k],
+        regions
+      )) == std.length(regions)
+    };
+
     local all_jobs = std.foldl(
       function(acc, region)
-        local p = pipeline_fn(region);
-        local pipeline_env = get_pipeline_env_vars(p);
-        local matching_stages = std.filter(
-          function(s) get_stage_name(s) == stage_name,
-          if std.objectHas(p, 'stages') then p.stages else []
-        );
-        local region_stage = if std.length(matching_stages) > 0 then matching_stages[0] else null;
-        local stage_env = if region_stage != null then get_stage_env_vars(region_stage) else {};
+        local parent_env = per_region_parent_envs[region];
+        local region_specific_env = {
+          [k]: parent_env[k]
+          for k in std.objectFields(parent_env)
+          if !std.objectHas(common_env, k) || common_env[k] != parent_env[k]
+        };
+        local p = region_pipelines[region];
+        local region_stage = get_matching_stage(p, stage_name);
         local stage_jobs = if region_stage != null then get_stage_jobs(region_stage) else {};
 
         acc + {
           [job_name + '-' + region]: (
             local job = stage_jobs[job_name];
             local job_env = if std.objectHas(job, 'environment_variables') then job.environment_variables else {};
-            local merged_env = merge_env_vars(pipeline_env, stage_env, job_env);
-            // Add merged env vars to job, or keep job as-is if no env vars
+            local merged_env = region_specific_env + job_env;
             if std.length(std.objectFields(merged_env)) > 0 then
               job { environment_variables: merged_env }
             else
@@ -285,7 +316,14 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     );
 
     {
-      [stage_name]: stage_props { jobs: all_jobs },
+      [stage_name]: stage_props {
+        jobs: all_jobs,
+      } + (
+        if std.length(std.objectFields(common_env)) > 0 then
+          { environment_variables: common_env }
+        else
+          {}
+      ),
     };
 
   // `auto_pipeline_progression` was added as a utility for folks new to

@@ -71,14 +71,6 @@
                {
                   "deploy": {
                      "jobs": {
-                        "deploy-s4s": {
-                           "elastic_profile_id": "example",
-                           "tasks": [
-                              {
-                                 "script": "./deploy.sh --region=s4s"
-                              }
-                           ]
-                        },
                         "deploy-s4s2": {
                            "elastic_profile_id": "example",
                            "tasks": [

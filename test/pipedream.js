@@ -36,7 +36,7 @@ test("multi-region group has parallel jobs for each region", async (t) => {
   // s4s group has s4s + s4s2 regions
   const s4s = got.pipelines["deploy-example-s4s"];
   const s4sJobs = Object.keys(s4s.stages[0].deploy.jobs);
-  t.deepEqual(s4sJobs.sort(), ["deploy-s4s", "deploy-s4s2"]);
+  t.deepEqual(s4sJobs.sort(), ["deploy-s4s2"]);
 
   // st group has customer-1, customer-2, customer-4, customer-7
   const st = got.pipelines["deploy-example-st"];

@@ -81,18 +81,6 @@
             {
                "deploy": {
                   "jobs": {
-                     "deploy-s4s": {
-                        "tasks": [
-                           {
-                              "exec": {
-                                 "arguments": [
-                                    "deploy s4s"
-                                 ],
-                                 "command": "echo"
-                              }
-                           }
-                        ]
-                     },
                      "deploy-s4s2": {
                         "tasks": [
                            {
@@ -214,18 +202,6 @@
             {
                "verify": {
                   "jobs": {
-                     "verify-customer-1": {
-                        "tasks": [
-                           {
-                              "exec": {
-                                 "arguments": [
-                                    "verify customer-1"
-                                 ],
-                                 "command": "echo"
-                              }
-                           }
-                        ]
-                     },
                      "verify-customer-2": {
                         "tasks": [
                            {

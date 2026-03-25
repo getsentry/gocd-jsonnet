@@ -13,8 +13,8 @@ local config = {
 // This pipeline_fn returns DIFFERENT stages depending on region
 local pipeline_fn(region) = {
   materials: config.materials,
-  stages: if region == 's4s' then [
-    // s4s only has deploy stage
+  stages: if region == 'customer-1' then [
+    // customer-1 only has deploy stage
     {
       deploy: {
         jobs: {
@@ -23,7 +23,7 @@ local pipeline_fn(region) = {
       },
     },
   ] else [
-    // s4s2 has deploy AND verify stages
+    // other regions have deploy AND verify stages
     {
       deploy: {
         jobs: {

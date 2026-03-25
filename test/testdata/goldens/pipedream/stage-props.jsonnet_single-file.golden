@@ -1,7 +1,7 @@
 {
    "format_version": 10,
    "pipelines": {
-      "deploy-example-s4s": {
+      "deploy-example-st": {
          "display_order": 2,
          "group": "example",
          "materials": {
@@ -18,17 +18,31 @@
                   },
                   "fetch_materials": true,
                   "jobs": {
-                     "deploy-s4s": {
+                     "deploy-customer-1": {
                         "tasks": [
                            {
-                              "script": "./deploy.sh --region=s4s"
+                              "script": "./deploy.sh --region=customer-1"
                            }
                         ]
                      },
-                     "deploy-s4s2": {
+                     "deploy-customer-2": {
                         "tasks": [
                            {
-                              "script": "./deploy.sh --region=s4s2"
+                              "script": "./deploy.sh --region=customer-2"
+                           }
+                        ]
+                     },
+                     "deploy-customer-4": {
+                        "tasks": [
+                           {
+                              "script": "./deploy.sh --region=customer-4"
+                           }
+                        ]
+                     },
+                     "deploy-customer-7": {
+                        "tasks": [
+                           {
+                              "script": "./deploy.sh --region=customer-7"
                            }
                         ]
                      }

@@ -239,9 +239,9 @@
             "group": "example",
             "lock_behavior": "unlockWhenFinished",
             "materials": {
-               "deploy-example-st-pipeline-complete": {
+               "deploy-example-st-deploy": {
                   "pipeline": "deploy-example-st",
-                  "stage": "pipeline-complete"
+                  "stage": "deploy"
                }
             },
             "stages": [
