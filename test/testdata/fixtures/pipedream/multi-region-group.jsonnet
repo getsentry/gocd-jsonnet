@@ -1,6 +1,6 @@
 local pipedream = import '../../../../libs/pipedream.libsonnet';
 
-// Only render s4s and st to focus on multi-region groups
+// Only render st to focus on multi-region groups
 local pipedream_config = {
   name: 'example',
   auto_deploy: true,

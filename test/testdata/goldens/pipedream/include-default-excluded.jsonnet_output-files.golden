@@ -3,7 +3,7 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-control": {
-            "display_order": 5,
+            "display_order": 4,
             "group": "example",
             "materials": {
                "deploy-example-us-pipeline-complete": {
@@ -54,13 +54,9 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-de": {
-            "display_order": 3,
+            "display_order": 2,
             "group": "example",
             "materials": {
-               "deploy-example-s4s-pipeline-complete": {
-                  "pipeline": "deploy-example-s4s",
-                  "stage": "pipeline-complete"
-               },
                "example_repo": {
                   "branch": "master",
                   "destination": "example",
@@ -101,58 +97,11 @@
          }
       }
    },
-   "deploy-example-s4s.yaml": {
-      "format_version": 10,
-      "pipelines": {
-         "deploy-example-s4s": {
-            "display_order": 2,
-            "group": "example",
-            "materials": {
-               "example_repo": {
-                  "branch": "master",
-                  "destination": "example",
-                  "git": "git@github.com:getsentry/example.git"
-               }
-            },
-            "stages": [
-               {
-                  "deploy": {
-                     "jobs": {
-                        "deploy-s4s2": {
-                           "elastic_profile_id": "example",
-                           "tasks": [
-                              {
-                                 "script": "./deploy.sh --region=s4s2"
-                              }
-                           ]
-                        }
-                     }
-                  }
-               },
-               {
-                  "pipeline-complete": {
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
-               }
-            ]
-         }
-      }
-   },
    "deploy-example-st.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-st": {
-            "display_order": 6,
+            "display_order": 5,
             "group": "example",
             "materials": {
                "deploy-example-control-pipeline-complete": {
@@ -227,7 +176,7 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-us": {
-            "display_order": 4,
+            "display_order": 3,
             "group": "example",
             "materials": {
                "deploy-example-de-pipeline-complete": {
