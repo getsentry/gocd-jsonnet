@@ -234,6 +234,30 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
 
   // Cache pipeline_fn results to avoid redundant calls per region
   local region_pipelines = { [r]: pipeline_fn(r) for r in regions };
+
+  // Validate that each stage object has exactly one key. In Jsonnet, a missing
+  // comma between stage definitions silently merges them into a single object,
+  // causing stages to be lost. Catch this at build time.
+  assert std.foldl(
+    function(acc, region)
+      local p = region_pipelines[region];
+      local stages = if std.objectHas(p, 'stages') then p.stages else [];
+      assert std.foldl(
+        function(acc2, stage)
+          local keys = std.objectFields(stage);
+          assert std.length(keys) == 1 :
+            "Stage object has %d keys (%s) — each stage must have exactly one key. "
+            % [std.length(keys), std.join(', ', keys)]
+            + "This usually means a missing comma between stage definitions.";
+          true,
+        stages,
+        true
+      );
+      true,
+    regions,
+    true
+  );
+
   local template_pipeline = region_pipelines[regions[0]];
 
   // Collect all unique stages across all regions in the group
