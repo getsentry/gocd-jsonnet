@@ -95,7 +95,7 @@ local pipedream_trigger_pipeline(pipedream_config) =
         materials: materials,
         lock_behavior: 'unlockWhenFinished',
         stages: [
-          gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { approval: 'manual', fetch_materials: false }),
+          gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { approval: 'manual' }),
         ],
       },
     };
@@ -411,10 +411,11 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
       // This stage is added to ensure a rollback doesn't cause
       // a deployment train.
       //
-      // i.e. During a rollback, US re-runs the final stage. With
-      // `pipeline-complete` as the final stage, it isn't
+      // i.e. During a rollback, de and US re-runs the final stage
+      // The de final stage completes and causes the US pipeline to
+      // re-run. With `pipeline-complete` as the final stage, it isn't
       // re-run by a rollback, preventing this domino effect.
-      gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { fetch_materials: false }),
+      gocd_stages.basic('pipeline-complete', [gocd_tasks.noop]),
     ],
   };
 

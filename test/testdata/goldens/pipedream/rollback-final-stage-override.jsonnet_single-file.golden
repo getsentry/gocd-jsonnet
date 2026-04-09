@@ -2,13 +2,9 @@
    "format_version": 10,
    "pipelines": {
       "deploy-example-de": {
-         "display_order": 3,
+         "display_order": 2,
          "group": "example",
          "materials": {
-            "deploy-example-s4s-pipeline-complete": {
-               "pipeline": "deploy-example-s4s",
-               "stage": "pipeline-complete"
-            },
             "example_repo": {
                "branch": "master",
                "destination": "example",
@@ -47,50 +43,8 @@
             }
          ]
       },
-      "deploy-example-s4s": {
-         "display_order": 2,
-         "group": "example",
-         "materials": {
-            "example_repo": {
-               "branch": "master",
-               "destination": "example",
-               "git": "git@github.com:getsentry/example.git"
-            }
-         },
-         "stages": [
-            {
-               "deploy": {
-                  "jobs": {
-                     "deploy-s4s2": {
-                        "elastic_profile_id": "example",
-                        "tasks": [
-                           {
-                              "script": "./deploy.sh --region=s4s2"
-                           }
-                        ]
-                     }
-                  }
-               }
-            },
-            {
-               "pipeline-complete": {
-                  "jobs": {
-                     "pipeline-complete": {
-                        "tasks": [
-                           {
-                              "exec": {
-                                 "command": true
-                              }
-                           }
-                        ]
-                     }
-                  }
-               }
-            }
-         ]
-      },
       "deploy-example-st": {
-         "display_order": 5,
+         "display_order": 4,
          "group": "example",
          "materials": {
             "deploy-example-us-pipeline-complete": {
@@ -160,7 +114,7 @@
          ]
       },
       "deploy-example-us": {
-         "display_order": 4,
+         "display_order": 3,
          "group": "example",
          "materials": {
             "deploy-example-de-pipeline-complete": {
@@ -208,9 +162,9 @@
       "rollback-example": {
          "display_order": 1,
          "environment_variables": {
-            "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-st",
+            "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-st",
             "GOCD_ACCESS_TOKEN": "{{SECRET:[devinfra][gocd_access_token]}}",
-            "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-st",
+            "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-st",
             "ROLLBACK_MATERIAL_NAME": "example_repo",
             "ROLLBACK_STAGE": "deploy",
             "TRIGGERED_BY": ""

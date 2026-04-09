@@ -2,13 +2,9 @@
    "format_version": 10,
    "pipelines": {
       "deploy-example-de": {
-         "display_order": 3,
+         "display_order": 2,
          "group": "example",
          "materials": {
-            "deploy-example-s4s-pipeline-complete": {
-               "pipeline": "deploy-example-s4s",
-               "stage": "pipeline-complete"
-            },
             "init_repo": {
                "branch": "main",
                "git": "git@github.com:getsentry/example.git"
@@ -68,71 +64,8 @@
             }
          ]
       },
-      "deploy-example-s4s": {
-         "display_order": 2,
-         "group": "example",
-         "materials": {
-            "init_repo": {
-               "branch": "main",
-               "git": "git@github.com:getsentry/example.git"
-            }
-         },
-         "stages": [
-            {
-               "deploy": {
-                  "jobs": {
-                     "deploy-s4s2": {
-                        "tasks": [
-                           {
-                              "exec": {
-                                 "arguments": [
-                                    "deploy s4s2"
-                                 ],
-                                 "command": "echo"
-                              }
-                           }
-                        ]
-                     }
-                  }
-               }
-            },
-            {
-               "verify": {
-                  "jobs": {
-                     "verify-s4s2": {
-                        "tasks": [
-                           {
-                              "exec": {
-                                 "arguments": [
-                                    "verify s4s2"
-                                 ],
-                                 "command": "echo"
-                              }
-                           }
-                        ]
-                     }
-                  }
-               }
-            },
-            {
-               "pipeline-complete": {
-                  "jobs": {
-                     "pipeline-complete": {
-                        "tasks": [
-                           {
-                              "exec": {
-                                 "command": true
-                              }
-                           }
-                        ]
-                     }
-                  }
-               }
-            }
-         ]
-      },
       "deploy-example-st": {
-         "display_order": 5,
+         "display_order": 4,
          "group": "example",
          "materials": {
             "deploy-example-us-pipeline-complete": {
@@ -259,7 +192,7 @@
          ]
       },
       "deploy-example-us": {
-         "display_order": 4,
+         "display_order": 3,
          "group": "example",
          "materials": {
             "deploy-example-de-pipeline-complete": {

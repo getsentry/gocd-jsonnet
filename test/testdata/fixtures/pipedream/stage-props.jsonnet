@@ -6,7 +6,7 @@ local pipedream = import '../../../../libs/pipedream.libsonnet';
 local pipedream_config = {
   name: 'example',
   auto_deploy: true,
-  exclude_regions: ['de', 'us', 's4s2'],
+  exclude_regions: ['de', 'us'],
 };
 
 // All regions use the same stage properties — no conflict.

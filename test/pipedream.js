@@ -22,8 +22,7 @@ test("generates pipeline per group in correct order", async (t) => {
     n.startsWith("deploy-example-"),
   );
 
-  // Should have s4s, de, us, st (control/snty-tools excluded by default)
-  t.true(pipelineNames.includes("deploy-example-s4s"));
+  // Should have de, us, st (control/snty-tools excluded by default)
   t.true(pipelineNames.includes("deploy-example-de"));
   t.true(pipelineNames.includes("deploy-example-us"));
   t.true(pipelineNames.includes("deploy-example-st"));
@@ -32,11 +31,6 @@ test("generates pipeline per group in correct order", async (t) => {
 
 test("multi-region group has parallel jobs for each region", async (t) => {
   const got = await render_fixture("pipedream/basic-autodeploy.jsonnet", false);
-
-  // s4s group has s4s + s4s2 regions
-  const s4s = got.pipelines["deploy-example-s4s"];
-  const s4sJobs = Object.keys(s4s.stages[0].deploy.jobs);
-  t.deepEqual(s4sJobs.sort(), ["deploy-s4s2"]);
 
   // st group has customer-1, customer-2, customer-4, customer-7
   const st = got.pipelines["deploy-example-st"];
@@ -60,13 +54,9 @@ test("single-region group has one job", async (t) => {
 test("serial mode: pipelines chain sequentially", async (t) => {
   const got = await render_fixture("pipedream/basic-manual.jsonnet", false);
 
-  // s4s depends on trigger
-  const s4s = got.pipelines["deploy-example-s4s"];
-  t.truthy(s4s.materials["deploy-example-pipeline-complete"]);
-
-  // de depends on s4s
+  // de depends on trigger
   const de = got.pipelines["deploy-example-de"];
-  t.truthy(de.materials["deploy-example-s4s-pipeline-complete"]);
+  t.truthy(de.materials["deploy-example-pipeline-complete"]);
 
   // us depends on de
   const us = got.pipelines["deploy-example-us"];
@@ -76,17 +66,14 @@ test("serial mode: pipelines chain sequentially", async (t) => {
 test("parallel mode: all pipelines depend on trigger only", async (t) => {
   const got = await render_fixture("pipedream/parallel-mode.jsonnet", false);
 
-  const s4s = got.pipelines["deploy-example-s4s"];
   const de = got.pipelines["deploy-example-de"];
   const us = got.pipelines["deploy-example-us"];
 
   // All depend on trigger
-  t.truthy(s4s.materials["deploy-example-pipeline-complete"]);
   t.truthy(de.materials["deploy-example-pipeline-complete"]);
   t.truthy(us.materials["deploy-example-pipeline-complete"]);
 
   // None depend on each other
-  t.falsy(de.materials["deploy-example-s4s-pipeline-complete"]);
   t.falsy(us.materials["deploy-example-de-pipeline-complete"]);
 });
 
@@ -109,7 +96,7 @@ test("exclude all regions in group: skips entire group", async (t) => {
   );
 
   t.falsy(got.pipelines["deploy-example-st"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]);
+  t.truthy(got.pipelines["deploy-example-de"]);
 });
 
 test("include region: adds default-excluded group", async (t) => {
