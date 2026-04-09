@@ -264,6 +264,24 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     local stage_name = get_stage_name(stage);
     local stage_props = get_stage_props(stage);
 
+    // Validate that all regions agree on stage properties. GoCD only supports
+    // stage-level attributes (approval, fetch_materials, etc.) — there is no
+    // per-job override — so conflicting values across regions must be caught
+    // at build time rather than silently using the first region's values.
+    assert std.foldl(
+      function(acc, r)
+        local p = region_pipelines[r];
+        local rs = get_matching_stage(p, stage_name);
+        local props = if rs != null then get_stage_props(rs) else stage_props;
+        assert props == stage_props :
+          "Stage '%s': conflicting properties across regions in group. "
+          % [stage_name]
+          + "Region '%s' differs from '%s'." % [r, regions[0]];
+        true,
+      regions[1:],
+      true
+    );
+
     // Collect merged pipeline+stage env vars for each region
     local per_region_parent_envs = {
       [region]: (
