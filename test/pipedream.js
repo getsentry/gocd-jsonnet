@@ -153,6 +153,18 @@ test("rollback: invalid final stage errors", (t) => {
   );
 });
 
+test("conflicting stage properties across regions errors", (t) => {
+  const err = t.throws(() =>
+    get_fixture_content(
+      "pipedream/stage-props-conflict.failing.jsonnet",
+      false,
+    ),
+  );
+  t.true(
+    err.message.includes("conflicting properties across regions in group"),
+  );
+});
+
 test("all pipelines end with pipeline-complete stage", async (t) => {
   const got = await render_fixture("pipedream/basic-autodeploy.jsonnet", false);
 

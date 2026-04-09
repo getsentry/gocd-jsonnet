@@ -1,7 +1,7 @@
 local pipedream = import '../../../../libs/pipedream.libsonnet';
 
-// Test that stage-level properties (approval, fetch_materials) are correctly
-// preserved when aggregating jobs from multiple regions in a group.
+// This fixture should FAIL at build time because regions in the st group
+// define conflicting stage properties (different approval types).
 
 local pipedream_config = {
   name: 'example',
@@ -9,7 +9,6 @@ local pipedream_config = {
   exclude_regions: ['de', 'us', 's4s2'],
 };
 
-// All regions use the same stage properties — no conflict.
 local pipeline_fn(region) = {
   materials: {
     example_repo: {
@@ -20,8 +19,8 @@ local pipeline_fn(region) = {
   stages: [
     {
       deploy: {
-        fetch_materials: true,
-        approval: { type: 'manual' },
+        fetch_materials: if region == 'customer-1' then true else false,
+        approval: if region == 'customer-1' then { type: 'manual' } else { type: 'success' },
         jobs: {
           deploy: {
             tasks: [{ script: './deploy.sh --region=' + region }],
