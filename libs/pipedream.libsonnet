@@ -206,9 +206,8 @@ local generate_region_pipeline(pipedream_config, pipeline_fn, region, display_or
       // This stage is added to ensure a rollback doesn't cause
       // a deployment train.
       //
-      // i.e. During a rollback, s4s and US re-runs the final stage
-      // The s4s final stage completes and causes the US pipeline to
-      // re-run. With `pipeline-complete` as the final stage, it isn't
+      // i.e. During a rollback, US re-runs the final stage. With
+      // `pipeline-complete` as the final stage, it isn't
       // re-run by a rollback, preventing this domino effect.
       gocd_stages.basic('pipeline-complete', [gocd_tasks.noop], { fetch_materials: false }),
     ],
