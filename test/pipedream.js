@@ -10,7 +10,6 @@ test("ensure manual deploys is expected structure in serial", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.truthy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]); // s4s is now a test region
 
   // Ensure the trigger has the right initial material
   const trigger = got.pipelines["deploy-example"];
@@ -37,21 +36,6 @@ test("ensure manual deploys is expected structure in serial", async (t) => {
       shallow_clone: true,
     },
   });
-
-  // Ensure s4s (test region) depends on trigger pipeline, deployed in parallel
-  const s4s = got.pipelines["deploy-example-s4s"];
-  t.deepEqual(s4s.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
 });
 
 test("ensure manual deploys is expected structure in parallel", async (t) => {
@@ -63,7 +47,6 @@ test("ensure manual deploys is expected structure in parallel", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.truthy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]);
 
   // Ensure the trigger has the right initial material
   const trigger = got.pipelines["deploy-example"];
@@ -90,21 +73,6 @@ test("ensure manual deploys is expected structure in parallel", async (t) => {
       shallow_clone: true,
     },
   });
-
-  // Ensure s4s also depends on the trigger material (parallel deploy)
-  const s4s = got.pipelines["deploy-example-s4s"];
-  t.deepEqual(s4s.materials, {
-    "deploy-example-pipeline-complete": {
-      pipeline: "deploy-example",
-      stage: "pipeline-complete",
-    },
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
 });
 
 test("ensure auto deploys is expected structure in serial", async (t) => {
@@ -116,23 +84,11 @@ test("ensure auto deploys is expected structure in serial", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.falsy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]); // s4s is now a test region
   t.truthy(got.pipelines["rollback-example"]);
 
   // Ensure s4s2 has just the repo material (first prod region)
   const s4s2 = got.pipelines["deploy-example-s4s2"];
   t.deepEqual(s4s2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure s4s (test region) has just the repo material (deployed in parallel)
-  const s4s = got.pipelines["deploy-example-s4s"];
-  t.deepEqual(s4s.materials, {
     example_repo: {
       branch: "master",
       destination: "example",
@@ -171,23 +127,11 @@ test("ensure auto deploys is expected structure in parallel", async (t) => {
   t.deepEqual(Object.keys(got), ["format_version", "pipelines"]);
   t.falsy(got.pipelines["deploy-example"]);
   t.truthy(got.pipelines["deploy-example-s4s2"]);
-  t.truthy(got.pipelines["deploy-example-s4s"]); // s4s is now a test region
   t.truthy(got.pipelines["rollback-example"]);
 
   // Ensure s4s2 has just the repo material (parallel deploy, no upstream)
   const s4s2 = got.pipelines["deploy-example-s4s2"];
   t.deepEqual(s4s2.materials, {
-    example_repo: {
-      branch: "master",
-      destination: "example",
-      git: "git@github.com:getsentry/example.git",
-      shallow_clone: true,
-    },
-  });
-
-  // Ensure s4s (test region) also has just the repo material (parallel deploy)
-  const s4s = got.pipelines["deploy-example-s4s"];
-  t.deepEqual(s4s.materials, {
     example_repo: {
       branch: "master",
       destination: "example",

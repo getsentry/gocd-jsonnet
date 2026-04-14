@@ -214,45 +214,6 @@
          }
       }
    },
-   "deploy-example-s4s.yaml": {
-      "format_version": 10,
-      "pipelines": {
-         "deploy-example-s4s": {
-            "display_order": 9,
-            "group": "example",
-            "materials": {
-               "example_repo": {
-                  "branch": "master",
-                  "destination": "example",
-                  "git": "git@github.com:getsentry/example.git",
-                  "shallow_clone": true
-               }
-            },
-            "region": "s4s",
-            "stages": [
-               {
-                  "example_stage": { }
-               },
-               {
-                  "pipeline-complete": {
-                     "fetch_materials": false,
-                     "jobs": {
-                        "pipeline-complete": {
-                           "tasks": [
-                              {
-                                 "exec": {
-                                    "command": true
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  }
-               }
-            ]
-         }
-      }
-   },
    "deploy-example-s4s2.yaml": {
       "format_version": 10,
       "pipelines": {
