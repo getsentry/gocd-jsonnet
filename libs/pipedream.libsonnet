@@ -260,6 +260,22 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
 
   local template_pipeline = region_pipelines[regions[0]];
 
+  // Validate pipeline-level attributes (materials, lock_behavior, etc.)
+  // are consistent across all regions in the group.
+  local pipeline_props(p) =
+    { [k]: p[k] for k in std.objectFields(p) if k != 'stages' && k != 'environment_variables' };
+  local template_props = pipeline_props(template_pipeline);
+  assert std.foldl(
+    function(acc, r)
+      local props = pipeline_props(region_pipelines[r]);
+      assert props == template_props :
+             'Pipeline-level attributes differ across regions in group. '
+             + "Region '%s' differs." % [r];
+      true,
+    regions[1:],
+    true
+  );
+
   // Collect all unique stages across all regions in the group.
   // If a region doesn't define a stage that another region has,
   // it simply contributes no jobs to that stage.
