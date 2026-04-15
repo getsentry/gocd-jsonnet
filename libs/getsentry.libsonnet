@@ -3,10 +3,11 @@
 */
 
 {
-  group_order: ['de', 'us', 'control', 'snty-tools', 'st'],
+  group_order: ['s4s2', 'de', 'us', 'control', 'snty-tools', 'st'],
   test_group_order: [],
   // These groupings consist of user facing deployments
   pipeline_groups: {
+    s4s2: ['s4s2'],
     de: ['de'],
     us: ['us'],
     control: ['control'],

@@ -6,6 +6,9 @@
       "de": [
          "de"
       ],
+      "s4s2": [
+         "s4s2"
+      ],
       "snty-tools": [
          "snty-tools"
       ],
@@ -20,6 +23,7 @@
       ]
    },
    "group_order": [
+      "s4s2",
       "de",
       "us",
       "control",

@@ -22,7 +22,8 @@ test("generates pipeline per group in correct order", async (t) => {
     n.startsWith("deploy-example-"),
   );
 
-  // Should have de, us, st (control/snty-tools excluded by default)
+  // Should have s4s2, de, us, st (control/snty-tools excluded by default)
+  t.true(pipelineNames.includes("deploy-example-s4s2"));
   t.true(pipelineNames.includes("deploy-example-de"));
   t.true(pipelineNames.includes("deploy-example-us"));
   t.true(pipelineNames.includes("deploy-example-st"));
@@ -54,9 +55,13 @@ test("single-region group has one job", async (t) => {
 test("serial mode: pipelines chain sequentially", async (t) => {
   const got = await render_fixture("pipedream/basic-manual.jsonnet", false);
 
-  // de depends on trigger
+  // s4s2 depends on trigger
+  const s4s2 = got.pipelines["deploy-example-s4s2"];
+  t.truthy(s4s2.materials["deploy-example-pipeline-complete"]);
+
+  // de depends on s4s2
   const de = got.pipelines["deploy-example-de"];
-  t.truthy(de.materials["deploy-example-pipeline-complete"]);
+  t.truthy(de.materials["deploy-example-s4s2-pipeline-complete"]);
 
   // us depends on de
   const us = got.pipelines["deploy-example-us"];
@@ -66,14 +71,17 @@ test("serial mode: pipelines chain sequentially", async (t) => {
 test("parallel mode: all pipelines depend on trigger only", async (t) => {
   const got = await render_fixture("pipedream/parallel-mode.jsonnet", false);
 
+  const s4s2 = got.pipelines["deploy-example-s4s2"];
   const de = got.pipelines["deploy-example-de"];
   const us = got.pipelines["deploy-example-us"];
 
   // All depend on trigger
+  t.truthy(s4s2.materials["deploy-example-pipeline-complete"]);
   t.truthy(de.materials["deploy-example-pipeline-complete"]);
   t.truthy(us.materials["deploy-example-pipeline-complete"]);
 
   // None depend on each other
+  t.falsy(de.materials["deploy-example-s4s2-pipeline-complete"]);
   t.falsy(us.materials["deploy-example-de-pipeline-complete"]);
 });
 
