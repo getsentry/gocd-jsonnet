@@ -156,7 +156,9 @@ test("conflicting stage properties across regions errors", (t) => {
     ),
   );
   t.true(
-    err.message.includes("conflicting properties across regions in group"),
+    err.message.includes(
+      "conflicting stage properties across regions in group",
+    ),
   );
 });
 
