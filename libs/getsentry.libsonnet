@@ -23,5 +23,5 @@
   get_targets(group)::
     if std.objectHas(self.pipeline_groups, group) then self.pipeline_groups[group]
     else self.test_groups[group],
-  is_st(region):: (region == 's4s2' || std.startsWith(region, 'customer-')),
+  is_st(region):: std.startsWith(region, 'customer-'),
 }
