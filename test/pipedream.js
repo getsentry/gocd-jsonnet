@@ -162,14 +162,9 @@ test("conflicting stage properties across regions errors", (t) => {
 
 test("merged stage objects (missing comma) errors", (t) => {
   const err = t.throws(() =>
-    get_fixture_content(
-      "pipedream/merged-stages.failing.jsonnet",
-      false,
-    ),
+    get_fixture_content("pipedream/merged-stages.failing.jsonnet", false),
   );
-  t.true(
-    err.message.includes("each stage must have exactly one key"),
-  );
+  t.true(err.message.includes("each stage must have exactly one key"));
 });
 
 test("all pipelines end with pipeline-complete stage", async (t) => {
