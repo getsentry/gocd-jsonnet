@@ -3,5 +3,6 @@
    "customer-a": true,
    "demo-customer": false,
    "eu": false,
+   "s4s2": true,
    "us": false
 }

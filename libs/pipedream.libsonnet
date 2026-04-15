@@ -246,9 +246,9 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
         function(acc2, stage)
           local keys = std.objectFields(stage);
           assert std.length(keys) == 1 :
-            "Stage object has %d keys (%s) — each stage must have exactly one key. "
-            % [std.length(keys), std.join(', ', keys)]
-            + "This usually means a missing comma between stage definitions.";
+                 'Stage object has %d keys (%s) — each stage must have exactly one key. '
+                 % [std.length(keys), std.join(', ', keys)]
+                 + 'This usually means a missing comma between stage definitions.';
           true,
         stages,
         true
@@ -298,9 +298,9 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
         local rs = get_matching_stage(p, stage_name);
         local props = if rs != null then get_stage_props(rs) else stage_props;
         assert props == stage_props :
-          "Stage '%s': conflicting properties across regions in group. "
-          % [stage_name]
-          + "Region '%s' differs from '%s'." % [r, regions[0]];
+               "Stage '%s': conflicting properties across regions in group. "
+               % [stage_name]
+               + "Region '%s' differs from '%s'." % [r, regions[0]];
         true,
       regions[1:],
       true
