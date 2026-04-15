@@ -14,7 +14,7 @@ local pipeline_fn(region) = {
   environment_variables: {
     PIPELINE_VAR: 'pipeline-' + region,  // Should cascade down to becoming a job level var
     SHARED_VAR_JOB: 'from-pipeline',  // Should be overwritten by stage, then job
-    SHARED_VAR_STAGE: 'from-pipeline',  // This should win
+    SHARED_VAR_STAGE: 'from-pipeline',  // Overridden by stage
   },
   materials: {
     example_repo: {

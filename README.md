@@ -93,7 +93,7 @@ parallel jobs. Groups are chained sequentially by default, or can fan out in
 parallel via `pipedream.render(config, pipeline_fn, parallel=true)`.
 
 The end result is a trigger pipeline `deploy-<service name>` and a pipeline per
-group (e.g. `deploy-example-s4s`, `deploy-example-st`).
+group (e.g. `deploy-example-s4s2`, `deploy-example-st`).
 
 `control` and `snty-tools` are excluded by default; use `include_regions` to
 opt in.

@@ -33,6 +33,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -80,6 +81,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -147,6 +149,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
@@ -198,6 +201,7 @@
                },
                {
                   "pipeline-complete": {
+                     "fetch_materials": false,
                      "jobs": {
                         "pipeline-complete": {
                            "tasks": [
