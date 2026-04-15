@@ -4,6 +4,7 @@
 
 {
   group_order: ['s4s2', 'de', 'us', 'control', 'snty-tools', 'st'],
+  // Empty for now — add future test groups here
   test_group_order: [],
   // These groupings consist of user facing deployments
   pipeline_groups: {

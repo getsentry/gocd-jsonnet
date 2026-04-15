@@ -260,7 +260,9 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
 
   local template_pipeline = region_pipelines[regions[0]];
 
-  // Collect all unique stages across all regions in the group
+  // Collect all unique stages across all regions in the group.
+  // If a region doesn't define a stage that another region has,
+  // it simply contributes no jobs to that stage.
   local all_stages = std.foldl(
     function(acc, region)
       local p = region_pipelines[region];
