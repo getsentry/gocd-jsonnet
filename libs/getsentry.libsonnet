@@ -10,6 +10,7 @@
     'us',
     // 'control' is excluded by default and must be explicitly included
     'control',
+    'prod-control',
     // 'snty-tools' is excluded by default and must be explicitly included
     'snty-tools',
     'customer-1',
