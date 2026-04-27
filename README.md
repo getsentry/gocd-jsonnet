@@ -103,6 +103,25 @@ handled automatically: variables identical across all regions in a group stay at
 the stage level, while region-specific variables are cascaded to the job level.
 GoCD resolves precedence as job > stage > pipeline.
 
+### Targeting a subset of regions
+
+By default, triggering a group pipeline deploys to every region in the group.
+To deploy to a subset, override `PIPEDREAM_GROUP_REGIONS` on the Environment
+Variables tab in GoCD's "Trigger with options".
+
+For example, on `deploy-foo-st` whose default is
+`customer-1,customer-2,customer-4,customer-7`:
+
+| Override value | Result |
+| --- | --- |
+| (no override) | All four regions deploy |
+| `customer-1` | Only customer-1 deploys |
+| `customer-1,customer-2` | Only customer-1 and customer-2 deploy |
+
+Setting a value that doesn't include any of the group's regions makes every
+job skip and the pipeline goes green having done nothing. If that happens,
+retrigger with a valid value.
+
 ### Example Usage
 
 ```jsonnet

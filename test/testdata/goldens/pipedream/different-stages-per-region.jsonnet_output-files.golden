@@ -4,6 +4,9 @@
       "pipelines": {
          "deploy-example-de": {
             "display_order": 3,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "de"
+            },
             "group": "example",
             "materials": {
                "deploy-example-s4s2-pipeline-complete": {
@@ -77,6 +80,9 @@
       "pipelines": {
          "deploy-example-s4s2": {
             "display_order": 2,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "s4s2"
+            },
             "group": "example",
             "materials": {
                "init_repo": {
@@ -146,6 +152,9 @@
       "pipelines": {
          "deploy-example-st": {
             "display_order": 5,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-4,customer-7"
+            },
             "group": "example",
             "materials": {
                "deploy-example-us-pipeline-complete": {
@@ -279,6 +288,9 @@
       "pipelines": {
          "deploy-example-us": {
             "display_order": 4,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "us"
+            },
             "group": "example",
             "materials": {
                "deploy-example-de-pipeline-complete": {

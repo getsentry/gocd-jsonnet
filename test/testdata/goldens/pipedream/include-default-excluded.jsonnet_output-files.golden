@@ -4,6 +4,9 @@
       "pipelines": {
          "deploy-example-control": {
             "display_order": 5,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "control"
+            },
             "group": "example",
             "materials": {
                "deploy-example-us-pipeline-complete": {
@@ -24,7 +27,7 @@
                            "elastic_profile_id": "example",
                            "tasks": [
                               {
-                                 "script": "./deploy.sh --region=control"
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=control"
                               }
                            ]
                         }
@@ -56,6 +59,9 @@
       "pipelines": {
          "deploy-example-de": {
             "display_order": 3,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "de"
+            },
             "group": "example",
             "materials": {
                "deploy-example-s4s2-pipeline-complete": {
@@ -76,7 +82,7 @@
                            "elastic_profile_id": "example",
                            "tasks": [
                               {
-                                 "script": "./deploy.sh --region=de"
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=de"
                               }
                            ]
                         }
@@ -108,6 +114,9 @@
       "pipelines": {
          "deploy-example-s4s2": {
             "display_order": 2,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "s4s2"
+            },
             "group": "example",
             "materials": {
                "example_repo": {
@@ -124,7 +133,7 @@
                            "elastic_profile_id": "example",
                            "tasks": [
                               {
-                                 "script": "./deploy.sh --region=s4s2"
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=s4s2"
                               }
                            ]
                         }
@@ -156,6 +165,9 @@
       "pipelines": {
          "deploy-example-st": {
             "display_order": 6,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-4,customer-7"
+            },
             "group": "example",
             "materials": {
                "deploy-example-control-pipeline-complete": {
@@ -176,7 +188,7 @@
                            "elastic_profile_id": "example",
                            "tasks": [
                               {
-                                 "script": "./deploy.sh --region=customer-1"
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-1"
                               }
                            ]
                         },
@@ -184,7 +196,7 @@
                            "elastic_profile_id": "example",
                            "tasks": [
                               {
-                                 "script": "./deploy.sh --region=customer-2"
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-2"
                               }
                            ]
                         },
@@ -192,7 +204,7 @@
                            "elastic_profile_id": "example",
                            "tasks": [
                               {
-                                 "script": "./deploy.sh --region=customer-4"
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-4"
                               }
                            ]
                         },
@@ -200,7 +212,7 @@
                            "elastic_profile_id": "example",
                            "tasks": [
                               {
-                                 "script": "./deploy.sh --region=customer-7"
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-7"
                               }
                            ]
                         }
@@ -232,6 +244,9 @@
       "pipelines": {
          "deploy-example-us": {
             "display_order": 4,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "us"
+            },
             "group": "example",
             "materials": {
                "deploy-example-de-pipeline-complete": {
@@ -252,7 +267,7 @@
                            "elastic_profile_id": "example",
                            "tasks": [
                               {
-                                 "script": "./deploy.sh --region=us"
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=us"
                               }
                            ]
                         }
