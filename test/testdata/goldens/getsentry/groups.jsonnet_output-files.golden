@@ -6,6 +6,9 @@
       "de": [
          "de"
       ],
+      "prod-control": [
+         "prod-control"
+      ],
       "s4s2": [
          "s4s2"
       ],
@@ -27,6 +30,7 @@
       "de",
       "us",
       "control",
+      "prod-control",
       "snty-tools",
       "st"
    ]

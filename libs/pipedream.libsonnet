@@ -62,7 +62,7 @@ local is_autodeploy(pipedream_config) =
   !std.objectHas(pipedream_config, 'auto_deploy') || pipedream_config.auto_deploy == true;
 
 // Regions that are excluded by default and must be explicitly included
-local default_excluded_regions = ['control', 'snty-tools'];
+local default_excluded_regions = ['control', 'prod-control', 'snty-tools'];
 
 local is_excluded_region = function(region, config)
   std.objectHas(config, 'exclude_regions') && std.length(std.find(region, config.exclude_regions)) > 0;

@@ -112,10 +112,10 @@ Variables tab in GoCD's "Trigger with options".
 For example, on `deploy-foo-st` whose default is
 `customer-1,customer-2,customer-4,customer-7`:
 
-| Override value | Result |
-| --- | --- |
-| (no override) | All four regions deploy |
-| `customer-1` | Only customer-1 deploys |
+| Override value          | Result                                |
+| ----------------------- | ------------------------------------- |
+| (no override)           | All four regions deploy               |
+| `customer-1`            | Only customer-1 deploys               |
 | `customer-1,customer-2` | Only customer-1 and customer-2 deploy |
 
 Setting a value that doesn't include any of the group's regions makes every
