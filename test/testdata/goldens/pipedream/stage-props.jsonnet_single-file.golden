@@ -1,0 +1,126 @@
+{
+   "format_version": 10,
+   "pipelines": {
+      "deploy-example-s4s2": {
+         "display_order": 2,
+         "environment_variables": {
+            "PIPEDREAM_GROUP_REGIONS": "s4s2"
+         },
+         "group": "example",
+         "materials": {
+            "example_repo": {
+               "branch": "master",
+               "git": "git@github.com:getsentry/example.git"
+            }
+         },
+         "stages": [
+            {
+               "deploy": {
+                  "approval": {
+                     "type": "manual"
+                  },
+                  "fetch_materials": true,
+                  "jobs": {
+                     "deploy-s4s2": {
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=s4s2"
+                           }
+                        ]
+                     }
+                  }
+               }
+            },
+            {
+               "pipeline-complete": {
+                  "fetch_materials": false,
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-st": {
+         "display_order": 3,
+         "environment_variables": {
+            "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-4,customer-7"
+         },
+         "group": "example",
+         "materials": {
+            "deploy-example-s4s2-pipeline-complete": {
+               "pipeline": "deploy-example-s4s2",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "git": "git@github.com:getsentry/example.git"
+            }
+         },
+         "stages": [
+            {
+               "deploy": {
+                  "approval": {
+                     "type": "manual"
+                  },
+                  "fetch_materials": true,
+                  "jobs": {
+                     "deploy-customer-1": {
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-1"
+                           }
+                        ]
+                     },
+                     "deploy-customer-2": {
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-2"
+                           }
+                        ]
+                     },
+                     "deploy-customer-4": {
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-4"
+                           }
+                        ]
+                     },
+                     "deploy-customer-7": {
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-7"
+                           }
+                        ]
+                     }
+                  }
+               }
+            },
+            {
+               "pipeline-complete": {
+                  "fetch_materials": false,
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      }
+   }
+}

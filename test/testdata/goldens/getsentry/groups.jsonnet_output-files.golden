@@ -1,0 +1,37 @@
+{
+   "all_groups": {
+      "control": [
+         "control"
+      ],
+      "de": [
+         "de"
+      ],
+      "prod-control": [
+         "prod-control"
+      ],
+      "s4s2": [
+         "s4s2"
+      ],
+      "snty-tools": [
+         "snty-tools"
+      ],
+      "st": [
+         "customer-1",
+         "customer-2",
+         "customer-4",
+         "customer-7"
+      ],
+      "us": [
+         "us"
+      ]
+   },
+   "group_order": [
+      "s4s2",
+      "de",
+      "us",
+      "control",
+      "prod-control",
+      "snty-tools",
+      "st"
+   ]
+}

@@ -1,0 +1,156 @@
+{
+   "format_version": 10,
+   "pipelines": {
+      "deploy-example-s4s2": {
+         "display_order": 2,
+         "environment_variables": {
+            "PIPEDREAM_GROUP_REGIONS": "s4s2"
+         },
+         "group": "example",
+         "materials": {
+            "example_repo": {
+               "branch": "master",
+               "git": "git@github.com:getsentry/example.git"
+            }
+         },
+         "stages": [
+            {
+               "deploy": {
+                  "environment_variables": {
+                     "PIPELINE_VAR": "pipeline-s4s2",
+                     "SHARED_VAR_JOB": "from-stage",
+                     "SHARED_VAR_STAGE": "from-stage",
+                     "STAGE_VAR": "stage-s4s2"
+                  },
+                  "jobs": {
+                     "deploy-s4s2": {
+                        "environment_variables": {
+                           "JOB_VAR": "job-s4s2",
+                           "SHARED_VAR_JOB": "from-job"
+                        },
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=s4s2"
+                           }
+                        ]
+                     }
+                  }
+               }
+            },
+            {
+               "pipeline-complete": {
+                  "fetch_materials": false,
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
+      "deploy-example-st": {
+         "display_order": 3,
+         "environment_variables": {
+            "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-4,customer-7"
+         },
+         "group": "example",
+         "materials": {
+            "deploy-example-s4s2-pipeline-complete": {
+               "pipeline": "deploy-example-s4s2",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "git": "git@github.com:getsentry/example.git"
+            }
+         },
+         "stages": [
+            {
+               "deploy": {
+                  "environment_variables": {
+                     "SHARED_VAR_JOB": "from-stage",
+                     "SHARED_VAR_STAGE": "from-stage"
+                  },
+                  "jobs": {
+                     "deploy-customer-1": {
+                        "environment_variables": {
+                           "JOB_VAR": "job-customer-1",
+                           "PIPELINE_VAR": "pipeline-customer-1",
+                           "SHARED_VAR_JOB": "from-job",
+                           "STAGE_VAR": "stage-customer-1"
+                        },
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-1"
+                           }
+                        ]
+                     },
+                     "deploy-customer-2": {
+                        "environment_variables": {
+                           "JOB_VAR": "job-customer-2",
+                           "PIPELINE_VAR": "pipeline-customer-2",
+                           "SHARED_VAR_JOB": "from-job",
+                           "STAGE_VAR": "stage-customer-2"
+                        },
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-2"
+                           }
+                        ]
+                     },
+                     "deploy-customer-4": {
+                        "environment_variables": {
+                           "JOB_VAR": "job-customer-4",
+                           "PIPELINE_VAR": "pipeline-customer-4",
+                           "SHARED_VAR_JOB": "from-job",
+                           "STAGE_VAR": "stage-customer-4"
+                        },
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-4"
+                           }
+                        ]
+                     },
+                     "deploy-customer-7": {
+                        "environment_variables": {
+                           "JOB_VAR": "job-customer-7",
+                           "PIPELINE_VAR": "pipeline-customer-7",
+                           "SHARED_VAR_JOB": "from-job",
+                           "STAGE_VAR": "stage-customer-7"
+                        },
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=customer-7"
+                           }
+                        ]
+                     }
+                  }
+               }
+            },
+            {
+               "pipeline-complete": {
+                  "fetch_materials": false,
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      }
+   }
+}

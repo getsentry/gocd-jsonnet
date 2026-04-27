@@ -1,12 +1,16 @@
 local pipedream = import '../../../../libs/pipedream.libsonnet';
 
+// Used by symbolicator and super-big-consumers to point the rollback
+// material at deploy-primary instead of the default pipeline-complete.
+
 local pipedream_config = {
   name: 'example',
   auto_deploy: true,
   rollback: {
     material_name: 'example_repo',
-    stage: 'this-stage-does-not-exist',
+    stage: 'deploy',
     elastic_profile_id: 'example',
+    final_stage: 'deploy',
   },
 };
 
