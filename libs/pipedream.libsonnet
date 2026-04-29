@@ -387,9 +387,13 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
         local stage_jobs = if region_stage != null then get_stage_jobs(region_stage) else {};
 
         acc + {
-          // Skip the suffix if job_name already ends with '-{region}' (pattern
-          // used by ops/k8s.libsonnet) so we don't get 'diff-region-region'.
-          [if std.endsWith(job_name, '-' + region) then job_name else job_name + '-' + region]: (
+          // Skip the suffix when there's nothing to disambiguate: a
+          // single-region group (one pipeline_fn call, names already unique)
+          // or a job already keyed by region (would yield 'diff-region-region').
+          [
+          local skip_suffix = std.length(regions) == 1 || std.endsWith(job_name, '-' + region);
+          if skip_suffix then job_name else job_name + '-' + region
+          ]: (
             local job = stage_jobs[job_name];
             local job_env = if std.objectHas(job, 'environment_variables') then job.environment_variables else {};
             local merged_env = region_specific_env + job_env;

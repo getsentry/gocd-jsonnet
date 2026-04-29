@@ -1,0 +1,115 @@
+{
+   "deploy-example-de.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-de": {
+            "display_order": 2,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "de"
+            },
+            "group": "example",
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "diff": {
+                     "jobs": {
+                        "diff-de-west-de": {
+                           "artifacts": [
+                              {
+                                 "build": {
+                                    "destination": "output",
+                                    "source": "result"
+                                 }
+                              }
+                           ],
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --cell=de-west-de"
+                              }
+                           ]
+                        },
+                        "diff-de-west-nl": {
+                           "artifacts": [
+                              {
+                                 "build": {
+                                    "destination": "output",
+                                    "source": "result"
+                                 }
+                              }
+                           ],
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --cell=de-west-nl"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "apply": {
+                     "jobs": {
+                        "apply-de-west-de": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "fetch": {
+                                    "destination": "artifacts",
+                                    "job": "diff-de-west-de",
+                                    "source": "output",
+                                    "stage": "diff"
+                                 }
+                              },
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --cell=de-west-de"
+                              }
+                           ]
+                        },
+                        "apply-de-west-nl": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "fetch": {
+                                    "destination": "artifacts",
+                                    "job": "diff-de-west-nl",
+                                    "source": "output",
+                                    "stage": "diff"
+                                 }
+                              },
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --cell=de-west-nl"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "fetch_materials": false,
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   }
+}

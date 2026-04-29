@@ -49,7 +49,9 @@ test("single-region group has one job", async (t) => {
 
   const de = got.pipelines["deploy-example-de"];
   const deJobs = Object.keys(de.stages[0].deploy.jobs);
-  t.deepEqual(deJobs, ["deploy-de"]);
+  // Single-region groups skip the auto-suffix since pipeline_fn is called
+  // once and the user-emitted job names are already unique.
+  t.deepEqual(deJobs, ["deploy"]);
 });
 
 test("serial mode: pipelines chain sequentially", async (t) => {
