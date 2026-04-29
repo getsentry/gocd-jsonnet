@@ -41,7 +41,7 @@ local pipeline_name(name, region=null) =
 // Stays POSIX (single-bracket [, no [[) so it works under dash, which is the
 // /bin/sh on most Linux GoCD agents and would silently no-op `[[` expressions.
 local deploy_target_gate = |||
-  if [ -n "${PIPEDREAM_GROUP_REGIONS:-}" ]; then
+  if [ -n "${PIPEDREAM_GROUP_REGIONS:-}" ] && [ -n "${SENTRY_REGION:-}" ]; then
     case ",${PIPEDREAM_GROUP_REGIONS}," in
       *",${SENTRY_REGION},"*) ;;
       *)
