@@ -31,15 +31,7 @@ local gocd_tasks = import './gocd-tasks.libsonnet';
 local pipeline_name(name, region=null) =
   if region != null then 'deploy-' + name + '-' + region else 'deploy-' + name;
 
-// POSIX-shell preamble injected at the top of every script task in a group
-// pipeline's region-keyed jobs. The renderer sets PIPEDREAM_GROUP_REGIONS to
-// the full list of regions in the group, so by default every region's job
-// runs. To target a subset (e.g. one region) override PIPEDREAM_GROUP_REGIONS
-// in GoCD's "Trigger with options" — jobs whose SENTRY_REGION isn't in the
-// (possibly subsetted) list exit 0 cleanly.
-//
-// Stays POSIX (single-bracket [, no [[) so it works under dash, which is the
-// /bin/sh on most Linux GoCD agents and would silently no-op `[[` expressions.
+// POSIX gate (no `[[`, for dash GoCD agents) letting an operator deploy a region subset of a group via PIPEDREAM_GROUP_REGIONS in "Trigger with options".
 local deploy_target_gate = |||
   if [ -n "${PIPEDREAM_GROUP_REGIONS:-}" ] && [ -n "${SENTRY_REGION:-}" ]; then
     case ",${PIPEDREAM_GROUP_REGIONS}," in
@@ -417,7 +409,10 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
             local job = stage_jobs[job_name];
             local job_env = if std.objectHas(job, 'environment_variables') then job.environment_variables else {};
             local merged_env = region_specific_env + job_env;
-            local job_tasks = if std.objectHas(job, 'tasks') then [wrap_task(t) for t in job.tasks] else null;
+            // Single-region groups skip the gate (see deploy_target_gate).
+            local job_tasks = if std.objectHas(job, 'tasks') then
+              (if std.length(regions) == 1 then job.tasks else [wrap_task(t) for t in job.tasks])
+            else null;
             local gated_job = if job_tasks != null then job { tasks: job_tasks } else job;
             if std.length(std.objectFields(merged_env)) > 0 then
               gated_job { environment_variables: merged_env }
