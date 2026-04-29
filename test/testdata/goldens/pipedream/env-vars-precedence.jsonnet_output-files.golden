@@ -24,7 +24,7 @@
                         "STAGE_VAR": "stage-s4s2"
                      },
                      "jobs": {
-                        "deploy-s4s2": {
+                        "deploy": {
                            "environment_variables": {
                               "JOB_VAR": "job-s4s2",
                               "SHARED_VAR_JOB": "from-job"

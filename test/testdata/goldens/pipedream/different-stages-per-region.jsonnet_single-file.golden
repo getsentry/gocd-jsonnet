@@ -21,7 +21,7 @@
             {
                "deploy": {
                   "jobs": {
-                     "deploy-de": {
+                     "deploy": {
                         "tasks": [
                            {
                               "exec": {
@@ -39,7 +39,7 @@
             {
                "verify": {
                   "jobs": {
-                     "verify-de": {
+                     "verify": {
                         "tasks": [
                            {
                               "exec": {
@@ -88,7 +88,7 @@
             {
                "deploy": {
                   "jobs": {
-                     "deploy-s4s2": {
+                     "deploy": {
                         "tasks": [
                            {
                               "exec": {
@@ -106,7 +106,7 @@
             {
                "verify": {
                   "jobs": {
-                     "verify-s4s2": {
+                     "verify": {
                         "tasks": [
                            {
                               "exec": {
@@ -290,7 +290,7 @@
             {
                "deploy": {
                   "jobs": {
-                     "deploy-us": {
+                     "deploy": {
                         "tasks": [
                            {
                               "exec": {
@@ -308,7 +308,7 @@
             {
                "verify": {
                   "jobs": {
-                     "verify-us": {
+                     "verify": {
                         "tasks": [
                            {
                               "exec": {

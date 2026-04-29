@@ -55,7 +55,7 @@
             {
                "deploy": {
                   "jobs": {
-                     "deploy-de": {
+                     "deploy": {
                         "elastic_profile_id": "example",
                         "tasks": [
                            {
@@ -105,7 +105,7 @@
             {
                "deploy": {
                   "jobs": {
-                     "deploy-s4s2": {
+                     "deploy": {
                         "elastic_profile_id": "example",
                         "tasks": [
                            {
@@ -229,7 +229,7 @@
             {
                "deploy": {
                   "jobs": {
-                     "deploy-us": {
+                     "deploy": {
                         "elastic_profile_id": "example",
                         "tasks": [
                            {

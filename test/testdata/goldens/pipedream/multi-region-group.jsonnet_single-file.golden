@@ -18,7 +18,7 @@
             {
                "deploy": {
                   "jobs": {
-                     "deploy-s4s2": {
+                     "deploy": {
                         "elastic_profile_id": "example",
                         "tasks": [
                            {
