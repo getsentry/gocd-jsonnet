@@ -1,0 +1,264 @@
+{
+   "deploy-example-s4s2.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-s4s2": {
+            "display_order": 2,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "s4s2"
+            },
+            "group": "example",
+            "materials": {
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "diff": {
+                     "jobs": {
+                        "diff-s4s2": {
+                           "artifacts": [
+                              {
+                                 "build": {
+                                    "destination": "output",
+                                    "source": "result"
+                                 }
+                              }
+                           ],
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=s4s2"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "apply": {
+                     "jobs": {
+                        "apply-s4s2": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "fetch": {
+                                    "destination": "artifacts",
+                                    "job": "diff-s4s2",
+                                    "source": "output",
+                                    "stage": "diff"
+                                 }
+                              },
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=s4s2"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "fetch_materials": false,
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "deploy-example-st.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-st": {
+            "display_order": 3,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-4,customer-7"
+            },
+            "group": "example",
+            "materials": {
+               "deploy-example-s4s2-pipeline-complete": {
+                  "pipeline": "deploy-example-s4s2",
+                  "stage": "pipeline-complete"
+               },
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "diff": {
+                     "jobs": {
+                        "diff-customer-1": {
+                           "artifacts": [
+                              {
+                                 "build": {
+                                    "destination": "output",
+                                    "source": "result"
+                                 }
+                              }
+                           ],
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=customer-1"
+                              }
+                           ]
+                        },
+                        "diff-customer-2": {
+                           "artifacts": [
+                              {
+                                 "build": {
+                                    "destination": "output",
+                                    "source": "result"
+                                 }
+                              }
+                           ],
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=customer-2"
+                              }
+                           ]
+                        },
+                        "diff-customer-4": {
+                           "artifacts": [
+                              {
+                                 "build": {
+                                    "destination": "output",
+                                    "source": "result"
+                                 }
+                              }
+                           ],
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=customer-4"
+                              }
+                           ]
+                        },
+                        "diff-customer-7": {
+                           "artifacts": [
+                              {
+                                 "build": {
+                                    "destination": "output",
+                                    "source": "result"
+                                 }
+                              }
+                           ],
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=customer-7"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "apply": {
+                     "jobs": {
+                        "apply-customer-1": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "fetch": {
+                                    "destination": "artifacts",
+                                    "job": "diff-customer-1",
+                                    "source": "output",
+                                    "stage": "diff"
+                                 }
+                              },
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=customer-1"
+                              }
+                           ]
+                        },
+                        "apply-customer-2": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "fetch": {
+                                    "destination": "artifacts",
+                                    "job": "diff-customer-2",
+                                    "source": "output",
+                                    "stage": "diff"
+                                 }
+                              },
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=customer-2"
+                              }
+                           ]
+                        },
+                        "apply-customer-4": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "fetch": {
+                                    "destination": "artifacts",
+                                    "job": "diff-customer-4",
+                                    "source": "output",
+                                    "stage": "diff"
+                                 }
+                              },
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=customer-4"
+                              }
+                           ]
+                        },
+                        "apply-customer-7": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "fetch": {
+                                    "destination": "artifacts",
+                                    "job": "diff-customer-7",
+                                    "source": "output",
+                                    "stage": "diff"
+                                 }
+                              },
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=customer-7"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "fetch_materials": false,
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   }
+}
