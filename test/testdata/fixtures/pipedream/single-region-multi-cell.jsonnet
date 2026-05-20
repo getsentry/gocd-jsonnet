@@ -10,7 +10,7 @@ local pipedream = import '../../../../libs/pipedream.libsonnet';
 local pipedream_config = {
   name: 'example',
   auto_deploy: true,
-  exclude_regions: ['us', 's4s2', 'customer-1', 'customer-2', 'customer-4', 'customer-7'],
+  exclude_regions: ['us', 'us2', 's4s2', 'customer-1', 'customer-2', 'customer-4', 'customer-7'],
 };
 
 local cells_for(region) = {
