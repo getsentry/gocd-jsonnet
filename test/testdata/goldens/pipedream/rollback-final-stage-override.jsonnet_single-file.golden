@@ -98,14 +98,14 @@
          ]
       },
       "deploy-example-st": {
-         "display_order": 5,
+         "display_order": 6,
          "environment_variables": {
             "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-4,customer-7"
          },
          "group": "example",
          "materials": {
-            "deploy-example-us-pipeline-complete": {
-               "pipeline": "deploy-example-us",
+            "deploy-example-us2-pipeline-complete": {
+               "pipeline": "deploy-example-us2",
                "stage": "pipeline-complete"
             },
             "example_repo": {
@@ -221,12 +221,62 @@
             }
          ]
       },
+      "deploy-example-us2": {
+         "display_order": 5,
+         "environment_variables": {
+            "PIPEDREAM_GROUP_REGIONS": "us2"
+         },
+         "group": "example",
+         "materials": {
+            "deploy-example-us-pipeline-complete": {
+               "pipeline": "deploy-example-us",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git"
+            }
+         },
+         "stages": [
+            {
+               "deploy": {
+                  "jobs": {
+                     "deploy": {
+                        "elastic_profile_id": "example",
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=us2"
+                           }
+                        ]
+                     }
+                  }
+               }
+            },
+            {
+               "pipeline-complete": {
+                  "fetch_materials": false,
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
+      },
       "rollback-example": {
          "display_order": 1,
          "environment_variables": {
-            "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-st",
+            "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-us2 --pipeline=deploy-example-st",
             "GOCD_ACCESS_TOKEN": "{{SECRET:[devinfra][gocd_access_token]}}",
-            "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-st",
+            "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-us2 --pipeline=deploy-example-st",
             "ROLLBACK_MATERIAL_NAME": "example_repo",
             "ROLLBACK_STAGE": "deploy",
             "TRIGGERED_BY": ""
