@@ -84,14 +84,14 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-st": {
-            "display_order": 3,
+            "display_order": 4,
             "environment_variables": {
                "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-4,customer-7"
             },
             "group": "example",
             "materials": {
-               "deploy-example-s4s2-pipeline-complete": {
-                  "pipeline": "deploy-example-s4s2",
+               "deploy-example-us2-pipeline-complete": {
+                  "pipeline": "deploy-example-us2",
                   "stage": "pipeline-complete"
                },
                "example_repo": {
@@ -235,6 +235,91 @@
                               },
                               {
                                  "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=customer-7"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "fetch_materials": false,
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "deploy-example-us2.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-us2": {
+            "display_order": 3,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "us2"
+            },
+            "group": "example",
+            "materials": {
+               "deploy-example-s4s2-pipeline-complete": {
+                  "pipeline": "deploy-example-s4s2",
+                  "stage": "pipeline-complete"
+               },
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "diff": {
+                     "jobs": {
+                        "diff-us2": {
+                           "artifacts": [
+                              {
+                                 "build": {
+                                    "destination": "output",
+                                    "source": "result"
+                                 }
+                              }
+                           ],
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=us2"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "apply": {
+                     "jobs": {
+                        "apply-us2": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "fetch": {
+                                    "destination": "artifacts",
+                                    "job": "diff-us2",
+                                    "source": "output",
+                                    "stage": "diff"
+                                 }
+                              },
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=us2"
                               }
                            ]
                         }

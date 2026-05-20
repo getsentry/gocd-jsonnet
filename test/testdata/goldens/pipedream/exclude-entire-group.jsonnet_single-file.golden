@@ -146,6 +146,56 @@
                }
             }
          ]
+      },
+      "deploy-example-us2": {
+         "display_order": 5,
+         "environment_variables": {
+            "PIPEDREAM_GROUP_REGIONS": "us2"
+         },
+         "group": "example",
+         "materials": {
+            "deploy-example-us-pipeline-complete": {
+               "pipeline": "deploy-example-us",
+               "stage": "pipeline-complete"
+            },
+            "example_repo": {
+               "branch": "master",
+               "destination": "example",
+               "git": "git@github.com:getsentry/example.git"
+            }
+         },
+         "stages": [
+            {
+               "deploy": {
+                  "jobs": {
+                     "deploy": {
+                        "elastic_profile_id": "example",
+                        "tasks": [
+                           {
+                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=us2"
+                           }
+                        ]
+                     }
+                  }
+               }
+            },
+            {
+               "pipeline-complete": {
+                  "fetch_materials": false,
+                  "jobs": {
+                     "pipeline-complete": {
+                        "tasks": [
+                           {
+                              "exec": {
+                                 "command": true
+                              }
+                           }
+                        ]
+                     }
+                  }
+               }
+            }
+         ]
       }
    }
 }
