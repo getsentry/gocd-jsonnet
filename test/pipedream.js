@@ -159,8 +159,9 @@ test("rollback: final_pipeline anchors material on an earlier group", async (t) 
   const r = got.pipelines["rollback-example"];
   t.truthy(r);
   // Material watches the `us` group's final stage, not the default last group.
-  t.truthy(r.materials["deploy-example-us-deploy"]);
-  t.is(r.materials["deploy-example-us-deploy"].pipeline, "deploy-example-us");
+  t.truthy(r.materials["deploy-example-us-pipeline-complete"]);
+  t.is(r.materials["deploy-example-us-pipeline-complete"].pipeline, "deploy-example-us");
+  t.is(r.materials["deploy-example-us-pipeline-complete"].stage, "pipeline-complete");
   // Rollback still re-runs every region pipeline.
   t.truthy(r.environment_variables.REGION_PIPELINE_FLAGS.includes("deploy-example-st"));
 });
