@@ -169,6 +169,10 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
       region_pipeline_flags
     else
       region_pipeline_flags + ' --pipeline=' + trigger_pipeline.name;
+    local allow_missing_flags = if std.objectHas(pipedream_config.rollback, 'final_pipeline') then
+      '--allow-missing'
+    else
+      '';
 
     // If we ever change the final stage in pipedream (i.e. add or remove a
     // final stage) we may want the material for the rollback pipeline to look
@@ -197,6 +201,7 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
           ROLLBACK_STAGE: pipedream_config.rollback.stage,
           REGION_PIPELINE_FLAGS: region_pipeline_flags,
           ALL_PIPELINE_FLAGS: all_pipeline_flags,
+          ALLOW_MISSING_FLAGS: allow_missing_flags,
           TRIGGERED_BY: '',
         },
         materials: {

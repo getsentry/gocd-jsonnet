@@ -172,6 +172,7 @@ test("rollback: final_pipeline anchors material on an earlier group", async (t) 
   t.truthy(
     r.environment_variables.REGION_PIPELINE_FLAGS.includes("deploy-example-st"),
   );
+  t.is(r.environment_variables.ALLOW_MISSING_FLAGS, "--allow-missing");
 });
 
 test("rollback: unknown final_pipeline errors", (t) => {

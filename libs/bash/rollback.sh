@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Note: $REGION_PIPELINE_FLAGS has no quoting, for word expansion
+# Note: $ALLOW_MISSING_FLAGS and $REGION_PIPELINE_FLAGS have no quoting, for word expansion
 # shellcheck disable=SC2086
 if [[ "${REGION_PIPELINE_FLAGS:-}" ]]; then
-  set -- $REGION_PIPELINE_FLAGS
+  set -- $ALLOW_MISSING_FLAGS $REGION_PIPELINE_FLAGS
 fi
 
 # The user that triggered the rollback
