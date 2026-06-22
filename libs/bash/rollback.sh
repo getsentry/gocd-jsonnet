@@ -2,7 +2,7 @@
 
 # Note: $ALLOW_MISSING_FLAGS and $REGION_PIPELINE_FLAGS have no quoting, for word expansion
 # shellcheck disable=SC2086
-if [[ "${REGION_PIPELINE_FLAGS:-}" ]]; then
+if [[ "${REGION_PIPELINE_FLAGS:-}" || "${ALLOW_MISSING_FLAGS:-}" ]]; then
   set -- $ALLOW_MISSING_FLAGS $REGION_PIPELINE_FLAGS
 fi
 
