@@ -137,7 +137,22 @@ local pipedream_trigger_pipeline(pipedream_config) =
 local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_pipeline) =
   if std.objectHas(pipedream_config, 'rollback') then
     local name = pipedream_config.name;
-    local final_pipeline = service_pipelines[std.length(service_pipelines) - 1];
+    // The rollback material's "source of truth" pipeline. By default this is
+    // the last pipeline in the chain (the final group, e.g. `st`), so a SHA is
+    // only rollback-eligible once it has deployed all the way through. Set
+    // `rollback.final_pipeline` to a group name (e.g. 'us') to anchor rollback
+    // eligibility on an earlier group instead — useful when the tail group is
+    // flaky and would otherwise starve the rollback target pool. Note the
+    // trade-off: anchoring upstream means a rollback target may not have been
+    // validated on the downstream groups it then gets deployed to.
+    local final_pipeline =
+      if std.objectHas(pipedream_config.rollback, 'final_pipeline') then
+        local target = pipeline_name(name, pipedream_config.rollback.final_pipeline);
+        local matches = std.filter(function(p) p.name == target, service_pipelines);
+        assert std.length(matches) > 0 : "Rollback final_pipeline '" + target + "' not found in service pipelines";
+        matches[0]
+      else
+        service_pipelines[std.length(service_pipelines) - 1];
 
     // Rollbacks work by calling two devinfra-deployment-infra scripts:
     //    gocd-pause-and-cancel-pipelines
@@ -154,6 +169,10 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
       region_pipeline_flags
     else
       region_pipeline_flags + ' --pipeline=' + trigger_pipeline.name;
+    local allow_missing_flags = if std.objectHas(pipedream_config.rollback, 'final_pipeline') then
+      '--allow-missing'
+    else
+      '';
 
     // If we ever change the final stage in pipedream (i.e. add or remove a
     // final stage) we may want the material for the rollback pipeline to look
@@ -182,6 +201,7 @@ local pipedream_rollback_pipeline(pipedream_config, service_pipelines, trigger_p
           ROLLBACK_STAGE: pipedream_config.rollback.stage,
           REGION_PIPELINE_FLAGS: region_pipeline_flags,
           ALL_PIPELINE_FLAGS: all_pipeline_flags,
+          ALLOW_MISSING_FLAGS: allow_missing_flags,
           TRIGGERED_BY: '',
         },
         materials: {

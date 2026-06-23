@@ -149,6 +149,19 @@ local pipedream_config = {
     stage: 'example_stage',
     # The elastic agent profile to run the rollback pipeline as
     elastic_profile_id: 'example_profile',
+    # (Optional) The stage on the source-of-truth pipeline that the rollback
+    # material watches. Defaults to that pipeline's final stage
+    # (`pipeline-complete`). Set to an earlier stage (e.g. 'deploy-primary')
+    # so a SHA becomes rollback-eligible without waiting for the trailing
+    # noop stage.
+    # final_stage: 'deploy-primary',
+    # (Optional) Which group pipeline is the source of truth for rollback
+    # revisions. Defaults to the last group in the chain (e.g. `st`). Set to a
+    # group name (e.g. 'us') to anchor rollback eligibility on an earlier group
+    # when the tail group is flaky and would otherwise starve the rollback
+    # target pool. Trade-off: an upstream-anchored target may not have been
+    # validated on the downstream groups the rollback then deploys it to.
+    # final_pipeline: 'us',
   },
 
   # Set to true to auto-deploy changes (defaults to true)

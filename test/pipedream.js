@@ -150,6 +150,41 @@ test("rollback: invalid final stage errors", (t) => {
   );
 });
 
+test("rollback: final_pipeline anchors material on an earlier group", async (t) => {
+  const got = await render_fixture(
+    "pipedream/rollback-final-pipeline-override.jsonnet",
+    false,
+  );
+
+  const r = got.pipelines["rollback-example"];
+  t.truthy(r);
+  // Material watches the `us` group's final stage, not the default last group.
+  t.truthy(r.materials["deploy-example-us-pipeline-complete"]);
+  t.is(
+    r.materials["deploy-example-us-pipeline-complete"].pipeline,
+    "deploy-example-us",
+  );
+  t.is(
+    r.materials["deploy-example-us-pipeline-complete"].stage,
+    "pipeline-complete",
+  );
+  // Rollback still re-runs every region pipeline.
+  t.truthy(
+    r.environment_variables.REGION_PIPELINE_FLAGS.includes("deploy-example-st"),
+  );
+  t.is(r.environment_variables.ALLOW_MISSING_FLAGS, "--allow-missing");
+});
+
+test("rollback: unknown final_pipeline errors", (t) => {
+  const err = t.throws(() =>
+    get_fixture_content(
+      "pipedream/rollback-bad-final-pipeline.failing.jsonnet",
+      false,
+    ),
+  );
+  t.true(err.message.includes("not found in service pipelines"));
+});
+
 test("conflicting stage properties across regions errors", (t) => {
   const err = t.throws(() =>
     get_fixture_content(

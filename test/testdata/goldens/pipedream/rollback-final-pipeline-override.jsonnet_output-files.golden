@@ -300,7 +300,7 @@
          "rollback-example": {
             "display_order": 1,
             "environment_variables": {
-               "ALLOW_MISSING_FLAGS": "",
+               "ALLOW_MISSING_FLAGS": "--allow-missing",
                "ALL_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-us2 --pipeline=deploy-example-st",
                "GOCD_ACCESS_TOKEN": "{{SECRET:[devinfra][gocd_access_token]}}",
                "REGION_PIPELINE_FLAGS": "--pipeline=deploy-example-s4s2 --pipeline=deploy-example-de --pipeline=deploy-example-us --pipeline=deploy-example-us2 --pipeline=deploy-example-st",
@@ -311,9 +311,9 @@
             "group": "example",
             "lock_behavior": "unlockWhenFinished",
             "materials": {
-               "deploy-example-st-deploy": {
-                  "pipeline": "deploy-example-st",
-                  "stage": "deploy"
+               "deploy-example-us-pipeline-complete": {
+                  "pipeline": "deploy-example-us",
+                  "stage": "pipeline-complete"
                }
             },
             "stages": [
