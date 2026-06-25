@@ -1,12 +1,9 @@
 local pipedream = import '../../../../libs/pipedream.libsonnet';
 
-// Exercises the pattern used by ops/gocd/templates/pipelines/uptime-checker-k8s
-// and vector-uc-k8s, where pipeline_fn is called once per single-region group
-// (e.g. region='de') but expands internally to multiple cells (e.g.
-// 'de-west-de', 'de-west-nl'). Jobs are keyed by cell name, and downstream
-// stages fetch artifacts using those cell-keyed names. Without the
-// single-region skip, transform_stage would append the group region
-// (e.g. 'diff-de-west-nl-de') and break the cell-keyed fetch references.
+// Mirrors the uptime-checker-k8s / vector-uc-k8s shape: a single-region group
+// whose pipeline_fn fans out to multiple cell-keyed jobs that override
+// SENTRY_REGION per cell. Validates that pipedream skips both the suffix and
+// the gate for single-region groups.
 local pipedream_config = {
   name: 'example',
   auto_deploy: true,
@@ -32,6 +29,7 @@ local sample = {
           jobs: {
             ['diff-' + cell]: {
               elastic_profile_id: 'example',
+              environment_variables: { SENTRY_REGION: cell },
               tasks: [
                 { script: './diff.sh --cell=' + cell },
               ],
@@ -48,6 +46,7 @@ local sample = {
           jobs: {
             ['apply-' + cell]: {
               elastic_profile_id: 'example',
+              environment_variables: { SENTRY_REGION: cell },
               tasks: [
                 {
                   fetch: {

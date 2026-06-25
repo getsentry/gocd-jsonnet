@@ -30,7 +30,7 @@
                         "elastic_profile_id": "example",
                         "tasks": [
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=s4s2"
+                              "script": "./diff.sh --region=s4s2"
                            }
                         ]
                      }
@@ -52,7 +52,7 @@
                               }
                            },
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=s4s2"
+                              "script": "./apply.sh --region=s4s2"
                            }
                         ]
                      }
@@ -286,7 +286,7 @@
                         "elastic_profile_id": "example",
                         "tasks": [
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=us2"
+                              "script": "./diff.sh --region=us2"
                            }
                         ]
                      }
@@ -308,7 +308,7 @@
                               }
                            },
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=us2"
+                              "script": "./apply.sh --region=us2"
                            }
                         ]
                      }

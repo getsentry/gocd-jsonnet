@@ -28,9 +28,12 @@
                            }
                         ],
                         "elastic_profile_id": "example",
+                        "environment_variables": {
+                           "SENTRY_REGION": "de-west-de"
+                        },
                         "tasks": [
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --cell=de-west-de"
+                              "script": "./diff.sh --cell=de-west-de"
                            }
                         ]
                      },
@@ -44,9 +47,12 @@
                            }
                         ],
                         "elastic_profile_id": "example",
+                        "environment_variables": {
+                           "SENTRY_REGION": "de-west-nl"
+                        },
                         "tasks": [
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --cell=de-west-nl"
+                              "script": "./diff.sh --cell=de-west-nl"
                            }
                         ]
                      }
@@ -58,6 +64,9 @@
                   "jobs": {
                      "apply-de-west-de": {
                         "elastic_profile_id": "example",
+                        "environment_variables": {
+                           "SENTRY_REGION": "de-west-de"
+                        },
                         "tasks": [
                            {
                               "fetch": {
@@ -68,12 +77,15 @@
                               }
                            },
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --cell=de-west-de"
+                              "script": "./apply.sh --cell=de-west-de"
                            }
                         ]
                      },
                      "apply-de-west-nl": {
                         "elastic_profile_id": "example",
+                        "environment_variables": {
+                           "SENTRY_REGION": "de-west-nl"
+                        },
                         "tasks": [
                            {
                               "fetch": {
@@ -84,7 +96,7 @@
                               }
                            },
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --cell=de-west-nl"
+                              "script": "./apply.sh --cell=de-west-nl"
                            }
                         ]
                      }

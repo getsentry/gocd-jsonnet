@@ -26,7 +26,7 @@
                         "elastic_profile_id": "example",
                         "tasks": [
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=de"
+                              "script": "./deploy.sh --region=de"
                            }
                         ]
                      }
@@ -72,7 +72,7 @@
                         "elastic_profile_id": "example",
                         "tasks": [
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=s4s2"
+                              "script": "./deploy.sh --region=s4s2"
                            }
                         ]
                      }
@@ -188,7 +188,7 @@
                         "elastic_profile_id": "example",
                         "tasks": [
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=us"
+                              "script": "./deploy.sh --region=us"
                            }
                         ]
                      }
@@ -238,7 +238,7 @@
                         "elastic_profile_id": "example",
                         "tasks": [
                            {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=us2"
+                              "script": "./deploy.sh --region=us2"
                            }
                         ]
                      }
