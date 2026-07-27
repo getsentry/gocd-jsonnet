@@ -15,7 +15,7 @@
     control: ['control'],
     'prod-control': ['prod-control'],
     'snty-tools': ['snty-tools'],
-    st: ['customer-1', 'customer-2', 'customer-4', 'customer-7'],
+    st: ['customer-1', 'customer-2', 'customer-7'],
   },
   // Test groups will deploy in parallel to the groups above
   test_groups: {

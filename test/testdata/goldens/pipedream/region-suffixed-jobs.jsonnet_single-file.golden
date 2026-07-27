@@ -80,7 +80,7 @@
       "deploy-example-st": {
          "display_order": 4,
          "environment_variables": {
-            "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-4,customer-7"
+            "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-7"
          },
          "group": "example",
          "materials": {
@@ -127,22 +127,6 @@
                         "tasks": [
                            {
                               "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=customer-2"
-                           }
-                        ]
-                     },
-                     "diff-customer-4": {
-                        "artifacts": [
-                           {
-                              "build": {
-                                 "destination": "output",
-                                 "source": "result"
-                              }
-                           }
-                        ],
-                        "elastic_profile_id": "example",
-                        "tasks": [
-                           {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./diff.sh --region=customer-4"
                            }
                         ]
                      },
@@ -197,22 +181,6 @@
                            },
                            {
                               "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=customer-2"
-                           }
-                        ]
-                     },
-                     "apply-customer-4": {
-                        "elastic_profile_id": "example",
-                        "tasks": [
-                           {
-                              "fetch": {
-                                 "destination": "artifacts",
-                                 "job": "diff-customer-4",
-                                 "source": "output",
-                                 "stage": "diff"
-                              }
-                           },
-                           {
-                              "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./apply.sh --region=customer-4"
                            }
                         ]
                      },
