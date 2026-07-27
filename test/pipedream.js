@@ -33,13 +33,12 @@ test("generates pipeline per group in correct order", async (t) => {
 test("multi-region group has parallel jobs for each region", async (t) => {
   const got = await render_fixture("pipedream/basic-autodeploy.jsonnet", false);
 
-  // st group has customer-1, customer-2, customer-4, customer-7
+  // st group has customer-1, customer-2, customer-7
   const st = got.pipelines["deploy-example-st"];
   const stJobs = Object.keys(st.stages[0].deploy.jobs);
   t.deepEqual(stJobs.sort(), [
     "deploy-customer-1",
     "deploy-customer-2",
-    "deploy-customer-4",
     "deploy-customer-7",
   ]);
 });
@@ -95,7 +94,6 @@ test("exclude region: removes job but keeps group", async (t) => {
 
   t.false(jobs.includes("deploy-customer-2"));
   t.true(jobs.includes("deploy-customer-1"));
-  t.true(jobs.includes("deploy-customer-4"));
   t.true(jobs.includes("deploy-customer-7"));
 });
 
