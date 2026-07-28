@@ -6,6 +6,28 @@
       "de": [
          "de"
       ],
+      "edge": [
+         "edge"
+      ],
+      "edge-pop": [
+         "edge-pop-au",
+         "edge-pop-br",
+         "edge-pop-ca",
+         "edge-pop-de",
+         "edge-pop-fi",
+         "edge-pop-in",
+         "edge-pop-jp",
+         "edge-pop-nl",
+         "edge-pop-or",
+         "edge-pop-qa",
+         "edge-pop-sc",
+         "edge-pop-sg",
+         "edge-pop-tx",
+         "edge-pop-va"
+      ],
+      "edge-pop-canary": [
+         "edge-pop-rr"
+      ],
       "prod-control": [
          "prod-control"
       ],
@@ -35,6 +57,9 @@
       "control",
       "prod-control",
       "snty-tools",
+      "edge",
+      "edge-pop-canary",
+      "edge-pop",
       "st"
    ]
 }

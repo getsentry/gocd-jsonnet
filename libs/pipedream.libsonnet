@@ -53,8 +53,11 @@ local wrap_task(task) =
 local is_autodeploy(pipedream_config) =
   !std.objectHas(pipedream_config, 'auto_deploy') || pipedream_config.auto_deploy == true;
 
-// Regions that are excluded by default and must be explicitly included
-local default_excluded_regions = ['control', 'prod-control', 'snty-tools'];
+// Regions that are excluded by default and must be explicitly included.
+// The edge regions are listed here so that adding the `edge` pipeline group
+// does not hand every pipedream service a 16-job edge pipeline for manifests
+// it does not render. Opting in is per-service, via include_regions.
+local default_excluded_regions = ['control', 'prod-control', 'snty-tools'] + getsentry.edge_regions;
 
 local is_excluded_region = function(region, config)
   std.objectHas(config, 'exclude_regions') && std.length(std.find(region, config.exclude_regions)) > 0;
@@ -513,6 +516,11 @@ local pipeline_to_array(pipeline) =
   if pipeline == null then [] else [pipeline];
 
 {
+  // Exported so downstream renderers that reimplement the region filter (e.g.
+  // ops' render_with_pre_diff) can share this list instead of copying it and
+  // drifting out of sync.
+  default_excluded_regions:: default_excluded_regions,
+
   // render generates the trigger pipeline (if manual), group pipelines, and rollback pipeline.
   render(pipedream_config, pipeline_fn, parallel=false)::
     local groups_to_render = std.filter(
