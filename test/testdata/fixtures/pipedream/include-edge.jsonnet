@@ -1,13 +1,17 @@
 // The edge regions are default-excluded, so a service reaches them only by
-// naming them in include_regions. This fixture opts into `edge` itself plus two
-// PoP pseudo-regions, and should render a single `deploy-example-edge` pipeline
-// with one job per included region -- and no jobs for the 13 PoPs left out.
+// naming them in include_regions.
+//
+// This fixture opts into all 16 and should render three chained pipelines:
+// `edge` (the primary cluster, an ordinary single-region group), then
+// `edge-pop-canary` holding only pop-rr, then `edge-pop` holding the remaining
+// 14 as parallel jobs. The canary group deploys before the rest and gates them.
+local getsentry = import '../../../../libs/getsentry.libsonnet';
 local pipedream = import '../../../../libs/pipedream.libsonnet';
 
 local pipedream_config = {
   name: 'example',
   auto_deploy: true,
-  include_regions: ['edge', 'edge-pop-au', 'edge-pop-va'],
+  include_regions: getsentry.edge_regions,
 };
 
 local sample = {

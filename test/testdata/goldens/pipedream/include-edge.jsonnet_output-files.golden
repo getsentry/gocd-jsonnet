@@ -54,13 +54,227 @@
          }
       }
    },
+   "deploy-example-edge-pop-canary.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-edge-pop-canary": {
+            "display_order": 7,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "edge-pop-rr"
+            },
+            "group": "example",
+            "materials": {
+               "deploy-example-edge-pipeline-complete": {
+                  "pipeline": "deploy-example-edge",
+                  "stage": "pipeline-complete"
+               },
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-edge-pop-rr": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "./deploy.sh --region=edge-pop-rr"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "fetch_materials": false,
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
+   "deploy-example-edge-pop.yaml": {
+      "format_version": 10,
+      "pipelines": {
+         "deploy-example-edge-pop": {
+            "display_order": 8,
+            "environment_variables": {
+               "PIPEDREAM_GROUP_REGIONS": "edge-pop-au,edge-pop-br,edge-pop-ca,edge-pop-de,edge-pop-fi,edge-pop-in,edge-pop-jp,edge-pop-nl,edge-pop-or,edge-pop-qa,edge-pop-sc,edge-pop-sg,edge-pop-tx,edge-pop-va"
+            },
+            "group": "example",
+            "materials": {
+               "deploy-example-edge-pop-canary-pipeline-complete": {
+                  "pipeline": "deploy-example-edge-pop-canary",
+                  "stage": "pipeline-complete"
+               },
+               "example_repo": {
+                  "branch": "master",
+                  "destination": "example",
+                  "git": "git@github.com:getsentry/example.git"
+               }
+            },
+            "stages": [
+               {
+                  "deploy": {
+                     "jobs": {
+                        "deploy-edge-pop-au": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-au"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-br": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-br"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-ca": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-ca"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-de": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-de"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-fi": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-fi"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-in": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-in"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-jp": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-jp"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-nl": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-nl"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-or": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-or"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-qa": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-qa"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-sc": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-sc"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-sg": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-sg"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-tx": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-tx"
+                              }
+                           ]
+                        },
+                        "deploy-edge-pop-va": {
+                           "elastic_profile_id": "example",
+                           "tasks": [
+                              {
+                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-va"
+                              }
+                           ]
+                        }
+                     }
+                  }
+               },
+               {
+                  "pipeline-complete": {
+                     "fetch_materials": false,
+                     "jobs": {
+                        "pipeline-complete": {
+                           "tasks": [
+                              {
+                                 "exec": {
+                                    "command": true
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   },
    "deploy-example-edge.yaml": {
       "format_version": 10,
       "pipelines": {
          "deploy-example-edge": {
             "display_order": 6,
             "environment_variables": {
-               "PIPEDREAM_GROUP_REGIONS": "edge,edge-pop-au,edge-pop-va"
+               "PIPEDREAM_GROUP_REGIONS": "edge"
             },
             "group": "example",
             "materials": {
@@ -82,23 +296,7 @@
                            "elastic_profile_id": "example",
                            "tasks": [
                               {
-                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge"
-                              }
-                           ]
-                        },
-                        "deploy-edge-pop-au": {
-                           "elastic_profile_id": "example",
-                           "tasks": [
-                              {
-                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-au"
-                              }
-                           ]
-                        },
-                        "deploy-edge-pop-va": {
-                           "elastic_profile_id": "example",
-                           "tasks": [
-                              {
-                                 "script": "if [ -n \"${PIPEDREAM_GROUP_REGIONS:-}\" ] && [ -n \"${SENTRY_REGION:-}\" ]; then\n  case \",${PIPEDREAM_GROUP_REGIONS},\" in\n    *\",${SENTRY_REGION},\"*) ;;\n    *)\n      echo \"Skipping $SENTRY_REGION (not in PIPEDREAM_GROUP_REGIONS=$PIPEDREAM_GROUP_REGIONS)\"\n      exit 0\n      ;;\n  esac\nfi\n./deploy.sh --region=edge-pop-va"
+                                 "script": "./deploy.sh --region=edge"
                               }
                            ]
                         }
@@ -180,14 +378,14 @@
       "format_version": 10,
       "pipelines": {
          "deploy-example-st": {
-            "display_order": 7,
+            "display_order": 9,
             "environment_variables": {
                "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-7"
             },
             "group": "example",
             "materials": {
-               "deploy-example-edge-pipeline-complete": {
-                  "pipeline": "deploy-example-edge",
+               "deploy-example-edge-pop-pipeline-complete": {
+                  "pipeline": "deploy-example-edge-pop",
                   "stage": "pipeline-complete"
                },
                "example_repo": {
