@@ -12,11 +12,11 @@ local edge_region = 'edge';
 // the gate for them.
 local edge_pop_canary_regions = ['edge-pop-rr'];
 
-// The remaining PoPs. They share a group so they deploy as parallel jobs: there
-// is no meaningful order between them, and alphabetical order in particular
-// implies a sequencing that does not exist. Adding a PoP here needs no ordering
-// decision.
-local edge_pop_regions = [
+// The PoPs the canary gates. They share a group so they deploy as parallel jobs:
+// there is no meaningful order between them, and alphabetical order in
+// particular implies a sequencing that does not exist. Adding a PoP here needs
+// no ordering decision.
+local edge_pop_gated_regions = [
   'edge-pop-au',
   'edge-pop-br',
   'edge-pop-ca',
@@ -42,12 +42,17 @@ local edge_pop_regions = [
 // Kept as file-level locals rather than fields so that pipeline_groups does not
 // depend on `self` -- pipeline_groups gets copied into other objects, which
 // would rebind `self` and break the reference.
-local edge_all_pop_regions = edge_pop_canary_regions + edge_pop_regions;
-local edge_regions = [edge_region] + edge_all_pop_regions;
+local edge_pop_regions = edge_pop_canary_regions + edge_pop_gated_regions;
+local edge_regions = [edge_region] + edge_pop_regions;
 
 {
   edge_regions:: edge_regions,
-  edge_pop_regions:: edge_all_pop_regions,
+
+  // All 15 PoPs, canary included -- deliberately not the same set as the
+  // `edge-pop` group, which holds only the 14 the canary gates. A service that
+  // runs on the PoPs wants all 15 in its include_regions; pipedream then splits
+  // them across the canary and gated groups on its behalf.
+  edge_pop_regions:: edge_pop_regions,
 
   // The edge groups trail the SaaS regions: these are ingest-path clusters, so
   // they should only move after the regions they front are known good. Within
@@ -78,7 +83,7 @@ local edge_regions = [edge_region] + edge_all_pop_regions;
     'snty-tools': ['snty-tools'],
     edge: [edge_region],
     'edge-pop-canary': edge_pop_canary_regions,
-    'edge-pop': edge_pop_regions,
+    'edge-pop': edge_pop_gated_regions,
     st: ['customer-1', 'customer-2', 'customer-7'],
   },
   // Test groups will deploy in parallel to the groups above
