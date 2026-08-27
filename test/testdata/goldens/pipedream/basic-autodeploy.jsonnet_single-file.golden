@@ -98,14 +98,14 @@
          ]
       },
       "deploy-example-st": {
-         "display_order": 6,
+         "display_order": 5,
          "environment_variables": {
             "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-7"
          },
          "group": "example",
          "materials": {
-            "deploy-example-us2-pipeline-complete": {
-               "pipeline": "deploy-example-us2",
+            "deploy-example-us-pipeline-complete": {
+               "pipeline": "deploy-example-us",
                "stage": "pipeline-complete"
             },
             "example_repo": {
@@ -189,56 +189,6 @@
                         "tasks": [
                            {
                               "script": "./deploy.sh --region=us"
-                           }
-                        ]
-                     }
-                  }
-               }
-            },
-            {
-               "pipeline-complete": {
-                  "fetch_materials": false,
-                  "jobs": {
-                     "pipeline-complete": {
-                        "tasks": [
-                           {
-                              "exec": {
-                                 "command": true
-                              }
-                           }
-                        ]
-                     }
-                  }
-               }
-            }
-         ]
-      },
-      "deploy-example-us2": {
-         "display_order": 5,
-         "environment_variables": {
-            "PIPEDREAM_GROUP_REGIONS": "us2"
-         },
-         "group": "example",
-         "materials": {
-            "deploy-example-us-pipeline-complete": {
-               "pipeline": "deploy-example-us",
-               "stage": "pipeline-complete"
-            },
-            "example_repo": {
-               "branch": "master",
-               "destination": "example",
-               "git": "git@github.com:getsentry/example.git"
-            }
-         },
-         "stages": [
-            {
-               "deploy": {
-                  "jobs": {
-                     "deploy": {
-                        "elastic_profile_id": "example",
-                        "tasks": [
-                           {
-                              "script": "./deploy.sh --region=us2"
                            }
                         ]
                      }
