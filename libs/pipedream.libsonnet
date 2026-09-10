@@ -315,6 +315,25 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     true
   );
 
+  // Returns the env vars whose value is identical across every region.
+  local common_env_vars(per_region_envs) =
+    local first = per_region_envs[regions[0]];
+    {
+      [k]: first[k]
+      for k in std.objectFields(first)
+      if std.length(std.filter(
+        function(r) std.objectHas(per_region_envs[r], k) && per_region_envs[r][k] == first[k],
+        regions
+      )) == std.length(regions)
+    };
+
+  // Pipeline-level env vars shared by all regions stay at pipeline level so they
+  // show up in GoCD's "Trigger with options" dialog and can be overridden per run.
+  local common_pipeline_env = common_env_vars({
+    [region]: get_pipeline_env_vars(region_pipelines[region])
+    for region in regions
+  });
+
   // Collect all unique stages across all regions in the group.
   // If a region doesn't define a stage that another region has,
   // it simply contributes no jobs to that stage.
@@ -339,8 +358,8 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     if std.length(matching) > 0 then matching[0] else null;
 
   // Transforms a stage by aggregating jobs from all regions.
-  // Env vars identical across all regions are kept at stage level;
-  // region-specific env vars are cascaded down to the job level.
+  // Env vars identical across all regions are kept at stage level (unless already
+  // set at pipeline level); region-specific env vars are cascaded down to the job level.
   local transform_stage(stage) =
     local stage_name = get_stage_name(stage);
     local stage_props = get_stage_props(stage);
@@ -375,24 +394,23 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
       for region in regions
     };
 
-    // Env vars identical across ALL regions stay at stage level
-    local first_env = per_region_parent_envs[regions[0]];
+    // Env vars identical across ALL regions stay at stage level. Ones already at
+    // pipeline level with the same value are dropped so a trigger-time override isn't shadowed.
+    local stage_common_env = common_env_vars(per_region_parent_envs);
     local common_env = {
-      [k]: first_env[k]
-      for k in std.objectFields(first_env)
-      if std.length(std.filter(
-        function(r) std.objectHas(per_region_parent_envs[r], k) && per_region_parent_envs[r][k] == first_env[k],
-        regions
-      )) == std.length(regions)
+      [k]: stage_common_env[k]
+      for k in std.objectFields(stage_common_env)
+      if !(std.objectHas(common_pipeline_env, k) && common_pipeline_env[k] == stage_common_env[k])
     };
 
     local all_jobs = std.foldl(
       function(acc, region)
         local parent_env = per_region_parent_envs[region];
+        local inherited_env = common_pipeline_env + common_env;
         local region_specific_env = {
           [k]: parent_env[k]
           for k in std.objectFields(parent_env)
-          if !std.objectHas(common_env, k) || common_env[k] != parent_env[k]
+          if !std.objectHas(inherited_env, k) || inherited_env[k] != parent_env[k]
         };
         local p = region_pipelines[region];
         local region_stage = get_matching_stage(p, stage_name);
@@ -464,7 +482,7 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     for stage in all_stages
   ];
 
-  // Strip pipeline and stage level environment variables
+  // Strip pipeline-level environment variables; shared ones are re-added below.
   local filtered_template = {
     [k]: template_pipeline[k]
     for k in std.objectFields(template_pipeline)
@@ -477,7 +495,7 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
   filtered_template {
     group: service_name,
     display_order: display_order,
-    environment_variables: {
+    environment_variables: common_pipeline_env {
       PIPEDREAM_GROUP_REGIONS: std.join(',', regions),
     },
     stages: prepend_stages + transformed_stages + [

@@ -100,7 +100,7 @@ opt in.
 
 Environment variables set at the pipeline or stage level in `pipeline_fn` are
 handled automatically: variables identical across all regions in a group stay at
-the stage level, while region-specific variables are cascaded to the job level.
+their original level, while region-specific variables are cascaded to the job level.
 GoCD resolves precedence as job > stage > pipeline.
 
 ### Targeting a subset of regions

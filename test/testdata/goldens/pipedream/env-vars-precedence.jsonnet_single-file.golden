@@ -4,7 +4,11 @@
       "deploy-example-s4s2": {
          "display_order": 2,
          "environment_variables": {
-            "PIPEDREAM_GROUP_REGIONS": "s4s2"
+            "PIPEDREAM_GROUP_REGIONS": "s4s2",
+            "PIPELINE_SHARED_VAR": "from-pipeline",
+            "PIPELINE_VAR": "pipeline-s4s2",
+            "SHARED_VAR_JOB": "from-pipeline",
+            "SHARED_VAR_STAGE": "from-pipeline"
          },
          "group": "example",
          "materials": {
@@ -17,7 +21,6 @@
             {
                "deploy": {
                   "environment_variables": {
-                     "PIPELINE_VAR": "pipeline-s4s2",
                      "SHARED_VAR_JOB": "from-stage",
                      "SHARED_VAR_STAGE": "from-stage",
                      "STAGE_VAR": "stage-s4s2"
@@ -58,7 +61,10 @@
       "deploy-example-st": {
          "display_order": 3,
          "environment_variables": {
-            "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-7"
+            "PIPEDREAM_GROUP_REGIONS": "customer-1,customer-2,customer-7",
+            "PIPELINE_SHARED_VAR": "from-pipeline",
+            "SHARED_VAR_JOB": "from-pipeline",
+            "SHARED_VAR_STAGE": "from-pipeline"
          },
          "group": "example",
          "materials": {
