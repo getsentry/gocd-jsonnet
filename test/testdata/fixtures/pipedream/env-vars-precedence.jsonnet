@@ -13,6 +13,7 @@ local pipeline_fn(region) = {
   // Pipeline-level env vars
   environment_variables: {
     PIPELINE_VAR: 'pipeline-' + region,  // Should cascade down to becoming a job level var
+    PIPELINE_SHARED_VAR: 'from-pipeline',  // Identical across regions, stays at pipeline level
     SHARED_VAR_JOB: 'from-pipeline',  // Should be overwritten by stage, then job
     SHARED_VAR_STAGE: 'from-pipeline',  // Overridden by stage
   },
