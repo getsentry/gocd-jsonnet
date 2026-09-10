@@ -99,11 +99,9 @@ group (e.g. `deploy-example-s4s2`, `deploy-example-st`).
 opt in.
 
 Environment variables set at the pipeline or stage level in `pipeline_fn` are
-handled automatically: pipeline-level variables identical across all regions in
-a group stay at the pipeline level (so they can be overridden from GoCD's
-"Trigger with options" dialog), stage-level variables identical across all
-regions stay at the stage level, and region-specific variables are cascaded to
-the job level. GoCD resolves precedence as job > stage > pipeline.
+handled automatically: variables identical across all regions in a group stay at
+their original level, while region-specific variables are cascaded to the job level.
+GoCD resolves precedence as job > stage > pipeline.
 
 ### Targeting a subset of regions
 
