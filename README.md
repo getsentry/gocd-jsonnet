@@ -1,36 +1,34 @@
 # gocd-jsonnet
 
-Jsonnet libraries used to help structure GoCD pipelines for getsentry
+Jsonnet libraries that generate GoCD pipelines for getsentry services.
 
-## Dependencies
+## Install
 
-You'll need go-jsonnet, jsonnet-bundler and yq for using this in sentry.
+You need go-jsonnet, jsonnet-bundler, and yq to use these libraries in Sentry repos:
 
 ```sh
 brew install go-jsonnet jsonnet-bundler yq
 ```
 
-## Install
-
-You'll need [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler) to install these libraries:
+Install the libraries with [jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler).
+Replace `v3.0.10` with the latest tag from [the releases page](https://github.com/getsentry/gocd-jsonnet/releases):
 
 ```sh
 jb init
-jb install https://github.com/getsentry/gocd-jsonnet.git/libs@v2.15.0
+jb install https://github.com/getsentry/gocd-jsonnet.git/libs@v3.0.10
 ```
 
-## Build
+To upgrade, change the `version` in your `jsonnetfile.json`, then run `jb update`.
 
-When using this library, you'll need to build with the following external
-variable:
+## Render pipelines
 
-```bash
+`pipedream.render()` reads the external variable `output-files`, so you must pass it on every build:
+
+```sh
 --ext-code output-files=<true|false>
 ```
 
-This variable will change the output of pipedream library.
-
-When `output-files=true` it'll output pipelines in the format:
+With `output-files=true`, the output has one file per pipeline:
 
 ```json
 {
@@ -49,17 +47,14 @@ When `output-files=true` it'll output pipelines in the format:
 }
 ```
 
-This is useful when you build using the `-m` flag in jsonnet as it'll output
-multiple files which makes reviewing pipelines easier.
+Use it with the jsonnet `-m` flag to write one file per pipeline, which is easier to review:
 
-```bash
+```sh
 jsonnet --ext-code output-files=true -m ./generated-pipelines ./example.jsonnet
 ```
 
-The GoCD plugin that can process jsonnet files directly doesn't support
-outputting multiple files, so GoCD is configured to have
-`--ext-code output-files=false` which will output the pipelines in a flattened
-format:
+The GoCD jsonnet plugin cannot write multiple files.
+GoCD is configured with `--ext-code output-files=false`, which outputs all pipelines in one object:
 
 ```json
 {
@@ -73,65 +68,107 @@ format:
 
 ## `pipedream.libsonnet`
 
-This libraries main purpose is to generate a set of pipelines that constitute a
-pipedream.
+A pipedream is the deployment process for a Sentry service that deploys to multiple regions.
+`pipedream.render(config, pipeline_fn, parallel=false)` generates its pipelines.
+`pipeline_fn(region)` returns a GoCD pipeline definition for one region.
 
-"pipedream" is what we're calling the overall deployment process for a service
-at sentry, where that service is expected to be deployed to multiple regions.
+### Generated pipelines
 
-The entry point for this library is the `render()` function which takes some
-configuration and a callback function. The callback function is expected to
-return a pipeline definition for a given region.
+Regions are organized into groups in `libs/getsentry.libsonnet`.
+The groups deploy in this order: `s4s2`, `de`, `us`, `control`, `snty-tools`, `st`.
+`render()` generates these pipelines:
 
-Pipedream will name the returned pipeline, add an upstream pipeline material and
-a final stage. The upstream material and final stage is needed to make GoCD
-chain the pipelines together.
+- `deploy-<name>`: a trigger pipeline with one manual-approval stage. `render()` adds it only when `auto_deploy` is `false`.
+- `deploy-<name>-<group>`: one pipeline per group. Each region in the group runs as a parallel job.
+- `rollback-<name>`: generated only when you set `rollback`.
 
-Regions are organized into **groups** (defined in `getsentry.libsonnet`). Each
-group produces a single GoCD pipeline where regions within the group run as
-parallel jobs. Groups are chained sequentially by default, or can fan out in
-parallel via `pipedream.render(config, pipeline_fn, parallel=true)`.
+`render()` skips a group when all of its regions are excluded.
+Group pipelines run one after the other by default.
+With `parallel=true`, every group pipeline starts from the trigger pipeline instead.
 
-The end result is a trigger pipeline `deploy-<service name>` and a pipeline per
-group (e.g. `deploy-example-s4s2`, `deploy-example-st`).
+Each group pipeline ends with a `pipeline-complete` stage.
+The stage stops a rollback from re-triggering the downstream pipelines.
 
-`control` and `snty-tools` are excluded by default; use `include_regions` to
-opt in.
+### Configuration
 
-Environment variables set at the pipeline or stage level in `pipeline_fn` are
-handled automatically: variables identical across all regions in a group stay at
-their original level, while region-specific variables are cascaded to the job level.
-GoCD resolves precedence as job > stage > pipeline.
+| Key                         | Required | Description                                                                                                   |
+| --------------------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
+| `name`                      | Yes      | Service name, used in every pipeline name and as the GoCD pipeline group.                                     |
+| `materials`                 | No       | Materials for the trigger pipeline. Required when `auto_deploy` is `false`.                                   |
+| `auto_deploy`               | No       | Defaults to `true`. Set to `false` to add the `deploy-<name>` trigger pipeline.                               |
+| `auto_pipeline_progression` | No       | Defaults to `true`. Set to `false` to add `ready` and `wait` stages, so each group waits for manual approval. |
+| `exclude_regions`           | No       | Regions to leave out of the pipedream.                                                                        |
+| `include_regions`           | No       | Regions that are excluded by default to opt in to. `control` and `snty-tools` are excluded by default.        |
+| `rollback`                  | No       | Adds the `rollback-<name>` pipeline. See [Rollback](#rollback).                                               |
 
-### Targeting a subset of regions
+### Rules for `pipeline_fn`
 
-By default, triggering a group pipeline deploys to every region in the group.
-To deploy to a subset, override `PIPEDREAM_GROUP_REGIONS` on the Environment
-Variables tab in GoCD's "Trigger with options".
+`render()` fails the build when the pipelines from `pipeline_fn` break these rules within a group:
 
-For example, on `deploy-foo-st` whose default is
-`customer-1,customer-2,customer-4,customer-7`:
+- Each stage object has exactly one key. A missing comma between two stages merges them into one object.
+- Pipeline attributes other than `stages` and `environment_variables` are the same for every region.
+- Stage attributes other than `jobs` and `environment_variables` are the same for every region.
+
+In groups with more than one region, `render()` appends `-<region>` to each job name.
+It skips the suffix when the job name already ends with `-<region>`.
+
+### Environment variables
+
+You can set `environment_variables` at the pipeline, stage, or job level in `pipeline_fn`.
+A variable with the same value in every region of a group stays at its original level.
+`render()` moves a region-specific variable down to the job level.
+GoCD resolves precedence as job, then stage, then pipeline.
+
+### Deploy to a subset of regions
+
+Each group pipeline has a `PIPEDREAM_GROUP_REGIONS` variable that lists the group's regions.
+To deploy to a subset, override `PIPEDREAM_GROUP_REGIONS` on the Environment Variables tab of "Trigger with options" in GoCD.
+For example, `deploy-example-st` defaults to `customer-1,customer-2,customer-7`:
 
 | Override value          | Result                                |
 | ----------------------- | ------------------------------------- |
-| (no override)           | All four regions deploy               |
+| (no override)           | All three regions deploy              |
 | `customer-1`            | Only customer-1 deploys               |
 | `customer-1,customer-2` | Only customer-1 and customer-2 deploy |
 
-Setting a value that doesn't include any of the group's regions makes every
-job skip and the pipeline goes green having done nothing. If that happens,
-retrigger with a valid value.
+The override works only when these conditions hold:
 
-### Example Usage
+- The group has more than one region.
+- The job's tasks are `script` tasks.
+- The job sets `SENTRY_REGION` to its region. `render()` does not set `SENTRY_REGION` for you.
+
+If the override matches none of the group's regions, every job skips and the pipeline succeeds without deploying.
+Trigger the pipeline again with a valid value.
+
+### Rollback
+
+| Key                  | Required | Description                                                                                                     |
+| -------------------- | -------- | --------------------------------------------------------------------------------------------------------------- |
+| `material_name`      | Yes      | The material name that every region pipeline uses, for example `getsentry_repo`.                                |
+| `stage`              | Yes      | The deploy stage that the rollback re-runs.                                                                     |
+| `elastic_profile_id` | Yes      | The elastic agent profile that runs the rollback jobs.                                                          |
+| `final_pipeline`     | No       | The group whose pipeline decides which revisions you can roll back to. Defaults to the last group.              |
+| `final_stage`        | No       | The stage on that pipeline that the rollback material watches. Defaults to its last stage, `pipeline-complete`. |
+
+`render()` fails the build when `stage` or `final_stage` does not exist on the final pipeline, or when `final_pipeline` names no generated group.
+
+Set `final_stage` to an earlier stage, for example `deploy-primary`, so a revision becomes eligible before the trailing `pipeline-complete` stage runs.
+Set `final_pipeline` to an earlier group, for example `us`, when a flaky last group leaves few revisions to roll back to.
+A revision from an earlier group may not have deployed to the later groups that the rollback then deploys it to.
+
+The rollback pipeline has three stages:
+
+1. `pause_pipelines` waits for manual approval, then pauses and cancels every pipeline in the pipedream.
+1. `start_rollback` deploys the chosen revision by re-running `stage` on each group pipeline.
+1. `incident_resolved` waits for manual approval, then unpauses and unlocks the pipelines.
+
+### Example
 
 ```jsonnet
 local pipedream = import 'github.com/getsentry/gocd-jsonnet/libs/pipedream.libsonnet';
 
 local pipedream_config = {
-  # Name of your service
   name: 'example',
-
-  # The materials you'd like the pipelines to watch for changes
   materials: {
     init_repo: {
       git: 'git@github.com:getsentry/init.git',
@@ -140,44 +177,18 @@ local pipedream_config = {
       destination: 'init',
     },
   },
-
-  # To add a rollback pipeline, add the rollback parameter
   rollback: {
-    # The material name used in all pipelines (i.e. getsentry_repo)
     material_name: 'example_repo',
-    # The deployment stage that the rollback should run
     stage: 'example_stage',
-    # The elastic agent profile to run the rollback pipeline as
     elastic_profile_id: 'example_profile',
-    # (Optional) The stage on the source-of-truth pipeline that the rollback
-    # material watches. Defaults to that pipeline's final stage
-    # (`pipeline-complete`). Set to an earlier stage (e.g. 'deploy-primary')
-    # so a SHA becomes rollback-eligible without waiting for the trailing
-    # noop stage.
-    # final_stage: 'deploy-primary',
-    # (Optional) Which group pipeline is the source of truth for rollback
-    # revisions. Defaults to the last group in the chain (e.g. `st`). Set to a
-    # group name (e.g. 'us') to anchor rollback eligibility on an earlier group
-    # when the tail group is flaky and would otherwise starve the rollback
-    # target pool. Trade-off: an upstream-anchored target may not have been
-    # validated on the downstream groups the rollback then deploys it to.
-    # final_pipeline: 'us',
   },
-
-  # Set to true to auto-deploy changes (defaults to true)
   auto_deploy: false,
-  # Set to true if you want each pipeline to require manual approval
   auto_pipeline_progression: false,
-
-  # If there is ever a situation where you need to remove a region from
-  # a pipedream, add the region name to this array.
   exclude_regions: [],
 };
 
-# You'll need to define a jsonnet function that describes your pipeline
 local sample = {
   pipeline(region):: {
-    region: region,
     materials: {
       example_repo: {
         git: 'git@github.com:getsentry/example.git',
@@ -188,108 +199,64 @@ local sample = {
     },
     stages: [
       {
-        example_stage: {},
+        example_stage: {
+          jobs: {
+            deploy: {
+              elastic_profile_id: 'example_profile',
+              environment_variables: { SENTRY_REGION: region },
+              tasks: [
+                { script: './deploy.sh --region=' + region },
+              ],
+            },
+          },
+        },
       },
     ],
   },
 };
 
-# Then call pipedream.render() to generate the set of pipelines for
-# a getsentry "pipedream".
 pipedream.render(pipedream_config, sample.pipeline)
 ```
 
 ## `gocd-tasks.libsonnet`
 
-The tasks library is a simple helper to simplify common tasks:
-
-```
+```jsonnet
 local gocdtasks = import 'github.com/getsentry/gocd-jsonnet/libs/gocd-tasks.libsonnet';
 
-
 local tasks = [
-  # A noop task
+  // A task that does nothing. GoCD requires at least one task per job.
   gocdtasks.noop,
 
-  # A script task (i.e. { script: "echo ...." })
+  // A script task: { script: "echo 'hello world'" }
   gocdtasks.script("echo 'hello world'"),
-  # Import a file, escape comments and output a script task
-  gocdtasks.script(importstr "./bash/example.sh"),
+
+  // A script task from a file
+  gocdtasks.script(importstr './bash/example.sh'),
 ];
 ```
 
+`gocdtasks.script()` doubles a `#` at the start of each line, because GoCD treats a single `#` as a parameter reference.
+
 ## `gocd-stages.libsonnet`
 
-The stages library provides helper methods to define a stage.
+`gocdstages.basic(name, tasks, opts={})` returns a stage with one job.
+The stage and the job both use `name`.
 
-```
+```jsonnet
 local gocdstages = import 'github.com/getsentry/gocd-jsonnet/libs/gocd-stages.libsonnet';
+local gocdtasks = import 'github.com/getsentry/gocd-jsonnet/libs/gocd-tasks.libsonnet';
 
-# A single job stage, with a noop task
-gocdstages.basic('example-stage', [gocdtasks.noop])
-# A single job stage, with a noop task and manual approval
-gocdstages.basic('example-stage', [gocdtasks.noop], {approval: 'manual'})
-# A single job stage, with a noop task and allow only on success approval
-gocdstages.basic('example-stage', [gocdtasks.noop], {approval: 'success'})
+[
+  gocdstages.basic('example-stage', [gocdtasks.noop]),
+  // Waits for manual approval
+  gocdstages.basic('example-stage', [gocdtasks.noop], { approval: 'manual' }),
+  // Runs only when the previous stage succeeded
+  gocdstages.basic('example-stage', [gocdtasks.noop], { approval: 'success' }),
+  // Skips fetching materials
+  gocdstages.basic('example-stage', [gocdtasks.noop], { fetch_materials: false }),
+]
 ```
 
-## Development
+## Contributing
 
-Run formatting, lint and tests using make:
-
-```shell
-make
-```
-
-## Testing
-
-You can run this repos tests with:
-
-```shell
-make test
-```
-
-Most tests use fixtures and goldens to check functionality.
-
-Adding a jsonnet file to `test/testdata/fixtures/` will result in a new test
-case which will build the jsonnet file and create a "golden" in
-`test/testdata/goldens/`. (See the `get_fixtures()` method and how it's used to
-see how these tests are created).
-
-You can easily update the "golden" file by deleting it and re-running the test,
-it'll automatically create a golden.
-
-Some tests have the name `*.failing.jsonnet`. These tests are intended for
-jsonnet files that we expect to raise an error and will not be run
-automatically - you have to manually create a test case.
-
-If you want to test changes on GoCD, the best option is to create a pipedream
-pipeline for a dev environment. You can see
-[an example dev pipedream here](https://github.com/getsentry/dicd-mattgaunt-3-saas/blob/main/gocd/templates/example.jsonnet)
-, notice the version in the `jsonnetfile.json` is set to a branch in in this
-repo, for example
-[main is used in the previous example](https://github.com/getsentry/dicd-mattgaunt-3-saas/blob/4e408f20452ab4e93864b1d24c0a0d42c023c5e4/gocd/templates/jsonnetfile.json#L11).
-This makes it easy to iterate on changes on the gocd-jsonnet repo and updates
-are reflected on GoCD by refreshing the config repo (either waiting for GoCD
-poll or by manually refreshing in the UI).
-
-Lastly, to see what your changes do to a services pipeline, change the version
-in a services `jsonnetfile.json` to your branch name and run `make gocd`. This
-should generate the pipeline yaml locally which you can then look over.
-
-## Release Process
-
-Creating a new release typically looks like:
-
-1. Make the changes to the gocd-jsonnet (this repo)
-1. Create a release on GitHub when ready:
-   https://github.com/getsentry/gocd-jsonnet/releases
-
-To roll out your changes:
-
-1. Update the version in projects `jsonnetfile.json` (which is typically in
-   `gocd/templates/`, see
-   [example here](https://github.com/getsentry/snuba/blob/f4a99cb98a4784311fc198a14f7bcd8def961f94/gocd/templates/jsonnetfile.json#L11))
-1. Run `make gocd` to update the lock file and check the generated pipelines
-   (see
-   [example Makefile here](https://github.com/getsentry/snuba/blob/f4a99cb98a4784311fc198a14f7bcd8def961f94/Makefile#L97))
+See [AGENTS.md](AGENTS.md) for the build and test commands, and [docs/releasing.md](docs/releasing.md) to release a new version.
