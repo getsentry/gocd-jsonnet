@@ -57,7 +57,8 @@ local pipelines_to_files_object(pipelines) =
   };
 
 // This method takes an array of pipelines and produces an object that contains
-// the pipelines in format { <pipeline name>: <pipeline definition> }.
+// the pipelines in format
+// { format_version: 10, pipelines: { <pipeline name>: <pipeline definition> } }.
 // This is used to output all pipelines in a single file.
 local pipelines_to_object(pipelines) =
   {
