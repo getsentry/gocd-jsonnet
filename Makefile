@@ -6,6 +6,7 @@ fmt:
 
 lint:
 	./scripts/lint.sh
+	npm run lint
 .PHONY: lint
 
 test: fmt lint
