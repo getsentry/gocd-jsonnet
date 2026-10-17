@@ -489,9 +489,10 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
     if k != 'environment_variables'
   };
 
-  // Assemble final pipeline from template. PIPEDREAM_GROUP_REGIONS is set so
-  // the deploy_target_gate preamble (injected into each region-keyed script
-  // task) can validate a user-supplied DEPLOY_TARGET_REGION at runtime.
+  // Assemble final pipeline from template. PIPEDREAM_GROUP_REGIONS lists the
+  // group's regions. The deploy_target_gate preamble (injected into script
+  // tasks of multi-region groups) skips a job whose SENTRY_REGION is not in
+  // it, so an operator can override it at trigger time to deploy a subset.
   filtered_template {
     group: service_name,
     display_order: display_order,
