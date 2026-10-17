@@ -577,10 +577,10 @@ local pipeline_to_array(pipeline) =
          std.map(function(p) gocd_pipelines.chain_materials(p, trigger_pipeline), test_pipelines);
 
 
-    // If --ext-var=output-files=true we want to return:
-    //     {<file name>: <pipeline>, <file name>: <pipeline>},
+    // If --ext-code output-files=true we want to return:
+    //     { <file name>: { format_version: 10, pipelines: { <name>: <pipeline> } }, ... },
     // Otherwise we want to return:
-    //     { pipelines: [ <pipeline>, <pipeline> ] },
+    //     { format_version: 10, pipelines: { <name>: <pipeline>, <name>: <pipeline> } },
     // This toggle is useful for a few reasons:
     //     1. Multiple files (output-files=true) is helpful when reviewing
     //        the pipelines locally (i.e. you can quickly look up the customer-1
