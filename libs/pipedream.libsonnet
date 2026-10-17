@@ -12,9 +12,11 @@ Key concepts:
 - Regions within a group run as parallel jobs within a single pipeline
 - Groups are chained sequentially (or fan out in parallel mode)
 
-The entry point is `render(config, pipeline_fn)` where:
+The entry point is `render(config, pipeline_fn, parallel=false)` where:
 - config: Pipedream configuration (name, materials, rollback, etc.)
 - pipeline_fn(region): Callback that returns a pipeline definition for a region
+- parallel: If true, every group pipeline depends only on the trigger pipeline
+  (if any) instead of on the previous group
 
 Pipedream will:
 1. Generate one pipeline per group
