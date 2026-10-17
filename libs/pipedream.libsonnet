@@ -476,7 +476,6 @@ local generate_group_pipeline(pipedream_config, pipeline_fn, group, display_orde
   else
     [];
 
-  // Apply transform to all stages
   local transformed_stages = [
     transform_stage(stage)
     for stage in all_stages
