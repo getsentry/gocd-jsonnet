@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "node": true,
+    "browser": true,
+    "es2021": true
+  },
+  "rules": {
+    "no-case-declarations": "error",
+    "no-empty": "error",
+    "no-fallthrough": "error",
+    "no-inner-declarations": "error",
+    "no-prototype-builtins": "error",
+    "no-redeclare": "error",
+    "no-regex-spaces": "error",
+    "no-undef": "error",
+    "no-unexpected-multiline": "error",
+    "no-unused-vars": ["error", { "caughtErrors": "none" }],
+    "no-var": "error",
+    "no-eval": "error",
+    "default-case": "error"
+  }
+}

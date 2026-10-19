@@ -2,6 +2,20 @@
 
 See [AGENTS.md](../AGENTS.md) for the commands that run the tests.
 
+## Tooling
+
+Use Node.js 24.12 or newer on the 24.x line, matching CI.
+The other supported Node.js versions are listed in `package.json`.
+Run `npm ci` to install the locked dependencies.
+
+`npm test` runs the AVA tests and requires `jsonnet` on `PATH`.
+`make` also formats and lints Jsonnet with `jsonnetfmt` and `jsonnet-lint`.
+
+`npm run lint` runs Oxlint for JavaScript and Oxfmt for supported source,
+configuration, and documentation files. `npm run lint:fix` fixes lint issues
+and formatting. Oxfmt leaves Jsonnet formatting to `jsonnetfmt`, and golden
+files are explicitly excluded from formatting.
+
 ## Fixtures and goldens
 
 Each jsonnet file in `test/testdata/fixtures/<library>/` is a test case.
