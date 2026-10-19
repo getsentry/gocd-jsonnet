@@ -4,9 +4,10 @@ Jsonnet libraries in `libs/` that generate GoCD pipelines for getsentry services
 
 ## Commands
 
-- `npm install`: install the test and lint dependencies.
-- `make`: format with `jsonnetfmt`, lint with `jsonnet-lint`, and run the ava tests. Needs go-jsonnet on `PATH`.
-- `npm run lint`: eslint and prettier checks. CI runs it, `make` does not.
+- `npm ci`: install the locked test and lint dependencies (Node.js 24.x recommended; see `package.json` for supported versions).
+- `make`: format with `jsonnetfmt`, lint with `jsonnet-lint`, and run the Vitest tests. Needs go-jsonnet on `PATH`.
+- `npm run lint`: Oxlint and Oxfmt checks. CI runs it, `make` does not.
+- `npm run lint:fix`: apply Oxlint fixes and Oxfmt formatting.
 
 ## Invariants
 

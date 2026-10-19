@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises";
 import * as path from "path";
 import { execSync } from "node:child_process";
+import { expect } from "vitest";
 
 export function get_fixture_content(filename, outputfiles) {
   const buff = execSync(
@@ -13,7 +14,7 @@ export async function render_fixture(filename, outputfiles = false) {
   return JSON.parse(get_fixture_content(filename, outputfiles));
 }
 
-export async function assert_testdata(t, filename, outputfiles = true) {
+export async function assert_testdata(filename, outputfiles = true) {
   const got = get_fixture_content(filename, outputfiles);
 
   const suffix = [];
@@ -40,24 +41,24 @@ export async function assert_testdata(t, filename, outputfiles = true) {
   const want = wantBuff.toString();
 
   // Deep Equal with give more helpful diffs
-  t.deepEqual(JSON.parse(got), JSON.parse(want));
+  expect(JSON.parse(got)).toStrictEqual(JSON.parse(want));
   // We still want the golden to match exactly
-  t.is(got, want);
+  expect(got).toBe(want);
 }
 
-function check_gocd_structure(t, config) {
-  t.deepEqual(Object.keys(config), ["format_version", "pipelines"]);
+function check_gocd_structure(config) {
+  expect(Object.keys(config)).toStrictEqual(["format_version", "pipelines"]);
 }
 
-export async function assert_gocd_structure(t, filename, outputfiles) {
+export async function assert_gocd_structure(filename, outputfiles) {
   const got = await render_fixture(filename, outputfiles);
   if (outputfiles) {
     for (const fn of Object.keys(got)) {
       const config = got[fn];
-      check_gocd_structure(t, config);
+      check_gocd_structure(config);
     }
   } else {
-    check_gocd_structure(t, got);
+    check_gocd_structure(got);
   }
 }
 

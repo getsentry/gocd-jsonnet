@@ -1,11 +1,8 @@
-import test from "ava";
+import { test } from "vitest";
 import { assert_testdata, get_fixtures } from "./utils/testdata.js";
 
-(async () => {
-  const files = await get_fixtures("gocd-pipelines");
-  for (const f of files) {
-    test(`render ${f}`, async (t) => {
-      await assert_testdata(t, f);
-    });
-  }
-})();
+for (const filename of await get_fixtures("gocd-pipelines")) {
+  test(`render ${filename}`, async () => {
+    await assert_testdata(filename);
+  });
+}
