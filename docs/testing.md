@@ -4,11 +4,13 @@ See [AGENTS.md](../AGENTS.md) for the commands that run the tests.
 
 ## Tooling
 
-Use Node.js 24.12 or newer on the 24.x line, matching CI.
+Use Node.js 24.x, matching CI.
 The other supported Node.js versions are listed in `package.json`.
 Run `npm ci` to install the locked dependencies.
 
-`npm test` runs the AVA tests and requires `jsonnet` on `PATH`.
+`npm test` runs Vitest once and requires `jsonnet` on `PATH`.
+`vitest.config.js` includes `test/*.js`, excluding helpers and fixture data
+from test discovery. To watch tests while developing, run `npx vitest`.
 `make` also formats and lints Jsonnet with `jsonnetfmt` and `jsonnet-lint`.
 
 `npm run lint` runs Oxlint for JavaScript and Oxfmt for supported source,

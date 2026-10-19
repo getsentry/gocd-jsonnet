@@ -1,25 +1,18 @@
-import test from "ava";
+import { test } from "vitest";
 import {
   assert_testdata,
   assert_gocd_structure,
   get_fixtures,
 } from "./utils/testdata.js";
 
-/*
-Kept separate from the other pipedream tests since otherwise these tests
-do not get run. I am not sure why.
-*/
-(async () => {
-  const files = await get_fixtures("pipedream");
-  for (const f of files) {
-    test(`render ${f} as multiple files`, async (t) => {
-      await assert_testdata(t, f, true);
-      await assert_gocd_structure(t, f, true);
-    });
+for (const filename of await get_fixtures("pipedream")) {
+  test(`render ${filename} as multiple files`, async () => {
+    await assert_testdata(filename, true);
+    await assert_gocd_structure(filename, true);
+  });
 
-    test(`render ${f} as a single file`, async (t) => {
-      await assert_testdata(t, f, false);
-      await assert_gocd_structure(t, f, true);
-    });
-  }
-})();
+  test(`render ${filename} as a single file`, async () => {
+    await assert_testdata(filename, false);
+    await assert_gocd_structure(filename, false);
+  });
+}

@@ -3,24 +3,18 @@
   "description": "Jsonnet libraries to help with GoCD",
   "type": "module",
   "engines": {
-    "node": "^22.20.0 || ^24.12.0 || >=26.0.0"
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
   },
   "scripts": {
-    "test": "ava",
+    "test": "vitest run",
     "oxlint": "oxlint . --deny-warnings",
     "oxfmt": "oxfmt .",
     "lint": "npm run oxlint && npm run oxfmt -- --check",
     "lint:fix": "npm run oxlint -- --fix && npm run oxfmt -- --write"
   },
   "devDependencies": {
-    "ava": "^8.1.0",
     "oxfmt": "^0.74.0",
-    "oxlint": "^1.89.0"
-  },
-  "ava": {
-    "files": [
-      "test/**/*",
-      "!test/utils"
-    ]
+    "oxlint": "^1.89.0",
+    "vitest": "^5.0.5"
   }
 }
