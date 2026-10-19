@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["eslint"],
+  "plugins": ["eslint", "vitest"],
   "categories": {
     "correctness": "error"
   },
@@ -22,6 +22,16 @@
     "no-unused-vars": ["error", { "caughtErrors": "none" }],
     "no-var": "error",
     "no-eval": "error",
-    "default-case": "error"
+    "default-case": "error",
+    "vitest/expect-expect": [
+      "error",
+      {
+        "assertFunctionNames": [
+          "expect",
+          "assert_testdata",
+          "assert_gocd_structure"
+        ]
+      }
+    ]
   }
 }
