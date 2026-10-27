@@ -2,6 +2,27 @@
 
 See [AGENTS.md](../AGENTS.md) for the commands that run the tests.
 
+## Tooling
+
+Use Node.js 24.x, matching CI.
+The other supported Node.js versions are listed in `package.json`.
+Run `npm ci` to install the locked dependencies.
+
+`npm test` runs Vitest once and requires `jsonnet` on `PATH`.
+`vitest.config.js` includes `test/*.js`, excluding helpers and fixture data
+from test discovery. To watch tests while developing, run `npx vitest`.
+Changes under `libs/` or `test/testdata/` rerun the full suite in watch mode,
+including Jsonnet, embedded Bash scripts, fixtures, and goldens.
+Every test must execute at least one Vitest `expect` assertion.
+`make` also formats and lints Jsonnet with `jsonnetfmt` and `jsonnet-lint`.
+
+`npm run lint` runs Oxlint for JavaScript and Oxfmt for supported source,
+configuration, and documentation files. `npm run lint:fix` fixes lint issues
+and formatting. Oxfmt leaves Jsonnet formatting to `jsonnetfmt`, and golden
+files are explicitly excluded from formatting.
+Oxlint also checks Vitest tests and recognizes `assert_testdata` and
+`assert_gocd_structure` as assertion helpers.
+
 ## Fixtures and goldens
 
 Each jsonnet file in `test/testdata/fixtures/<library>/` is a test case.
